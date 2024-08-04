@@ -2,7 +2,10 @@ const sequelize = require('../config/database');
 const Category = require('./category');
 const Service = require('./service');
 const User = require('./User');
-const Role = require('./role')
+const Role = require('./role');
+const Shopping = require('./shopping');
+const absence = require('./absence');
+const programming = require('./programmingEmployee');
 
 
 
@@ -10,7 +13,10 @@ const models = {
     Category,
     Service,
     User,
-    Role
+    Role,
+    Shopping,
+    absence,
+    programming
 };
 
 const connectDb = async () => {

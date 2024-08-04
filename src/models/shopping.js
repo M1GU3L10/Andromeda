@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Supplier = require('./supplier'); // Asegúrate de ajustar la ruta al archivo del modelo de proveedor
+const Supplier = require('./suppliers'); // Asegúrate de ajustar la ruta al archivo del modelo de proveedor
 const { models } = require('.');
 
 const Shopping = sequelize.define('Shopping', {
@@ -44,12 +44,6 @@ const Shopping = sequelize.define('Shopping', {
     timestamps: true // Configura a true si deseas usar timestamps (createdAt, updatedAt)
 });
 
-Shopping.associate=(models)=>{
-Shopping.belongsTo(models.supplier, {
-    foreignKey: 'supplier_id',
-    as:'supplier'
-})
-}
 
 
 // Definir la relación con el modelo Supplier

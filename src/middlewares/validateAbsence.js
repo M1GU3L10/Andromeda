@@ -1,4 +1,5 @@
-const { body } = require('express-validator');
+const { body, validationResult } = require('express-validator');
+const User = require('../models/User'); 
 
 const validateAbsence = [
     body('date')
@@ -28,6 +29,20 @@ const validateAbsence = [
     body('status')
         .notEmpty().withMessage('El estado es requerido')
         .isIn(['A', 'I']).withMessage('El estado debe ser "A" (Activo) o "I" (Inactivo)'),
+
+    body('userId')
+        .notEmpty().withMessage('El ID de usuario es requerido')
+        .custom(async (value) => {
+            // Verificar si el usuario existe y tiene el rol adecuado
+            const user = await User.findByPk(value);
+            if (!user) {
+                throw new Error('El usuario no existe');
+            }
+            if (user.role !== 'barbero') {
+                throw new Error('El usuario debe tener el rol de "barbero" para crear una ausencia');
+            }
+            return true;
+        })
 ];
 
 module.exports = validateAbsence;
