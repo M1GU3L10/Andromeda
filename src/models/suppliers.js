@@ -1,5 +1,8 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Asegúrate de importar la instancia de sequelize correctamente
+const sequelize = require('../config/database');
+const Category = require('./category');
+const Product = require('./products'); // Asegúrate de ajustar la ruta al archivo del modelo de proveedor
+const { models } = require('.');
 
 const Supplier = sequelize.define('Supplier', {
     Supplier_Name: { // Nombre del proveedor
@@ -38,7 +41,7 @@ const Supplier = sequelize.define('Supplier', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Categories', // Nombre de la tabla a la que hace referencia
+            model: Category, // Nombre de la tabla a la que hace referencia
             key: 'id'            // Clave primaria en la tabla de categorías
         },
         onUpdate: 'CASCADE', // Opcional: Actualiza las referencias si se cambia la clave primaria en la tabla de categorías
@@ -48,7 +51,7 @@ const Supplier = sequelize.define('Supplier', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Products', // Nombre de la tabla a la que hace referencia
+            model: Product, // Nombre de la tabla a la que hace referencia
             key: 'id'         // Clave primaria en la tabla de productos
         },
         onUpdate: 'CASCADE', // Opcional: Actualiza las referencias si se cambia la clave primaria en la tabla de productos

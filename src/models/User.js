@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Role = require('./role'); // Asegúrate de ajustar la ruta al archivo del modelo de proveedor
+const Role = require('./role');
 const { models } = require('.');
 
 const User = sequelize.define('User', {
