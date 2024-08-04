@@ -1,13 +1,16 @@
 const sequelize = require('../config/database');
 const Category = require('./category');
-const Service = require('./service')
-const User = require('./UserModel')
+const Service = require('./service');
+const User = require('./User');
+const Role = require('./role')
+
 
 
 const models = {
     Category,
     Service,
-    User
+    User,
+    Role
 };
 
 const connectDb = async () => {

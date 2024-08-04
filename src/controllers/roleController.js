@@ -1,9 +1,9 @@
-const categoryService = require('../services/roleService');
+const roleService = require('../services/roleService');
 const { sendResponse, sendError } = require('../utils/response');
 
 const getAllRoles = async (req, res) => {
     try {
-        const roles = await categoryService.getAllRoles();
+        const roles = await roleService.getAllRoles();
         sendResponse(res, roles);
     } catch (error) {
         sendError(res, error);

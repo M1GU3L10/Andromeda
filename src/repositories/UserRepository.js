@@ -1,14 +1,34 @@
-// src/repositories/UserRepository.js
-const User = require('../models/UserModel');
+const { models } = require('../models');
 
-class UserRepository {
-    async getUserByUsername(username) {
-        return await User.findOne({ where: { username } });
-    }
+const getAllUsers = async () => {
+    return await models.User.findAll();
+};
 
-    async createUser(username, password) {
-        return await User.create({ username, password });
-    }
-}
+const getUserById = async (id) => {
+    return await models.User.findByPk(id);
+};
 
-module.exports = UserRepository;
+const createUser = async (data) => {
+    return await models.User.create(data);
+};
+
+const updateUser = async (id, data) => {
+    return await models.User.update(data, {
+        where: { id }
+    });
+};
+
+const deleteUser = async (id) => {
+    return await models.User.destroy({
+        where: { id }
+    });
+};
+
+module.exports = {
+    getAllUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser
+};
+
