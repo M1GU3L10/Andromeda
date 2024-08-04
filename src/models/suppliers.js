@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Asegúrate de importar la instancia de sequelize correctamente
+const sequelize = require('../config/database');
 
-const Category = sequelize.define('Category', {
+const Supplier = sequelize.define('Supplier', {
     name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -10,7 +10,11 @@ const Category = sequelize.define('Category', {
             notEmpty: true
         }
     },
-    description: {
+    contactInfo: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    address: {
         type: DataTypes.STRING,
         allowNull: true
     },
@@ -20,7 +24,7 @@ const Category = sequelize.define('Category', {
         defaultValue: 'A'
     }
 }, {
-    tableName: 'categories'
+    tableName: 'suppliers'
 });
 
-module.exports = Category;
+module.exports = Supplier;
