@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Supplier = sequelize.define('Supplier', {
-    Nombre_Proveedor: {
+    Supplier_Name: { // Nombre del proveedor
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
@@ -10,7 +10,7 @@ const Supplier = sequelize.define('Supplier', {
             notEmpty: true
         }
     },
-    Unidades: {
+    Units: { // Unidades suministradas
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
@@ -18,7 +18,7 @@ const Supplier = sequelize.define('Supplier', {
             min: 0
         }
     },
-    Precio_unitario: {
+    Unit_Price: { // Precio por unidad
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {
@@ -26,7 +26,7 @@ const Supplier = sequelize.define('Supplier', {
             min: 0
         }
     },
-    Precio_total: {
+    Total_Price: { // Precio total
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {
@@ -34,7 +34,7 @@ const Supplier = sequelize.define('Supplier', {
             min: 0
         }
     },
-    Id_categoria_producto: {
+    Category_Product_Id: { // Identificador de la categoría del producto
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
@@ -42,7 +42,7 @@ const Supplier = sequelize.define('Supplier', {
             key: 'id'            // Clave primaria en la tabla de categorías
         }
     },
-    Id_Producto: {
+    Product_Id: { // Identificador del producto suministrado
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {

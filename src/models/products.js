@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Asegúrate de importar la instancia de sequelize correctamente
+const sequelize = require('../config/database'); // Make sure to import the sequelize instance correctly
 
 const Product = sequelize.define('Product', {
-    Nombre_Producto: {
+    Product_Name: { // Nombre del producto
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
@@ -10,7 +10,7 @@ const Product = sequelize.define('Product', {
             notEmpty: true
         }
     },
-    Stock: {
+    Stock: { // Cantidad en inventario
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
@@ -18,7 +18,7 @@ const Product = sequelize.define('Product', {
             min: 0
         }
     },
-    Precio: {
+    Price: { // Precio del producto
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {
@@ -26,12 +26,12 @@ const Product = sequelize.define('Product', {
             min: 0
         }
     },
-    Id_categoria_producto: {
+    Category_Id: { // Identificador de la categoría del producto
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Categories', // Nombre de la tabla a la que hace referencia
-            key: 'id'            // Clave primaria en la tabla de categorías
+            model: 'Categories', // Name of the table it references
+            key: 'id'            // Primary key in the Categories table
         }
     }
 }, {

@@ -1,16 +1,16 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const sequelize = require('../config/database'); // Make sure to import the sequelize instance correctly
 
 const Order = sequelize.define('Order', {
-    Fecha_pedido: {
+    Order_Date: { // Fecha del pedido
         type: DataTypes.DATE,
         allowNull: false
     },
-    hora_registro: {
+    Order_Time: { // Hora de registro
         type: DataTypes.TIME,
         allowNull: false
     },
-    Montototal: {
+    Total_Amount: { // Monto total
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {
@@ -18,17 +18,17 @@ const Order = sequelize.define('Order', {
             min: 0
         }
     },
-    estado: {
+    Status: { // Estado del pedido
         type: DataTypes.ENUM('Pending', 'Shipped', 'Delivered', 'Cancelled'),
         allowNull: false,
         defaultValue: 'Pending'
     },
-    id_usuario: {
+    User_Id: { // Identificador del usuario
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Users', // Nombre de la tabla a la que hace referencia
-            key: 'id'      // Clave primaria en la tabla de usuarios
+            model: 'Users', // Name of the table it references
+            key: 'id'      // Primary key in the Users table
         }
     }
 }, {
