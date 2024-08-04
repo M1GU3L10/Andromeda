@@ -2,23 +2,15 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Order = sequelize.define('Order', {
-    orderNumber: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        validate: {
-            notEmpty: true
-        }
-    },
-    orderDate: {
+    Fecha_pedido: {
         type: DataTypes.DATE,
         allowNull: false
     },
-    customerName: {
-        type: DataTypes.STRING,
+    hora_registro: {
+        type: DataTypes.TIME,
         allowNull: false
     },
-    totalAmount: {
+    Montototal: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {
@@ -26,10 +18,18 @@ const Order = sequelize.define('Order', {
             min: 0
         }
     },
-    status: {
+    estado: {
         type: DataTypes.ENUM('Pending', 'Shipped', 'Delivered', 'Cancelled'),
         allowNull: false,
         defaultValue: 'Pending'
+    },
+    id_usuario: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'Users', // Nombre de la tabla a la que hace referencia
+            key: 'id'      // Clave primaria en la tabla de usuarios
+        }
     }
 }, {
     tableName: 'orders'
