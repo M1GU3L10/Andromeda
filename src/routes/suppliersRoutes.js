@@ -1,29 +1,13 @@
-const supplierRepository = require('../repositories/supplierRepository');
+const express = require('express');
+const supplierController = require('../controllers/supplierController');
+const validateSupplier = require('../middlewares/validateSupplier');
 
-const getAllSuppliers = async () => {
-    return await supplierRepository.getAllSuppliers();
-};
+const router = express.Router();
 
-const getSupplierById = async (id) => {
-    return await supplierRepository.getSupplierById(id);
-};
+router.get('/', supplierController.getAllSuppliers);
+router.get('/:id', supplierController.getSupplierById);
+router.post('/', validateSupplier, supplierController.createSupplier);
+router.put('/:id', validateSupplier, supplierController.updateSupplier);
+router.delete('/:id', supplierController.deleteSupplier);
 
-const createSupplier = async (data) => {
-    return await supplierRepository.createSupplier(data);
-};
-
-const updateSupplier = async (id, data) => {
-    return await supplierRepository.updateSupplier(id, data);
-};
-
-const deleteSupplier = async (id) => {
-    return await supplierRepository.deleteSupplier(id);
-};
-
-module.exports = {
-    getAllSuppliers,
-    getSupplierById,
-    createSupplier,
-    updateSupplier,
-    deleteSupplier
-};
+module.exports = router;
