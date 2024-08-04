@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Make sure to import the sequelize instance correctly
+const sequelize = require('../config/database'); // Asegúrate de importar la instancia de sequelize correctamente
 
 const Order = sequelize.define('Order', {
     Order_Date: { // Fecha del pedido
@@ -27,9 +27,11 @@ const Order = sequelize.define('Order', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Users', // Name of the table it references
-            key: 'id'      // Primary key in the Users table
-        }
+            model: 'Users', // Nombre de la tabla a la que hace referencia
+            key: 'id'      // Clave primaria en la tabla de usuarios
+        },
+        onUpdate: 'CASCADE', // Opcional: Actualiza las referencias si se cambia la clave primaria en la tabla de usuarios
+        onDelete: 'RESTRICT' // Opcional: Restringe la eliminación si hay pedidos asociados
     }
 }, {
     tableName: 'orders'
