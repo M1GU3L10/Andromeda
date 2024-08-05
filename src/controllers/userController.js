@@ -1,4 +1,5 @@
 const userService = require('../services/userService');
+const authService = require('../services/authService');
 const { sendResponse, sendError } = require('../utils/response');
 
 const getAllUsers = async (req, res) => {
@@ -55,10 +56,37 @@ const deleteUser = async (req, res) => {
     }
 };
 
+
+
+const register = async (req, res) => {
+  try {
+    const { name, email, password, phone, roleId } = req.body;
+    const user = await authService.register(name, email, password, phone, roleId);
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const { user, token } = await authService.login(email, password);
+    res.json({ user, token });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
+
+
 module.exports = {
     getAllUsers,
     getUserById,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    register,
+    login
 };

@@ -24,11 +24,22 @@ const deleteUser = async (id) => {
     });
 };
 
+
+
+
+const findUserByEmail = async (email) => {
+  return await User.findOne({ where: { email } });
+};
+
+
+
 module.exports = {
     getAllUsers,
     getUserById,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    createUser,
+    findUserByEmail
 };
 
