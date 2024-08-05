@@ -1,7 +1,7 @@
 const serviceRepository = require('../repositories/serviceRepository');
 
 const getAllServices = async () => {
-    return await serviceRepository.getAllServices;
+    return await serviceRepository.getAllServices();
 };
 
 const getServiceById = async (id) => {

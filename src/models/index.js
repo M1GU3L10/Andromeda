@@ -4,8 +4,8 @@ const Service = require('./service');
 const User = require('./User');
 const Role = require('./role');
 const Shopping = require('./shopping');
-const absence = require('./absence');
-const programming = require('./programmingEmployee');
+const Absence = require('./absence');
+const Programmingemployees = require('./programmingEmployee');
 
 
 
@@ -15,8 +15,8 @@ const models = {
     User,
     Role,
     Shopping,
-    absence,
-    programming
+    Absence,
+    Programmingemployees
 };
 
 const connectDb = async () => {

@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const User = require('./User'); // Asegúrate de ajustar la ruta al archivo del modelo de usuario
+const User = require('./User');
 
 const Absence = sequelize.define('Absence', {
     date: {
