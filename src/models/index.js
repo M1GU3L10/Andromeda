@@ -6,6 +6,7 @@ const Role = require('./role');
 const Permission = require('./permission');
 const PermissionRole = require('./permissionRole');
 const Shopping = require('./shopping');
+const ShoppingDetail = require('./shoppingDetail');
 const absence = require('./absence');
 const programming = require('./programmingEmployee');
 const appointment = require('./appointment');
@@ -34,7 +35,9 @@ const models = {
     supplier,
     Order,
     Permission,
-    PermissionRole
+    PermissionRole,
+    ShoppingDetail
+
 };
 
 const connectDb = async () => {

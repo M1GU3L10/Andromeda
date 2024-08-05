@@ -1,13 +1,13 @@
 const saleService = require('../services/saleService');
 
 const createSale = async (req, res) => {
-  try {
-    const sale = await saleService.createSale(req.body);
-    res.status(201).json(sale);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
+    try {
+      const sale = await saleService.createSale(req.body);
+      res.status(201).json(sale);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  };
 
 const getSaleById = async (req, res) => {
   try {
@@ -24,10 +24,10 @@ const getSaleById = async (req, res) => {
 
 const getAllSales = async (req, res) => {
     try {
-        const sale = await saleService.getSaleAll();
-        sendResponse(res, sale);
+        const sales = await saleService.getSaleAll();
+        res.status(200).json(sales);
     } catch (error) {
-        sendError(res, error);
+        res.status(500).json({ error: error.message });
     }
 };
 

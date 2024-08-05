@@ -1,4 +1,32 @@
 const { models } = require('../models');
+const Product = require('../models/products');
+
+const updateProductStock = async (saleDetails, transaction = null) => {
+    for (const detail of saleDetails) {
+        const product = await Product.findByPk(detail.id_producto, { transaction });
+        if (product) {
+            const newStock = product.Stock - detail.cantidad;
+            if (newStock < 0) {
+                throw new Error(`Stock insuficiente para el producto con ID ${product.id}`);
+            }
+            await product.update({ Stock: newStock }, { transaction });
+        }
+    }
+};
+
+const updateProductStockForPurchases = async (shoppingDetails, transaction = null) => {
+    for (const detail of shoppingDetails) {
+        const product = await Product.findByPk(detail.product_id, { transaction });
+        if (product) {
+            // Incrementar el stock
+            const newStock = product.Stock + detail.quantity;
+            await product.update({ Stock: newStock }, { transaction });
+        } else {
+            throw new Error(`Product with ID ${detail.product_id} not found.`);
+        }
+    }
+};
+
 
 const getAllProducts = async () => {
     return await models.Product.findAll();
@@ -29,5 +57,7 @@ module.exports = {
     getProductById,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    updateProductStock,
+    updateProductStockForPurchases
 };
