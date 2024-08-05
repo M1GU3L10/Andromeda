@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Supplier = require('./suppliers'); // Asegúrate de ajustar la ruta al archivo del modelo de proveedor
-const { models } = require('.');
+const Supplier = require('./suppliers');
 
 const Shopping = sequelize.define('Shopping', {
     code: {

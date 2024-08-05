@@ -4,6 +4,7 @@ const Service = require('./service');
 const User = require('./User');
 const Role = require('./role');
 const Shopping = require('./shopping');
+const ShoppingDetail = require('./shoppingDetail');
 const absence = require('./absence');
 const programming = require('./programmingEmployee');
 const appointment = require('./appointment');
@@ -31,7 +32,8 @@ const models = {
     Detail,
     Product,
     supplier,
-    Order
+    Order,
+    ShoppingDetail
 };
 
 const connectDb = async () => {
