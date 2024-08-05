@@ -4,7 +4,7 @@ const SaleDetail = require('../models/saleDetail');
 const createSale = async (saleData) => {
   const { saleDetails, ...sale } = saleData;
 
-  // Crear la venta
+  // Crear la venta y agrega el detalle de la venta
   const createdSale = await Sale.create(sale, { include: [SaleDetail] });
 
   // Crear los detalles de venta
@@ -23,7 +23,14 @@ const getSaleById = async (id) => {
   return await Sale.findByPk(id, { include: [SaleDetail] });
 };
 
+const getSaleAll = async () => {
+    return await Sale.findAll({
+      include: [SaleDetail]
+    });
+};  
+
 module.exports = {
   createSale,
   getSaleById,
+  getSaleAll
 };

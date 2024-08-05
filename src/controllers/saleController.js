@@ -22,7 +22,17 @@ const getSaleById = async (req, res) => {
   }
 };
 
+const getAllSales = async (req, res) => {
+    try {
+        const sale = await saleService.getSaleAll();
+        sendResponse(res, sale);
+    } catch (error) {
+        sendError(res, error);
+    }
+};
+
 module.exports = {
   createSale,
   getSaleById,
+  getAllSales
 };
