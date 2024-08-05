@@ -1,4 +1,4 @@
-const categoryService = require('../services/appointmentService');
+const  appointmentService = require('../services/appointmentService');
 const { sendResponse, sendError } = require('../utils/response');
 
 const getAllAppointment = async (req, res) => {

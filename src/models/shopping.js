@@ -4,11 +4,6 @@ const Supplier = require('./suppliers'); // Asegúrate de ajustar la ruta al arc
 const { models } = require('.');
 
 const Shopping = sequelize.define('Shopping', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey:true,
-        autoIncrement:true
-    },
     code: {
         type: DataTypes.STRING,
         allowNull: false,

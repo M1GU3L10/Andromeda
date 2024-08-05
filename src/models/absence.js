@@ -11,7 +11,7 @@ const Absence = sequelize.define('Absence', {
         type: DataTypes.TIME,
         allowNull: false
     },
-    date_absence: {
+    date: {
         type: DataTypes.DATEONLY,
         allowNull: false
     },    
