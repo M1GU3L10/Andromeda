@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const User = require('./User'); // Asegúrate de ajustar la ruta al archivo del modelo de usuario
 
-const Absence = sequelize.define('Absence', {
+const programming = sequelize.define('programming', {
     startTime: {
         type: DataTypes.TIME,
         allowNull: false,
@@ -33,12 +33,12 @@ const Absence = sequelize.define('Absence', {
         },
     }
 }, {
-    tableName: 'absences',
+    tableName: 'programming',
     timestamps: true // Configura a true si deseas usar timestamps (createdAt, updatedAt)
 });
 
 // Definir la relación con el modelo User
-Absence.belongsTo(User, { foreignKey: 'userId' });
-User.hasMany(Absence, { foreignKey: 'userId' });
+programming.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(programming, { foreignKey: 'userId' });
 
-module.exports = Absence;
+module.exports = programming;

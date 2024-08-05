@@ -1,9 +1,9 @@
-const Service = require('../services/serviceService');
+const benefitService = require('../services/benefitService');
 const { sendResponse, sendError } = require('../utils/response');
 
 const getAllServices = async (req, res) => {
     try {
-        const services = await Service.getAllServices();
+        const services = await benefitService.getAllServices();
         sendResponse(res, services);
     } catch (error) {
         sendError(res, error);
@@ -12,7 +12,7 @@ const getAllServices = async (req, res) => {
 
 const getServiceById = async (req, res) => {
     try {
-        const service = await Service.getServiceById(req.params.id);
+        const service = await benefitService.getServiceById(req.params.id);
         if (!service) {
             return sendError(res, 'Servicio no encontrado', 404);
         }
@@ -24,7 +24,7 @@ const getServiceById = async (req, res) => {
 
 const createService = async (req, res) => {
     try {
-        const service = await Service.createService(req.body);
+        const service = await benefitService.createService(req.body);
         sendResponse(res, service, 201);
     } catch (error) {
         sendError(res, error);
@@ -33,7 +33,7 @@ const createService = async (req, res) => {
 
 const updateService = async (req, res) => {
     try {
-        const updated = await Service.updateService(req.params.id, req.body);
+        const updated = await benefitService.updateService(req.params.id, req.body);
         if (updated[0] === 0) {
             return sendError(res, 'Servicio no encontrado', 404);
         }
@@ -45,7 +45,7 @@ const updateService = async (req, res) => {
 
 const deleteService = async (req, res) => {
     try {
-        const deleted = await Service.deleteService(req.params.id);
+        const deleted = await benefitService.deleteService(req.params.id);
         if (deleted === 0) {
             return sendError(res, 'Servicio no encontrado', 404);
         }

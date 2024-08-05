@@ -1,12 +1,8 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const User = require('./User'); // Asegúrate de ajustar la ruta al archivo del modelo de usuario
+const User = require('./User');
 
 const Absence = sequelize.define('Absence', {
-    date: {
-        type: DataTypes.DATE,
-        allowNull: false
-    },
     startTime: {
         type: DataTypes.TIME,
         allowNull: false
@@ -15,6 +11,10 @@ const Absence = sequelize.define('Absence', {
         type: DataTypes.TIME,
         allowNull: false
     },
+    date_absence: {
+        type: DataTypes.DATEONLY,
+        allowNull: false
+    },    
     description: {
         type: DataTypes.STRING,
         allowNull: true
