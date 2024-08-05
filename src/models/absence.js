@@ -11,10 +11,10 @@ const Absence = sequelize.define('Absence', {
         type: DataTypes.TIME,
         allowNull: false
     },
-    date: {
-        type: DataTypes.DATE,
+    date_absence: {
+        type: DataTypes.DATEONLY,
         allowNull: false
-    },
+    },    
     description: {
         type: DataTypes.STRING,
         allowNull: true

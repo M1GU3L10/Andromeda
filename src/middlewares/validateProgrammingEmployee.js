@@ -37,7 +37,7 @@ const validateAbsence = [
             if (!user) {
                 throw new Error('El usuario no existe');
             }
-            if (user.role !== 'barbero') {
+            if (user.roleId !== 'barbero') {
                 throw new Error('El usuario debe tener el rol de "barbero" para crear una programación');
             }
             return true;
