@@ -4,14 +4,13 @@ const Service = require('./service');
 const User = require('./User');
 const Role = require('./role');
 const Shopping = require('./shopping');
-
 const absence = require('./absence');
 const programming = require('./programmingEmployee');
 const appointment = require('./appointment');
-
 const Absence = require('./absence');
 const Programmingemployees = require('./programmingEmployee');
-
+const Sale = require('./sale');
+const Detail = require('./saleDetail');
 
 const models = {
     Category,
@@ -23,8 +22,9 @@ const models = {
     programming,
     appointment,
     Absence,
-    Programmingemployees
-
+    Programmingemployees,
+    Sale,
+    Detail
 };
 
 const connectDb = async () => {
