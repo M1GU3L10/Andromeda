@@ -31,17 +31,18 @@ const validateAbsence = [
         .isIn(['A', 'I']).withMessage('El estado debe ser "A" (Activo) o "I" (Inactivo)'),
 
         body('userId')
-        .notEmpty().withMessage('El ID de usuario es requerido')
-        .custom(async (value) => {
-            const user = await User.findByPk(value);
-            if (!user) {
-                throw new Error('El usuario no existe');
-            }
-            if (user.roleId !== 'barbero') {
-                throw new Error('El usuario debe tener el rol de "barbero" para crear una programación');
-            }
-            return true;
-        })
+    .notEmpty().withMessage('El ID de usuario es requerido')
+    .custom(async (value) => {
+        const user = await User.findByPk(value);
+        if (!user) {
+            throw new Error('El usuario no existe');
+        }
+        if (user.roleId !== 'barbero') {
+            throw new Error('El usuario debe tener el rol de "barbero" para crear una programación');
+        }
+        return true;
+    })
+
 
 ];
 
