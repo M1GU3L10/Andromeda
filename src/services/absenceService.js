@@ -1,7 +1,7 @@
 const absenceRepository = require('../repositories/absenceRepository');
 
 const getAllAbsences = async () => {
-    return await absenceRepository.getAllAbsencesetAllAbsences();
+    return await absenceRepository.getAllabsences();
 };
 
 const getAbsenceById = async (id) => {

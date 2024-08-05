@@ -3,16 +3,16 @@ const sequelize = require('../config/database');
 const User = require('./User');
 
 const Absence = sequelize.define('Absence', {
-    date: {
-        type: DataTypes.DATE,
-        allowNull: false
-    },
     startTime: {
         type: DataTypes.TIME,
         allowNull: false
     },
     endTime: {
         type: DataTypes.TIME,
+        allowNull: false
+    },
+    date: {
+        type: DataTypes.DATE,
         allowNull: false
     },
     description: {
