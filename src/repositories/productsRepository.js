@@ -1,4 +1,18 @@
 const { models } = require('../models');
+const Product = require('../models/products');
+
+const updateProductStock = async (saleDetails, transaction = null) => {
+    for (const detail of saleDetails) {
+        const product = await Product.findByPk(detail.id_producto, { transaction });
+        if (product) {
+            const newStock = product.Stock - detail.cantidad;
+            if (newStock < 0) {
+                throw new Error(`Stock insuficiente para el producto con ID ${product.id}`);
+            }
+            await product.update({ Stock: newStock }, { transaction });
+        }
+    }
+};
 
 const getAllProducts = async () => {
     return await models.Product.findAll();
@@ -29,5 +43,6 @@ module.exports = {
     getProductById,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    updateProductStock
 };
