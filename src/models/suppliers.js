@@ -1,11 +1,11 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Category = require('./category');
-const Product = require('./products'); // Asegúrate de ajustar la ruta al archivo del modelo de proveedor
+const Product = require('./products');
 const { models } = require('.');
 
 const Supplier = sequelize.define('Supplier', {
-    Supplier_Name: { // Nombre del proveedor
+    Supplier_Name: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
@@ -13,7 +13,7 @@ const Supplier = sequelize.define('Supplier', {
             notEmpty: true
         }
     },
-    Units: { // Unidades suministradas
+    Units: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
@@ -21,7 +21,7 @@ const Supplier = sequelize.define('Supplier', {
             min: 0
         }
     },
-    Unit_Price: { // Precio por unidad
+    Unit_Price: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {
@@ -29,7 +29,7 @@ const Supplier = sequelize.define('Supplier', {
             min: 0
         }
     },
-    Total_Price: { // Precio total
+    Total_Price: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {
@@ -37,25 +37,25 @@ const Supplier = sequelize.define('Supplier', {
             min: 0
         }
     },
-    Category_Product_Id: { // Identificador de la categoría del producto
+    Category_Product_Id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: Category, // Nombre de la tabla a la que hace referencia
-            key: 'id'            // Clave primaria en la tabla de categorías
+            model: Category,
+            key: 'id'
         },
-        onUpdate: 'CASCADE', // Opcional: Actualiza las referencias si se cambia la clave primaria en la tabla de categorías
-        onDelete: 'RESTRICT' // Opcional: Restringe la eliminación si hay proveedores asociados
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT'
     },
-    Product_Id: { // Identificador del producto suministrado
+    Product_Id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: Product, // Nombre de la tabla a la que hace referencia
-            key: 'id'         // Clave primaria en la tabla de productos
+            model: Product,
+            key: 'id'
         },
-        onUpdate: 'CASCADE', // Opcional: Actualiza las referencias si se cambia la clave primaria en la tabla de productos
-        onDelete: 'RESTRICT' // Opcional: Restringe la eliminación si hay proveedores asociados
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT'
     }
 }, {
     tableName: 'suppliers'

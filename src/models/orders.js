@@ -1,16 +1,16 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Asegúrate de importar la instancia de sequelize correctamente
+const sequelize = require('../config/database');
 
 const Order = sequelize.define('Order', {
-    Order_Date: { // Fecha del pedido
+    Order_Date: {
         type: DataTypes.DATE,
         allowNull: false
     },
-    Order_Time: { // Hora de registro
+    Order_Time: {
         type: DataTypes.TIME,
         allowNull: false
     },
-    Total_Amount: { // Monto total
+    Total_Amount: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {
@@ -18,20 +18,20 @@ const Order = sequelize.define('Order', {
             min: 0
         }
     },
-    Status: { // Estado del pedido
+    Status: {
         type: DataTypes.ENUM('Pending', 'Shipped', 'Delivered', 'Cancelled'),
         allowNull: false,
         defaultValue: 'Pending'
     },
-    User_Id: { // Identificador del usuario
+    User_Id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Users', // Nombre de la tabla a la que hace referencia
-            key: 'id'      // Clave primaria en la tabla de usuarios
+            model: 'Users',
+            key: 'id'
         },
-        onUpdate: 'CASCADE', // Opcional: Actualiza las referencias si se cambia la clave primaria en la tabla de usuarios
-        onDelete: 'RESTRICT' // Opcional: Restringe la eliminación si hay pedidos asociados
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT'
     }
 }, {
     tableName: 'orders'
