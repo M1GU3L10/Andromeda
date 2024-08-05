@@ -14,6 +14,20 @@ const updateProductStock = async (saleDetails, transaction = null) => {
     }
 };
 
+const updateProductStockForPurchases = async (shoppingDetails, transaction = null) => {
+    for (const detail of shoppingDetails) {
+        const product = await Product.findByPk(detail.product_id, { transaction });
+        if (product) {
+            // Incrementar el stock
+            const newStock = product.Stock + detail.quantity;
+            await product.update({ Stock: newStock }, { transaction });
+        } else {
+            throw new Error(`Product with ID ${detail.product_id} not found.`);
+        }
+    }
+};
+
+
 const getAllProducts = async () => {
     return await models.Product.findAll();
 };
@@ -44,5 +58,6 @@ module.exports = {
     createProduct,
     updateProduct,
     deleteProduct,
-    updateProductStock
+    updateProductStock,
+    updateProductStockForPurchases
 };
