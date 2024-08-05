@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -20,8 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.0",
     "promise-mysql": "^5.2.0",
-    "sequelize": "^6.37.3",
-    "sequelize-cli": "^6.6.2"
+    "sequelize": "^6.37.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.8",
@@ -29,7 +29,8 @@
     "@babel/node": "^7.25.0",
     "@babel/preset-env": "^7.25.3",
     "morgan": "^1.10.0",
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.4",
+    "sequelize-cli": "^6.6.2"
   },
   "description": ""
 }

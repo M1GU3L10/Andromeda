@@ -1,26 +1,38 @@
-// src/services/AuthService.js
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const UserRepository = require('../repositories/UserRepository');
+const { createUser, findUserByEmail } = require('../repositories/UserRepository');
+const { JWT_SECRET } = process.env;
 
-class AuthService {
-    constructor() {
-        this.userRepository = new UserRepository();
-    }
+const register = async (name, email, password, phone, roleId) => {
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await createUser({
+    name,
+    email,
+    password: hashedPassword,
+    phone,
+    roleId
+  });
+  return user;
+};
 
-    async registerUser(username, password) {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        return await this.userRepository.createUser(username, hashedPassword);
-    }
+const login = async (email, password) => {
+  console.log('Iniciando sesión para el email:', email); // Añadir log
+  const user = await findUserByEmail(email);
+  if (!user) {
+    console.log('Usuario no encontrado'); // Añadir log
+    throw new Error('Usuario no encontrado');
+  }
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    console.log('Contraseña inválida'); // Añadir log
+    throw new Error('Contraseña inválida');
+  }
+  const token = jwt.sign({ id: user.id, email: user.email, roleId: user.roleId }, JWT_SECRET, { expiresIn: '1h' });
+  console.log('Usuario autenticado:', user); // Añadir log
+  return { user, token };
+};
 
-    async authenticateUser(username, password) {
-        const user = await this.userRepository.getUserByUsername(username);
-        if (user && await bcrypt.compare(password, user.password)) {
-            const token = jwt.sign({ id: user.id }, 'your_jwt_secret_key');
-            return token;
-        }
-        return null;
-    }
-}
-
-module.exports = AuthService;
+module.exports = {
+  register,
+  login
+};
