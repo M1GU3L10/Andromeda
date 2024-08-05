@@ -6,8 +6,7 @@ const Role = require('./role');
 const Shopping = require('./shopping');
 const absence = require('./absence');
 const programming = require('./programmingEmployee');
-
-
+const appointmen = require('./appointment');
 
 const models = {
     Category,
@@ -16,7 +15,8 @@ const models = {
     Role,
     Shopping,
     absence,
-    programming
+    programming,
+    appointmen
 };
 
 const connectDb = async () => {

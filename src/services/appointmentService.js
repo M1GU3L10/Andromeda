@@ -1,7 +1,7 @@
 const appointmentRepository = require('../repositories/appointmentRepository');
 
 const getAllAppointment = async () => {
-    return await appointmentRepository.getAllAppointments();
+    return await appointmentRepository.getAllAppointment();
 };
 
 const getAppointmentById = async (id) => {

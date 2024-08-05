@@ -6,6 +6,9 @@ const categoryRoutes = require('./src/routes/categoryRoutes');
 const serviceRoutes = require('./src/routes/serviceRoutes');
 const absenceRoutes = require('./src/routes/absenceRoutes');
 const shoppingRoutes = require('./src/routes/shoppingRoutes');
+const appointmentRoutes = require('./src/routes/appointmentRoutes');
+const roleRoutes = require('./src/routes/roleRoutes');
+const userRoutes = require('./src/routes/userRoutes');
 const programmingEmployeeRoutes = require('./src/routes/programmingEmployeeRoutes');
 
 
@@ -20,6 +23,9 @@ app.use('/api/services', serviceRoutes);
 
 app.use('/api/absences', absenceRoutes);
 app.use('/api/shopping', shoppingRoutes);
+app.use('/api/appointment', appointmentRoutes);
+app.use('/api/role', roleRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/programming', programmingEmployeeRoutes);
 
 

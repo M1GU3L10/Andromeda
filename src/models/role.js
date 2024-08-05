@@ -4,19 +4,15 @@ const sequelize = require('../config/database'); // Asegúrate de importar la in
 const Role = sequelize.define('Role', {
     name: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        validate: {
-            notEmpty: true
-        }
+        allowNull: false
     },
     status: {
         type: DataTypes.ENUM('A', 'I'),
         allowNull: false,
         defaultValue: 'A'
-    }
+    },
 }, {
-    tableName: 'role'
+    tableName: 'roless'
 });
 
 module.exports = Role;

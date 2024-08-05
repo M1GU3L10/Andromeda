@@ -1,16 +1,17 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database'); // Asegúrate de importar la instancia de sequelize correctamente
+const User = require('./User'); // Asegúrate de ajustar la ruta al archivo del modelo de usuario
 
 const Appointment = sequelize.define('Appointment', {
-    Init_Time: { // Hora de registro
+    Init_Time: { // Hora de inicio
         type: DataTypes.TIME,
         allowNull: false
     },
-    Finish_Time: { // Hora de registro
+    Finish_Time: { // Hora de finalización
         type: DataTypes.TIME,
         allowNull: false
     },
-    Date: { // Fecha del pedido
+    Date: { // Fecha de la cita
         type: DataTypes.DATE,
         allowNull: false
     },
@@ -27,28 +28,24 @@ const Appointment = sequelize.define('Appointment', {
         allowNull: false,
         defaultValue: 'A'
     },
-    Client_Id: { // Identificador de la categoría del producto
+    clienteId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'users', // Nombre de la tabla a la que hace referencia
-            key: 'id'            // Clave primaria en la tabla de categorías
+            model: User,
+            key: 'id'
         },
-        onUpdate: 'CASCADE', // Opcional: Actualiza las referencias si se cambia la clave primaria en la tabla de categorías
-        onDelete: 'RESTRICT' // Opcional: Restringe la eliminación si hay clientes asociados
     },
-    Empleado_Id: { // Identificador de la categoría del producto
+    empleadoId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'users', // Nombre de la tabla a la que hace referencia
-            key: 'id'            // Clave primaria en la tabla de categorías
+            model: User,
+            key: 'id'
         },
-        onUpdate: 'CASCADE', // Opcional: Actualiza las referencias si se cambia la clave primaria en la tabla de categorías
-        onDelete: 'RESTRICT' // Opcional: Restringe la eliminación si hay empleados asociados
     }
 }, {
-    tableName: 'appointment'
+    tableName: 'appointments'
 });
 
 module.exports = Appointment;
