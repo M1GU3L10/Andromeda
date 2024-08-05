@@ -12,6 +12,7 @@ const programmingEmployeeRoutes = require('./src/routes/programmingEmployeeRoute
 
 
 
+
 dotenv.config();
 
 const app = express();
@@ -19,7 +20,6 @@ app.use(bodyParser.json());
 
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/roles', roleRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/absences', absenceRoutes);

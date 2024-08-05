@@ -9,6 +9,16 @@ const validateService= [
         }
         return true;
     }),
+    body('price')
+        .notEmpty().withMessage('El precio total es requerido')
+        .isFloat({ min: 0 }).withMessage('El precio total debe ser un número positivo')
+        .custom(value => {
+            if (/[^0-9.]/.test(value)) {
+                throw new Error('El precio total no debe contener letras');
+            }
+            return true;
+        }),
+
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
