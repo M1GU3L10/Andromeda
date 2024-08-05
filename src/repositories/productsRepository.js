@@ -5,7 +5,7 @@ const updateProductStock = async (saleDetails, transaction = null) => {
     for (const detail of saleDetails) {
         const product = await Product.findByPk(detail.id_producto, { transaction });
         if (product) {
-            const newStock = product.Stock - detail.cantidad;
+            const newStock = product.Stock - detail.quantity;
             if (newStock < 0) {
                 throw new Error(`Stock insuficiente para el producto con ID ${product.id}`);
             }

@@ -3,44 +3,40 @@ const sequelize = require('../config/database');
 const User = require('./User');
 
 const Sale = sequelize.define('Sale', {
-  numero_factura: {
-    type: DataTypes.STRING(100),
-    allowNull: false,
-    validate: {
-      is: /^[0-9]+$/,
+    Billnumber: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        validate: {
+            is: /^[0-9]+$/,
+        },
     },
-  },
-  fecha_venta: {
-    type: DataTypes.DATEONLY,
-    allowNull: false,
-  },
-  hora_registro: {
-    type: DataTypes.TIME,
-  },
-  montototal: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-    validate: {
-      min: 0,
+    SaleDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
     },
-  },
-  estado: {
-    type: DataTypes.CHAR(1),
-    allowNull: false,
-    defaultValue: 'P',
-    validate: {
-      isIn: [['P', 'C', 'S']],
+    registrationDate: {
+        type: DataTypes.TIME,
     },
-  },
-  id_usuario: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: User,
-      key: 'id',
+    total_price: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        validate: {
+            min: 0,
+        },
     },
-  },
+    status: {
+        type: DataTypes.ENUM('Completada', 'Cancelada'),
+        allowNull: false,
+    },
+    id_usuario: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: User,
+            key: 'id',
+        },
+    },
 }, {
-  tableName: 'sales',
+    tableName: 'sales',
 });
 
 Sale.belongsTo(User, { foreignKey: 'id_usuario' });

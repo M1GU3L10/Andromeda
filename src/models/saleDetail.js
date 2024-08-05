@@ -4,21 +4,21 @@ const Product = require('./products');
 const Sale = require('./sale');
 
 const SaleDetail = sequelize.define('SaleDetail', {
-  cantidad: {
+    quantity: {
     type: DataTypes.FLOAT,
     allowNull: false,
     validate: {
       min: 0,
     },
   },
-  precio_unitario: {
+  unitPrice: {
     type: DataTypes.INTEGER,
     allowNull: false,
     validate: {
       min: 0,
     },
   },
-  precio_total: {
+  total_price: {
     type: DataTypes.INTEGER,
     allowNull: false,
     validate: {
