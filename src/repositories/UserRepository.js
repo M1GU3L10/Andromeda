@@ -24,14 +24,9 @@ const deleteUser = async (id) => {
     });
 };
 
-
-
-
 const findUserByEmail = async (email) => {
-  return await User.findOne({ where: { email } });
+    return await models.User.findOne({ where: { email } });
 };
-
-
 
 module.exports = {
     getAllUsers,
@@ -39,7 +34,5 @@ module.exports = {
     createUser,
     updateUser,
     deleteUser,
-    createUser,
     findUserByEmail
 };
-
