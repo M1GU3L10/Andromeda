@@ -11,6 +11,10 @@ const Absence = require('./absence');
 const Programmingemployees = require('./programmingEmployee');
 const Sale = require('./sale');
 const Detail = require('./saleDetail');
+const Product = require('./products');
+const supplier = require('./suppliers');
+const Order = require('./orders');
+
 
 const models = {
     Category,
@@ -24,7 +28,10 @@ const models = {
     Absence,
     Programmingemployees,
     Sale,
-    Detail
+    Detail,
+    Product,
+    supplier,
+    Order
 };
 
 const connectDb = async () => {

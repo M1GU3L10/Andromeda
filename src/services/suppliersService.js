@@ -1,4 +1,4 @@
-const supplierRepository = require('../repositories/supplierRepository');
+const supplierRepository = require('../repositories/suppliersRepository');
 
 const getAllSuppliers = async () => {
     return await supplierRepository.getAllSuppliers();

@@ -1,4 +1,4 @@
-const SupplierService = require('../services/supplierService');
+const SupplierService = require('../services/suppliersService');
 const { sendResponse, sendError } = require('../utils/response');
 
 const getAllSuppliers = async (req, res) => {
