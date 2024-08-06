@@ -8,12 +8,12 @@ const getProductById = async (id) => {
     return await productRepository.getProductById(id);
 };
 
-const createProduct = async (data) => {
-    return await productRepository.createProduct(data);
-};
+const createProduct = async (productdata) => {
+    return await productRepository.createProduct(productdata);
 
-const updateProduct = async (id, data) => {
-    return await productRepository.updateProduct(id, data);
+};
+const updateProduct = async (id, productdata) => {
+    return await productRepository.updateProduct(id, productdata);
 };
 
 const deleteProduct = async (id) => {

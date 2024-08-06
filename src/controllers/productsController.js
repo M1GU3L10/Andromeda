@@ -1,5 +1,14 @@
-const productService = require('../services/products');
+const productService = require('../services/productsService');
 const { sendResponse, sendError } = require('../utils/response');
+
+const createProduct = async (req, res) => {
+    try {
+        const product = await productService.createProduct(req.body);
+        sendResponse(res, product, 201);
+    } catch (error) {
+        sendError(res, error);
+    }
+};
 
 const getAllProducts = async (req, res) => {
     try {
@@ -22,14 +31,7 @@ const getProductById = async (req, res) => {
     }
 };
 
-const createProduct = async (req, res) => {
-    try {
-        const product = await productService.createProduct(req.body);
-        sendResponse(res, product, 201);
-    } catch (error) {
-        sendError(res, error);
-    }
-};
+
 
 const updateProduct = async (req, res) => {
     try {

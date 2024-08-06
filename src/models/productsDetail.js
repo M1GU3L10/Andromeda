@@ -1,39 +1,33 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+const Product = require('./products');
 
-const Product = sequelize.define('Product', {
-  name: {
-    type: DataTypes.STRING,
+const DetailProduct = sequelize.define('DetailProducts', {
+  registrationTime: {
+    type: DataTypes.TIME,
     allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
   },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: true,
+  registrationDate: {
+    type: DataTypes.DATEONLY,
+    allowNull: false,
   },
-  price: {
+  subtotal: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
-    validate: {
-      isDecimal: true,
-      min: 0,
-    },
   },
-  stock_quantity: {
+  productId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    validate: {
-      min: 0,
+    references: {
+      model: Product,
+      key: 'id',
     },
   },
-  category: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
 }, {
-  tableName: 'products',
+  tableName: 'DetailProducts',
 });
 
-module.exports = Product;
+Product.hasMany(DetailProduct, { foreignKey: 'productId' });
+DetailProduct.belongsTo(Product, { foreignKey: 'productId' });
+
+module.exports = DetailProduct;

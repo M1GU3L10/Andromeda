@@ -1,5 +1,7 @@
 const { models } = require('../models');
 const Product = require('../models/products');
+const productDetail = require('../models/productsDetail');
+const { Transaction } = require('sequelize');
 
 const updateProductStock = async (saleDetails, transaction = null) => {
     for (const detail of saleDetails) {
@@ -18,7 +20,7 @@ const updateProductStockForPurchases = async (shoppingDetail, transaction = null
     for (const detail of shoppingDetail) {
         const product = await Product.findByPk(detail.product_id, { transaction });
         if (product) {
-            // Incrementa el stock sumando la cantidad comprada
+            // Incrementar el stock
             const newStock = product.Stock + detail.quantity;
             await product.update({ Stock: newStock }, { transaction });
         } else {
@@ -29,21 +31,88 @@ const updateProductStockForPurchases = async (shoppingDetail, transaction = null
 
 
 const getAllProducts = async () => {
-    return await models.Product.findAll();
+    return await Product.findAll({
+        include: [productDetail]
+    });
 };
 
 const getProductById = async (id) => {
-    return await models.Product.findByPk(id);
+    return await Product.findByPk(id, {include: [productDetail]});
 };
 
-const createProduct = async (data) => {
-    return await models.Product.create(data);
+const createProduct = async (productsData) => {
+    const { productsDetails, ...products } = productsData;
+
+    // Iniciar una transacción
+    const transaction = await sequelize.transaction();
+
+    try {
+        // Crear producto
+        const createdProduct = await Product.create(products, {
+            include: [productDetail],
+            transaction
+        });
+        console.log('Created products:', createdProduct);
+
+        if (productDetail && productsDetails.length > 0) {
+            // Crear los detalles de producto
+            const detailsWithProductId = productsDetails.map(detail => ({
+                ...detail,
+                product_id: createdProduct.id,
+            }));
+            await productDetail.bulkCreate(detailsWithProductId, { transaction });
+        }
+
+        // Confirmar la transacción
+        await transaction.commit();
+        console.log('Transaction committed.');
+
+        return createdProduct;
+        
+    } catch (error) {
+        // Revertir la transacción en caso de error
+        await transaction.rollback();
+        console.error('Transaction rolled back:', error);
+        throw error;
+    }
 };
 
-const updateProduct = async (id, data) => {
-    return await models.Product.update(data, {
-        where: { id }
-    });
+const updateProduct = async (id, productData) => {
+    const { productDetails, ...products } = productData;
+
+    // Iniciar una transacción
+    const transaction = await sequelize.transaction();
+
+    try {
+        await Product.update(products, {
+            where: { id },
+            transaction
+        });
+
+        await productDetail.destroy({
+            where: { product_id: id },
+            transaction
+        });
+
+        if (productDetails && productDetails.length > 0) {
+            const detailsWithProductId = productDetails.map(detail => ({
+                ...detail,
+                product_id: id,
+            }));
+            await productDetail.bulkCreate(detailsWithProductId, { transaction });
+        }
+
+        // Confirmar la transacción
+        await transaction.commit();
+        console.log('Transaction committed.');
+
+        return await getProductById(id);
+    } catch (error) {
+        // Revertir la transacción en caso de error
+        await transaction.rollback();
+        console.error('Transaction rolled back:', error);
+        throw error;
+    }
 };
 
 const deleteProduct = async (id) => {
