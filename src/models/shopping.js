@@ -6,23 +6,41 @@ const Shopping = sequelize.define('Shopping', {
     code: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
+        unique: true,
+        validate: {
+            notEmpty: true
+        }
     },
     purchaseDate: {
         type: DataTypes.DATEONLY,
         allowNull: false,
+        validate: {
+            notEmpty: true,
+            isDate: true
+        }
     },
     registrationDate: {
         type: DataTypes.DATEONLY,
         allowNull: false,
+        validate: {
+            notEmpty: true,
+            isDate: true
+        }
     },
     totalPrice: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: false
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+            isDecimal: true
+        }
     },
     status: {
         type: DataTypes.ENUM('pending', 'completed', 'canceled'),
         allowNull: false,
+        validate: {
+            isIn: [['pending', 'completed', 'canceled']]
+        }
     },
     supplierId: {
         type: DataTypes.INTEGER,
@@ -31,16 +49,15 @@ const Shopping = sequelize.define('Shopping', {
             model: Supplier,
             key: 'id'
         },
-       
+        validate: {
+            notEmpty: true
+        }
     }
 }, {
     tableName: 'shopping',
-    timestamps: true // Configura a true si deseas usar timestamps (createdAt, updatedAt)
+    timestamps: true
 });
 
-
-
-// Definir la relación con el modelo Supplier
 Shopping.belongsTo(Supplier, { foreignKey: 'supplierId' });
 Supplier.hasMany(Shopping, { foreignKey: 'supplierId' });
 

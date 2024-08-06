@@ -5,38 +5,58 @@ const User = require('./User');
 const Absence = sequelize.define('Absence', {
     startTime: {
         type: DataTypes.TIME,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            notEmpty: true, 
+        }
     },
     endTime: {
         type: DataTypes.TIME,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        }
     },
     date: {
         type: DataTypes.DATEONLY,
-        allowNull: false
-    },    
+        allowNull: false,
+        validate: {
+            notEmpty: true, 
+            isDate: true, 
+        }
+    },
     description: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: false,
+        validate: {
+            notEmpty: true, 
+            len: [1, 255] 
+        }
     },
     status: {
         type: DataTypes.ENUM('A', 'I'),
         allowNull: false,
-        defaultValue: 'A'
+        defaultValue: 'A',
+        validate: {
+            isIn: [['A', 'I']]
+        }
     },
     userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: User, // Esto debe ser el nombre del modelo de usuario
+            model: User,
             key: 'id'
+        },
+        validate: {
+            notEmpty: true 
         }
     }
 }, {
-    tableName: 'absences'
+    tableName: 'absences',
+    timestamps: false 
 });
 
-// Definir la relación con el modelo User
 Absence.belongsTo(User, { foreignKey: 'userId' });
 User.hasMany(Absence, { foreignKey: 'userId' });
 

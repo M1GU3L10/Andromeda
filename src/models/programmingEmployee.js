@@ -1,28 +1,37 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const User = require('./User'); // Asegúrate de ajustar la ruta al archivo del modelo de usuario
+const User = require('./User');
 
 const programming = sequelize.define('programming', {
     startTime: {
         type: DataTypes.TIME,
         allowNull: false,
-       
+        validate: {
+            notEmpty: true
+        }
     },
     endTime: {
         type: DataTypes.TIME,
         allowNull: false,
-       
+        validate: {
+            notEmpty: true
+        }
     },
     status: {
         type: DataTypes.ENUM('pending', 'approved', 'rejected'),
         allowNull: false,
         defaultValue: 'pending',
-       
+        validate: {
+            isIn: [['pending', 'approved', 'rejected']]
+        }
     },
     day: {
         type: DataTypes.DATEONLY,
         allowNull: false,
-        
+        validate: {
+            notEmpty: true,
+            isDate: true
+        }
     },
     userId: {
         type: DataTypes.INTEGER,
@@ -31,13 +40,15 @@ const programming = sequelize.define('programming', {
             model: User,
             key: 'id'
         },
+        validate: {
+            notEmpty: true
+        }
     }
 }, {
     tableName: 'programming',
-    timestamps: true // Configura a true si deseas usar timestamps (createdAt, updatedAt)
+    timestamps: true
 });
 
-// Definir la relación con el modelo User
 programming.belongsTo(User, { foreignKey: 'userId' });
 User.hasMany(programming, { foreignKey: 'userId' });
 

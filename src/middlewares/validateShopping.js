@@ -1,9 +1,17 @@
 const { body, validationResult } = require('express-validator');
+const { models } = require('../models');
 
 const validateShopping = [
     body('code')
         .notEmpty().withMessage('El código es requerido')
-        .isLength({ max: 50 }).withMessage('El código no puede exceder los 50 caracteres'),
+        .isLength({ max: 50 }).withMessage('El código no puede exceder los 50 caracteres')
+        .custom(async (value) => {
+            const shopping = await models.Shopping.findOne({ where: { code: value } });
+            if (shopping) {
+                throw new Error('El código de compra ya se encuentra registrado');
+            }
+            return true;
+        }),
 
     body('purchaseDate')
         .notEmpty().withMessage('La fecha de compra es requerida')
@@ -15,17 +23,14 @@ const validateShopping = [
 
     body('totalPrice')
         .notEmpty().withMessage('El precio total es requerido')
-        .isFloat({ min: 0 }).withMessage('El precio total debe ser un número positivo')
-        .custom(value => {
-            if (/[^0-9.]/.test(value)) {
-                throw new Error('El precio total no debe contener letras');
-            }
-            return true;
-        }),
+        .isFloat({ min: 0 }).withMessage('El precio total debe ser un número positivo'),
 
     body('status')
         .notEmpty().withMessage('El estado es requerido')
         .isIn(['pending', 'completed', 'canceled']).withMessage('El estado debe ser uno de los siguientes: pending, completed, canceled'),
+
+    body('supplierId')
+        .notEmpty().withMessage('El ID del proveedor es requerido')
 ];
 
 module.exports = validateShopping;
