@@ -1,64 +1,52 @@
-const  appointmentService = require('../services/appointmentService');
-const { sendResponse, sendError } = require('../utils/response');
+const appointmentService = require('../services/appointmentService');
 
-const getAllAppointment = async (req, res) => {
-    try {
-        const appointment = await appointmentService.getAllAppointment();
-        sendResponse(res, appointment);
-    } catch (error) {
-        sendError(res, error);
-    }
+const createAppointment = async (req, res) => {
+  try {
+    const appointment = await appointmentService.createAppointment(req.body);
+    res.status(201).json(appointment);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 const getAppointmentById = async (req, res) => {
-    try {
-        const appointment = await appointmentService.getAppointmentById(req.params.id);
-        if (!appointment) {
-            return sendError(res, 'Cita no encontrada', 404);
-        }
-        sendResponse(res, appointment);
-    } catch (error) {
-        sendError(res, error);
+  try {
+    const appointment = await appointmentService.getAppointmentById(req.params.id);
+    if (appointment) {
+      res.json(appointment);
+    } else {
+      res.status(404).json({ error: 'Appointment not found' });
     }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
-const createAppointment = async (req, res) => {
-    try {
-        const appointment= await appointmentService.createAppointment(req.body);
-        sendResponse(res, appointment, 201);
-    } catch (error) {
-        sendError(res, error);
-    }
+const getAllAppointments = async (req, res) => {
+  try {
+    const appointments = await appointmentService.getAppointmentAll();
+    res.json(appointments);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 const updateAppointment = async (req, res) => {
-    try {
-        const updated = await appointmentService.updateAppointment(req.params.id, req.body);
-        if (updated[0] === 0) {
-            return sendError(res, 'Cita no encontrada', 404);
-        }
-        sendResponse(res, 'Cita actualizada correctamente');
-    } catch (error) {
-        sendError(res, error);
+  try {
+    const appointment = await appointmentService.updateAppointment(req.params.id, req.body);
+    if (appointment) {
+      res.json(appointment);
+    } else {
+      res.status(404).json({ error: 'Appointment not found' });
     }
-};
-
-const deleteAppointment = async (req, res) => {
-    try {
-        const deleted = await appointmentService.deleteAppointment(req.params.id);
-        if (deleted === 0) {
-            return sendError(res, 'Cita no funciona', 404);
-        }
-        sendResponse(res, 'Cita eliminada correctamente');
-    } catch (error) {
-        sendError(res, error);
-    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 module.exports = {
-    getAllAppointment,
-    getAppointmentById,
-    createAppointment,
-    updateAppointment,
-    deleteAppointment
+  createAppointment,
+  getAppointmentById,
+  getAllAppointments,
+  updateAppointment
 };

@@ -1,30 +1,24 @@
 const appointmentRepository = require('../repositories/appointmentRepository');
 
-const getAllAppointment = async () => {
-    return await appointmentRepository.getAllAppointment();
+const createAppointment = async (appointmentData) => {
+  return await appointmentRepository.createAppointment(appointmentData);
 };
 
 const getAppointmentById = async (id) => {
-    return await appointmentRepository.getAppointmentById(id);
+  return await appointmentRepository.getAppointmentById(id);
 };
 
-const createAppointment = async (data) => {
-    return await appointmentRepository.createAppointment(data);
+const getAppointmentAll = async () => {
+  return await appointmentRepository.getAppointmentAll();
 };
 
-const updateAppointment = async (id, data) => {
-    return await appointmentRepository.updateAppointment(id, data);
-};
-
-const deleteAppointment = async (id) => {
-    return await appointmentRepository.deleteAppointment(id);
+const updateAppointment = async (id, appointmentData) => {
+  return await appointmentRepository.updateAppointment(id, appointmentData);
 };
 
 module.exports = {
-    getAllAppointment,
-    getAppointmentById,
-    createAppointment,
-    updateAppointment,
-    deleteAppointment
+  createAppointment,
+  getAppointmentById,
+  getAppointmentAll,
+  updateAppointment
 };
-
