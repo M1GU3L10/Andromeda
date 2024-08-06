@@ -18,7 +18,7 @@ const updateProductStockForPurchases = async (shoppingDetail, transaction = null
     for (const detail of shoppingDetail) {
         const product = await Product.findByPk(detail.product_id, { transaction });
         if (product) {
-            // Incrementar el stock
+            // Incrementa el stock sumando la cantidad comprada
             const newStock = product.Stock + detail.quantity;
             await product.update({ Stock: newStock }, { transaction });
         } else {

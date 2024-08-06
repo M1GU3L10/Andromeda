@@ -6,9 +6,6 @@ const Absence = sequelize.define('Absence', {
     startTime: {
         type: DataTypes.TIME,
         allowNull: false,
-        validate: {
-            notEmpty: true, 
-        }
     },
     endTime: {
         type: DataTypes.TIME,
@@ -20,26 +17,15 @@ const Absence = sequelize.define('Absence', {
     date: {
         type: DataTypes.DATEONLY,
         allowNull: false,
-        validate: {
-            notEmpty: true, 
-            isDate: true, 
-        }
     },
     description: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate: {
-            notEmpty: true, 
-            len: [1, 255] 
-        }
     },
     status: {
         type: DataTypes.ENUM('A', 'I'),
         allowNull: false,
         defaultValue: 'A',
-        validate: {
-            isIn: [['A', 'I']]
-        }
     },
     userId: {
         type: DataTypes.INTEGER,
@@ -48,9 +34,6 @@ const Absence = sequelize.define('Absence', {
             model: User,
             key: 'id'
         },
-        validate: {
-            notEmpty: true 
-        }
     }
 }, {
     tableName: 'absences',

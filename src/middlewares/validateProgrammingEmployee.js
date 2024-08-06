@@ -1,6 +1,5 @@
 const { body, validationResult } = require('express-validator');
 const { models } = require('../models');
-const User = require('../models/User');
 
 const validateProgramming = [
     body('startTime')
@@ -25,7 +24,7 @@ const validateProgramming = [
         .notEmpty().withMessage('El día es requerido')
         .isISO8601().withMessage('El día debe estar en formato YYYY-MM-DD'),
 
-        body('userId')
+    body('userId')
         .custom(async (id_usuario) => {
             const user = await models.User.findByPk(id_usuario);
             if (!user || user.roleId !== 2) {
@@ -33,6 +32,13 @@ const validateProgramming = [
             }
             return true;
         }),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
 ];
 
 module.exports = validateProgramming;

@@ -6,32 +6,19 @@ const programming = sequelize.define('programming', {
     startTime: {
         type: DataTypes.TIME,
         allowNull: false,
-        validate: {
-            notEmpty: true
-        }
     },
     endTime: {
         type: DataTypes.TIME,
         allowNull: false,
-        validate: {
-            notEmpty: true
-        }
     },
     status: {
         type: DataTypes.ENUM('pending', 'approved', 'rejected'),
         allowNull: false,
         defaultValue: 'pending',
-        validate: {
-            isIn: [['pending', 'approved', 'rejected']]
-        }
     },
     day: {
         type: DataTypes.DATEONLY,
         allowNull: false,
-        validate: {
-            notEmpty: true,
-            isDate: true
-        }
     },
     userId: {
         type: DataTypes.INTEGER,
@@ -40,9 +27,6 @@ const programming = sequelize.define('programming', {
             model: User,
             key: 'id'
         },
-        validate: {
-            notEmpty: true
-        }
     }
 }, {
     tableName: 'programming',
