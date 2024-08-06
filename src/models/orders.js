@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+const { Op } = require('sequelize');
 
 const Order = sequelize.define('Order', {
     Order_Date: {
@@ -32,9 +33,42 @@ const Order = sequelize.define('Order', {
         },
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
+    },
+    Order_Tokens: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+            min: 0
+        }
+    },
+    Token_Price: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+        validate: {
+            isDecimal: true,
+            min: 0
+        }
+    },
+    Token_Expiration: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: function() {
+            const today = new Date();
+            const randomDays = Math.floor(Math.random() * 3) + 1; // Número aleatorio entre 1 y 3
+            today.setDate(today.getDate() + randomDays);
+            return today;
+        }
     }
 }, {
-    tableName: 'orders'
+    tableName: 'orders',
+    defaultScope: {
+        where: {
+            Token_Expiration: {
+                [Op.gt]: new Date() // Sólo incluye órdenes con tokens que no hayan expirado
+            }
+        }
+    }
 });
 
 module.exports = Order;
