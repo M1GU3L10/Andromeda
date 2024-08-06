@@ -3,6 +3,8 @@ const Category = require('./category');
 const Service = require('./service');
 const User = require('./User');
 const Role = require('./role');
+const Permission = require('./permission');
+const PermissionRole = require('./permissionRole');
 const Shopping = require('./shopping');
 const ShoppingDetail = require('./shoppingDetail');
 const absence = require('./absence');
@@ -15,7 +17,6 @@ const Detail = require('./saleDetail');
 const Product = require('./products');
 const supplier = require('./suppliers');
 const Order = require('./orders');
-
 
 const models = {
     Category,
@@ -33,7 +34,10 @@ const models = {
     Product,
     supplier,
     Order,
+    Permission,
+    PermissionRole,
     ShoppingDetail
+
 };
 
 const connectDb = async () => {

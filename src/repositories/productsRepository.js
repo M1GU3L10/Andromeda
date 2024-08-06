@@ -14,8 +14,8 @@ const updateProductStock = async (saleDetails, transaction = null) => {
     }
 };
 
-const updateProductStockForPurchases = async (shoppingDetails, transaction = null) => {
-    for (const detail of shoppingDetails) {
+const updateProductStockForPurchases = async (shoppingDetail, transaction = null) => {
+    for (const detail of shoppingDetail) {
         const product = await Product.findByPk(detail.product_id, { transaction });
         if (product) {
             // Incrementar el stock

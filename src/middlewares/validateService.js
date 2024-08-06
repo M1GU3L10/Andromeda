@@ -18,6 +18,8 @@ const validateService = [
             }
             return true;
         }),
+    body('time')
+        .isInt({ min: 15, max: 120 }).withMessage('El tiempo debe estar entre 15 y 120 minutos'),
     body('status')
         .isIn(['A', 'I']).withMessage('El estado debe ser A (Activo) o I (Inactivo)'),
     (req, res, next) => {
