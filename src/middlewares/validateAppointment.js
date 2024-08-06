@@ -26,7 +26,7 @@ const validateAppointment = [
     body('clienteId').notEmpty().withMessage('El ID del cliente es requerido')
         .custom(async value => {
             const user = await models.User.findByPk(value);
-            if (!user) {
+            if (!user || user.roleId !== 3) {
                 throw new Error('El ID del cliente no es válido');
             }
             return true;
@@ -34,8 +34,8 @@ const validateAppointment = [
     body('empleadoId').notEmpty().withMessage('El ID del empleado es requerido')
         .custom(async value => {
             const user = await models.User.findByPk(value);
-            if (!user) {
-                throw new Error('El ID del empleado no es válido');
+            if (!user || user.roleId !== 2) {
+                throw new Error('El ID del barbero no es válido');
             }
             return true;
         }),

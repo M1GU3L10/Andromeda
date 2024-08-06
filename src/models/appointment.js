@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database'); // Asegúrate de importar la instancia de sequelize correctamente
 const User = require('./User'); // Asegúrate de ajustar la ruta al archivo del modelo de usuario
-const DetailAppointment = require('./detailAppointment'); // Importa el modelo de detalle de la cita
 const Service = require('./service'); // Importa el modelo de servicio (si es necesario)
 
 const Appointment = sequelize.define('Appointment', {
