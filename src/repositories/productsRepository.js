@@ -2,6 +2,7 @@ const { models } = require('../models');
 const Product = require('../models/products');
 const productDetail = require('../models/productsDetail');
 const { Transaction } = require('sequelize');
+const sequelize = require('../config/database');
 
 const updateProductStock = async (saleDetails, transaction = null) => {
     for (const detail of saleDetails) {
@@ -9,7 +10,7 @@ const updateProductStock = async (saleDetails, transaction = null) => {
         if (product) {
             const newStock = product.Stock - detail.quantity;
             if (newStock < 0) {
-                throw new Error(`Stock insuficiente para el producto con ID ${product.id}`);
+                throw new Error(`Stock insuficiente para el producto :${product.Product_Name}`);
             }
             await product.update({ Stock: newStock }, { transaction });
         }
@@ -37,7 +38,7 @@ const getAllProducts = async () => {
 };
 
 const getProductById = async (id) => {
-    return await Product.findByPk(id, {include: [productDetail]});
+    return await Product.findByPk(id, { include: [productDetail] });
 };
 
 const createProduct = async (productsData) => {
@@ -54,7 +55,7 @@ const createProduct = async (productsData) => {
         });
         console.log('Created products:', createdProduct);
 
-        if (productDetail && productsDetails.length > 0) {
+        if (productDetail && productDetail.length > 0) {
             // Crear los detalles de producto
             const detailsWithProductId = productsDetails.map(detail => ({
                 ...detail,
@@ -68,7 +69,7 @@ const createProduct = async (productsData) => {
         console.log('Transaction committed.');
 
         return createdProduct;
-        
+
     } catch (error) {
         // Revertir la transacción en caso de error
         await transaction.rollback();

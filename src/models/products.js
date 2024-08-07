@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Asegúrate de importar la instancia de sequelize correctamente
+const sequelize = require('../config/database');
+const Category = require('./category');
 
 const Product = sequelize.define('Product', {
     Product_Name: {
@@ -30,7 +31,7 @@ const Product = sequelize.define('Product', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Categories', // Nombre de la tabla a la que hace referencia
+            model: Category, // Nombre de la tabla a la que hace referencia
             key: 'id'
         },
         onUpdate: 'CASCADE',

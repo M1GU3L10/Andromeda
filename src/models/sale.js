@@ -6,9 +6,6 @@ const Sale = sequelize.define('Sale', {
     Billnumber: {
         type: DataTypes.STRING(100),
         allowNull: false,
-        validate: {
-            is: /^[0-9]+$/,
-        },
     },
     SaleDate: {
         type: DataTypes.DATEONLY,
@@ -20,9 +17,6 @@ const Sale = sequelize.define('Sale', {
     total_price: {
         type: DataTypes.FLOAT,
         allowNull: false,
-        validate: {
-            min: 0,
-        },
     },
     status: {
         type: DataTypes.ENUM('Completada', 'Cancelada'),
