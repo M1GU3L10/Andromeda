@@ -1,6 +1,5 @@
 const { models } = require('../models');
 const Product = require('../models/products');
-const productDetail = require('../models/productsDetail');
 const { Transaction } = require('sequelize');
 
 const updateProductStock = async (saleDetails, transaction = null) => {
@@ -31,88 +30,21 @@ const updateProductStockForPurchases = async (shoppingDetail, transaction = null
 
 
 const getAllProducts = async () => {
-    return await Product.findAll({
-        include: [productDetail]
-    });
+    return await models.Product.findAll();
 };
 
 const getProductById = async (id) => {
-    return await Product.findByPk(id, {include: [productDetail]});
+    return await models.Product.findByPk(id);
 };
 
-const createProduct = async (productsData) => {
-    const { productsDetails, ...products } = productsData;
-
-    // Iniciar una transacción
-    const transaction = await sequelize.transaction();
-
-    try {
-        // Crear producto
-        const createdProduct = await Product.create(products, {
-            include: [productDetail],
-            transaction
-        });
-        console.log('Created products:', createdProduct);
-
-        if (productDetail && productsDetails.length > 0) {
-            // Crear los detalles de producto
-            const detailsWithProductId = productsDetails.map(detail => ({
-                ...detail,
-                product_id: createdProduct.id,
-            }));
-            await productDetail.bulkCreate(detailsWithProductId, { transaction });
-        }
-
-        // Confirmar la transacción
-        await transaction.commit();
-        console.log('Transaction committed.');
-
-        return createdProduct;
-        
-    } catch (error) {
-        // Revertir la transacción en caso de error
-        await transaction.rollback();
-        console.error('Transaction rolled back:', error);
-        throw error;
-    }
+const createProduct = async (data) => {
+    return await models.Product.create(data);
 };
 
-const updateProduct = async (id, productData) => {
-    const { productDetails, ...products } = productData;
-
-    // Iniciar una transacción
-    const transaction = await sequelize.transaction();
-
-    try {
-        await Product.update(products, {
-            where: { id },
-            transaction
-        });
-
-        await productDetail.destroy({
-            where: { product_id: id },
-            transaction
-        });
-
-        if (productDetails && productDetails.length > 0) {
-            const detailsWithProductId = productDetails.map(detail => ({
-                ...detail,
-                product_id: id,
-            }));
-            await productDetail.bulkCreate(detailsWithProductId, { transaction });
-        }
-
-        // Confirmar la transacción
-        await transaction.commit();
-        console.log('Transaction committed.');
-
-        return await getProductById(id);
-    } catch (error) {
-        // Revertir la transacción en caso de error
-        await transaction.rollback();
-        console.error('Transaction rolled back:', error);
-        throw error;
-    }
+const updateProduct = async (id, data) => {
+    return await models.Product.update(data, {
+        where: { id }
+    });
 };
 
 const deleteProduct = async (id) => {
