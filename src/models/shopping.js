@@ -27,7 +27,7 @@ const Shopping = sequelize.define('Shopping', {
             isDate: true
         }
     },
-    totalPrice: {
+    total_price: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {

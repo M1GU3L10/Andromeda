@@ -21,7 +21,7 @@ const validateShopping = [
         .notEmpty().withMessage('La fecha de registro es requerida')
         .isISO8601().withMessage('La fecha de registro debe estar en formato YYYY-MM-DD'),
 
-    body('totalPrice')
+    body('total_price')
         .notEmpty().withMessage('El precio total es requerido')
         .isFloat({ min: 0 }).withMessage('El precio total debe ser un número positivo'),
 

@@ -2,37 +2,37 @@ const Shopping = require('../models/shopping');
 const ShoppingDetail = require('../models/shoppingDetail');
 const productRepository = require('./productsRepository');
 const sequelize = require('../config/database');
+const { Transaction } = require('sequelize');
 
 const createShopping = async (shoppingData) => {
     const { shoppingDetails, ...shopping } = shoppingData;
-    const transaction = await sequelize.transaction();
+
+    const transaction = await sequelize.transaction();  // Cambiar Transaction a transaction
 
     try {
-        // Crear la compra
         const createdShopping = await Shopping.create(shopping, {
             include: [ShoppingDetail],
-            transaction
+            transaction  // Cambiar Transaction a transaction
         });
 
         if (shoppingDetails && shoppingDetails.length > 0) {
-            // Crear los detalles de la compra y actualizar el stock
             const detailsWithShoppingId = shoppingDetails.map(detail => ({
                 ...detail,
                 shopping_id: createdShopping.id,
             }));
-            await ShoppingDetail.bulkCreate(detailsWithShoppingId, { transaction });
+            await ShoppingDetail.bulkCreate(detailsWithShoppingId, { transaction });  // Cambiar Transaction a transaction
 
-            // Aquí se incrementa el stock de los productos
-            await productRepository.updateProductStockForPurchases(detailsWithShoppingId, transaction);
+            await productRepository.updateProductStockForPurchases(detailsWithShoppingId, transaction);  // Cambiar Transaction a transaction
         }
 
-        await transaction.commit();
+        await transaction.commit();  // Cambiar Transaction a transaction
         return createdShopping;
     } catch (error) {
-        await transaction.rollback();
+        await transaction.rollback();  // Cambiar Transaction a transaction
         throw error;
     }
 };
+
 
 const getShoppingById = async (id) => {
     return await Shopping.findByPk(id, { include: [ShoppingDetail] });
