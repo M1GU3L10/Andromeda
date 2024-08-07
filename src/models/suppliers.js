@@ -2,7 +2,6 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Category = require('./category');
 const Product = require('./products');
-const { models } = require('.');
 
 const Supplier = sequelize.define('Supplier', {
     Supplier_Name: {
@@ -13,12 +12,27 @@ const Supplier = sequelize.define('Supplier', {
             notEmpty: true
         }
     },
-    Units: {
-        type: DataTypes.INTEGER,
+
+    Phone_Number: {
+        type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            isInt: true,
-            min: 0
+            notEmpty: true,
+            is: /^[0-9]+$/ // Validación para asegurar que sea un número de teléfono
+        }
+    },
+    Email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+            isEmail: true
+        }
+    },
+    Address: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+            notEmpty: true
         }
     },
     Unit_Price: {
@@ -29,14 +43,7 @@ const Supplier = sequelize.define('Supplier', {
             min: 0
         }
     },
-    Total_Price: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-        validate: {
-            isDecimal: true,
-            min: 0
-        }
-    },
+
     Category_Product_Id: {
         type: DataTypes.INTEGER,
         allowNull: false,

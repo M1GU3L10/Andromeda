@@ -1,6 +1,5 @@
 const { models } = require('../models');
 const Product = require('../models/products');
-const productDetail = require('../models/productsDetail');
 const { Transaction } = require('sequelize');
 const sequelize = require('../config/database');
 
@@ -32,13 +31,11 @@ const updateProductStockForPurchases = async (shoppingDetail, transaction = null
 
 
 const getAllProducts = async () => {
-    return await Product.findAll({
-        include: [productDetail]
-    });
+    return await models.Product.findAll();
 };
 
 const getProductById = async (id) => {
-    return await Product.findByPk(id, { include: [productDetail] });
+    return await Product.findByPk(id, {include: [productDetail]});
 };
 
 const createProduct = async (productsData) => {
@@ -55,7 +52,7 @@ const createProduct = async (productsData) => {
         });
         console.log('Created products:', createdProduct);
 
-        if (productDetail && productDetail.length > 0) {
+        if (productDetail && productsDetails.length > 0) {
             // Crear los detalles de producto
             const detailsWithProductId = productsDetails.map(detail => ({
                 ...detail,
@@ -69,7 +66,7 @@ const createProduct = async (productsData) => {
         console.log('Transaction committed.');
 
         return createdProduct;
-
+        
     } catch (error) {
         // Revertir la transacción en caso de error
         await transaction.rollback();

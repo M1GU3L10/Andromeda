@@ -11,7 +11,7 @@ const ShoppingDetail = sequelize.define('ShoppingDetail', {
       min: 0,
     },
   },
-  unit_price: {
+  unitPrice: {
     type: DataTypes.INTEGER,
     allowNull: false,
     validate: {

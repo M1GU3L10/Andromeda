@@ -16,7 +16,6 @@ const Programmingemployees = require('./programmingEmployee');
 const Sale = require('./sale');
 const Detail = require('./saleDetail');
 const Product = require('./products');
-const ProductDetail = require('./productsDetail');
 const supplier = require('./suppliers');
 const Order = require('./orders');
 const OrderDetail = require('./ordersDetail');
@@ -42,7 +41,6 @@ const models = {
     PermissionRole,
     ShoppingDetail,
     DetailAppointment,
-    ProductDetail,
     OrderDetail
 };
 

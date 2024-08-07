@@ -24,7 +24,7 @@ const getShoppingById = async (req, res) => {
 
 const getAllShopping = async (req, res) => {
   try {
-    const shopping = await shoppingService.getShoppingAll();
+    const shopping = await shoppingService.getShoppingAll(); 
     res.json(shopping);
   } catch (error) {
     res.status(400).json({ error: error.message });
