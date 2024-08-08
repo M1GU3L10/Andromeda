@@ -35,7 +35,7 @@ const getAllProducts = async () => {
 };
 
 const getProductById = async (id) => {
-    return await Product.findByPk(id, {include: [productDetail]});
+    return await Product.findByPk(id);
 };
 
 const createProduct = async (productsData) => {
