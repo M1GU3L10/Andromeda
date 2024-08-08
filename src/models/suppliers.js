@@ -35,14 +35,7 @@ const Supplier = sequelize.define('Supplier', {
             notEmpty: true
         }
     },
-    Unit_Price: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-        validate: {
-            isDecimal: true,
-            min: 0
-        }
-    },
+   
 
     Category_Product_Id: {
         type: DataTypes.INTEGER,
