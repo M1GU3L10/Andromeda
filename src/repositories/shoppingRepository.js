@@ -2,7 +2,6 @@ const Shopping = require('../models/shopping');
 const ShoppingDetail = require('../models/shoppingDetail');
 const productRepository = require('./productsRepository');
 const sequelize = require('../config/database');
-const { Transaction } = require('sequelize');
 
 const createShopping = async (shoppingData) => {
     const { shoppingDetails, ...shopping } = shoppingData;
@@ -33,7 +32,6 @@ const createShopping = async (shoppingData) => {
     }
 };
 
-
 const getShoppingById = async (id) => {
     return await Shopping.findByPk(id, { include: [ShoppingDetail] });
 };
@@ -48,4 +46,4 @@ module.exports = {
     createShopping,
     getShoppingById,
     getShoppingAll,
-};  
+};

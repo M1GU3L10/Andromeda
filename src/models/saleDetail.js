@@ -19,7 +19,7 @@ const SaleDetail = sequelize.define('SaleDetail', {
     },
   },
   total_price: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.FLOAT,
     allowNull: false,
     validate: {
       min: 0,

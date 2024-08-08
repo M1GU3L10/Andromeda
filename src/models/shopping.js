@@ -28,13 +28,12 @@ const Shopping = sequelize.define('Shopping', {
         }
     },
     total_price: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.FLOAT,
         allowNull: false,
         validate: {
-            notEmpty: true,
-            isDecimal: true
-        }
-    },
+          min: 0,
+        },
+      },
     status: {
         type: DataTypes.ENUM('pending', 'completed', 'canceled'),
         allowNull: false,

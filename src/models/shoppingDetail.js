@@ -19,7 +19,7 @@ const ShoppingDetail = sequelize.define('ShoppingDetail', {
     },
   },
   total_price: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.FLOAT,
     allowNull: false,
     validate: {
       min: 0,
