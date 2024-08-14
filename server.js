@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const { connectDb } = require('./src/models/index');
+const cors = require('cors');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const roleRoutes = require('./src/routes/roleRoutes');
@@ -23,6 +24,7 @@ const programmingEmployeeRoutes = require('./src/routes/programmingEmployeeRoute
 dotenv.config();
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api/categories', categoryRoutes);
