@@ -6,7 +6,7 @@ const createSale = async (saleData) => {
 
   // Obteniendo el unitPrice desde el repositorio de productos
   const updatedSaleDetails = await Promise.all(saleDetails.map(async (detail) => {
-      const product = await productRepository.getProductById(detail.id_producto); // Asume que tienes un método getProductById
+      const product = await productRepository.getProductById(detail.id_producto);
       const unitPrice = product.Price;
       return {
           ...detail,

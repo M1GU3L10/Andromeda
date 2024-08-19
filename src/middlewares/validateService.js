@@ -1,10 +1,11 @@
 const { body, validationResult } = require('express-validator');
+const { models } = require('../models');
 
 const validateService = [
     body('name').notEmpty().withMessage('El nombre es requerido')
         .custom(async (value) => {
-            const category = await models.Category.findOne({ where: { name: value } });
-            if (category) {
+            const Service = await models.Service.findOne({ where: { name: value } });
+            if (Service) {
                 throw new Error('El servicio ya se encuentra registrado');
             }
             return true;
