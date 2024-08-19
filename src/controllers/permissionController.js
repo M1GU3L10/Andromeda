@@ -1,4 +1,4 @@
-const categoryService = require('../services/permissionService');
+const permissionService = require('../services/permissionService');
 const { sendResponse, sendError } = require('../utils/response');
 
 const getAllPermissions = async (req, res) => {

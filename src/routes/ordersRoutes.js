@@ -1,7 +1,6 @@
 const express = require('express');
 const orderController = require('../controllers/ordersController');
 const validateOrder = require('../middlewares/validateOrders');
-
 const router = express.Router();
 
 router.get('/', orderController.getAllOrders);
