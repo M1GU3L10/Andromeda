@@ -1,9 +1,6 @@
 const { body, validationResult } = require('express-validator');
-<<<<<<< HEAD
 const { models } = require('../models');
-=======
-const {models}=require('../models')
->>>>>>> c7d4187479739b8e3fcd312daed7a439e4afc940
+
 
 const validateService = [
     body('name').notEmpty().withMessage('El nombre es requerido')

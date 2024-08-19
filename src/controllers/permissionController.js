@@ -9,7 +9,6 @@ const getAllPermissions = async (req, res) => {
         sendError(res, error);
     }
 };
-
 const getPermissionById = async (req, res) => {
     try {
         const permission = await permissionService.getPermissionById(req.params.id);
@@ -21,7 +20,6 @@ const getPermissionById = async (req, res) => {
         sendError(res, error);
     }
 };
-
 const createPermission = async (req, res) => {
     try {
         const permission = await permissionService.createPermission(req.body);
@@ -30,7 +28,6 @@ const createPermission = async (req, res) => {
         sendError(res, error);
     }
 };
-
 const updatePermission = async (req, res) => {
     try {
         const updated = await permissionService.updatePermission(req.params.id, req.body);
@@ -42,7 +39,6 @@ const updatePermission = async (req, res) => {
         sendError(res, error);
     }
 };
-
 const deletePermission = async (req, res) => {
     try {
         const deleted = await permissionService.deletePermission(req.params.id);
@@ -54,7 +50,6 @@ const deletePermission = async (req, res) => {
         sendError(res, error);
     }
 };
-
 module.exports = {
     getAllPermissions,
     getPermissionById,

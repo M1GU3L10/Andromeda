@@ -2,7 +2,6 @@ const { models } = require('../models');
 const Product = require('../models/products');
 const { Transaction } = require('sequelize');
 const sequelize = require('../config/database');
-
 const updateProductStock = async (saleDetails, transaction = null) => {
     for (const detail of saleDetails) {
         const product = await Product.findByPk(detail.id_producto, { transaction });
@@ -15,7 +14,6 @@ const updateProductStock = async (saleDetails, transaction = null) => {
         }
     }
 };
-
 const updateProductStockForPurchases = async (shoppingDetail, transaction = null) => {
     for (const detail of shoppingDetail) {
         const product = await Product.findByPk(detail.product_id, { transaction });
@@ -53,44 +51,31 @@ const updateProductStockForOrders = async (orderDetails, transaction = null) => 
 const getAllProducts = async () => {
     return await models.Product.findAll();
 };
-
 const getProductById = async (id) => {
     return await Product.findByPk(id);
 };
 
 const createProduct = async (data) => {
     return await models.Product.create(data);
-<<<<<<< HEAD
-};
-
-const updateProduct = async (id, data) => {
-    return await models.Product.update(data, {
-        where: { id }
-    });
-};
-=======
     };
-
-const updateProduct = async (id, data) => {
+    const updateProduct = async (id, data) => {
         return await models.Product.update(data, {
             where: { id }
         });
     };
->>>>>>> c7d4187479739b8e3fcd312daed7a439e4afc940
 
-const deleteProduct = async (id) => {
-    return await models.Product.destroy({
-        where: { id }
-    });
-};
-
-module.exports = {
-    getAllProducts,
-    getProductById,
-    createProduct,
-    updateProduct,
-    deleteProduct,
-    updateProductStock,
-    updateProductStockForPurchases,
-    updateProductStockForOrders
-};
+    const deleteProduct = async (id) => {
+        return await models.Product.destroy({
+            where: { id }
+        });
+    };
+    module.exports = {
+        getAllProducts,
+        getProductById,
+        createProduct,
+        updateProduct,
+        deleteProduct,
+        updateProductStock,
+        updateProductStockForPurchases,
+        updateProductStockForOrders
+    };
