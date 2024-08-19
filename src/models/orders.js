@@ -34,22 +34,6 @@ const Order = sequelize.define('Order', {
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
     },
-    Order_Tokens: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-        validate: {
-            min: 0
-        }
-    },
-    Token_Price: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-        validate: {
-            isDecimal: true,
-            min: 0
-        }
-    },
     Token_Expiration: {
         type: DataTypes.DATE,
         allowNull: false,

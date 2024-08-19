@@ -29,6 +29,26 @@ const updateProductStockForPurchases = async (shoppingDetail, transaction = null
     }
 };
 
+const updateProductStockForOrders = async (orderDetails, transaction = null) => {
+    for (const detail of orderDetails) {
+        const product = await Product.findByPk(detail.product_id, { transaction });
+        if (product) {
+            console.log(`Stock antes: ${product.Stock}, cantidad ordenada: ${detail.quantity}`);
+            const newStock = product.Stock - detail.quantity;
+            console.log(`Nuevo stock debería ser: ${newStock}`);
+
+            if (newStock < 0) {
+                throw new Error(`Stock insuficiente para el producto con ID ${detail.product_id}.`);
+            }
+
+            await product.update({ Stock: newStock }, { transaction });
+            console.log(`Stock actualizado para el producto con ID ${product.id}`);
+        } else {
+            throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
+        }
+    }
+};
+
 
 const getAllProducts = async () => {
     return await models.Product.findAll();
@@ -40,6 +60,7 @@ const getProductById = async (id) => {
 
 const createProduct = async (data) => {
     return await models.Product.create(data);
+<<<<<<< HEAD
 };
 
 const updateProduct = async (id, data) => {
@@ -47,6 +68,15 @@ const updateProduct = async (id, data) => {
         where: { id }
     });
 };
+=======
+    };
+
+const updateProduct = async (id, data) => {
+        return await models.Product.update(data, {
+            where: { id }
+        });
+    };
+>>>>>>> c7d4187479739b8e3fcd312daed7a439e4afc940
 
 const deleteProduct = async (id) => {
     return await models.Product.destroy({
@@ -61,5 +91,6 @@ module.exports = {
     updateProduct,
     deleteProduct,
     updateProductStock,
-    updateProductStockForPurchases
+    updateProductStockForPurchases,
+    updateProductStockForOrders
 };

@@ -1,5 +1,4 @@
 const orderRepository = require('../repositories/ordersRepository');
-const salesRepository = require('../repositories/saleRepository');
 
 const getAllOrders = async () => {
     return await orderRepository.getAllOrders();
