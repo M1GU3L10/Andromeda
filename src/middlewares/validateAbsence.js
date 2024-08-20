@@ -20,8 +20,9 @@ const validateAbsence = [
     body('date')
         .notEmpty().withMessage('La fecha es requerida')
         .isISO8601().withMessage('La fecha debe estar en formato YYYY-MM-DD'),
-    body('status')
-        .isIn(['A', 'I']).withMessage('El estado debe ser A (Activo) o I (Inactivo)'),
+        body('status')
+        .isIn(['en proceso', 'aprobado', 'no aprobado'])
+        .withMessage('El estado debe ser "en proceso", "aprobado" o "no aprobado"'),    
     body('userId')
         .custom(async (userId) => {
             const user = await models.User.findByPk(userId);
