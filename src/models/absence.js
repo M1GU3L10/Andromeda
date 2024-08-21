@@ -23,10 +23,11 @@ const Absence = sequelize.define('Absence', {
         allowNull: false,
     },
     status: {
-        type: DataTypes.ENUM('A', 'I'),
+        type: DataTypes.ENUM('en proceso', 'aprobado', 'no aprobado'),
         allowNull: false,
-        defaultValue: 'A',
-    },
+        defaultValue: 'en proceso',
+    }
+    ,
     userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
