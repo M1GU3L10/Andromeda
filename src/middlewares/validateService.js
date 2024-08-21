@@ -3,14 +3,7 @@ const { models } = require('../models');
 
 
 const validateService = [
-    body('name').notEmpty().withMessage('El nombre es requerido')
-        .custom(async (value) => {
-            const Service = await models.Service.findOne({ where: { name: value } });
-            if (Service) {
-                throw new Error('El servicio ya se encuentra registrado');
-            }
-            return true;
-        }),
+    body('name').notEmpty().withMessage('El nombre es requerido'),
     body('price')
         .notEmpty().withMessage('El precio total es requerido')
         .isFloat({ min: 0 }).withMessage('El precio total debe ser mayor a 0')
