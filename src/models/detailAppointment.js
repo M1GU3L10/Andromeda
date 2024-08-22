@@ -11,6 +11,10 @@ const DetailAppointment = sequelize.define('DetailAppointment', {
             min: 0,
         },
     },
+    tiempo_de_la_cita: {  // Tiempo cita
+        type: DataTypes.TIME,
+        allowNull: false,
+    },
     appointmentId: {
         type: DataTypes.INTEGER,
         allowNull: false,

@@ -9,8 +9,7 @@ const User = sequelize.define('User', {
     },
     email: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+        allowNull: false
     },
     password: {
         type: DataTypes.STRING,
@@ -18,8 +17,7 @@ const User = sequelize.define('User', {
     },
     phone: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+        allowNull: false
     },
     status: {
         type: DataTypes.ENUM('A', 'I'),
