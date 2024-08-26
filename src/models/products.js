@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const Category = require('./category');
+const sequelize = require('../config/database'); // Asegúrate de que la configuración de la base de datos esté correcta
+const Category = require('./category'); // Asegúrate de que este archivo exporta el modelo Category
 
 const Product = sequelize.define('Product', {
     Product_Name: {
@@ -8,30 +8,30 @@ const Product = sequelize.define('Product', {
         allowNull: false,
         unique: true,
         validate: {
-            notEmpty: true
+            notEmpty: true // Asegura que el nombre del producto no esté vacío
         }
     },
     Stock: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
-            isInt: true,
-            min: 0
+            isInt: true, // Asegura que el stock es un número entero
+            min: 0 // Asegura que el stock no sea negativo
         }
     },
     Price: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {
-            isDecimal: true,
-            min: 0
+            isDecimal: true, // Asegura que el precio es un decimal
+            min: 0 // Asegura que el precio no sea negativo
         }
     },
     Category_Id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: Category, // Nombre de la tabla a la que hace referencia
+            model: Category, // Asegúrate de que el modelo Category está definido y exportado
             key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -40,13 +40,10 @@ const Product = sequelize.define('Product', {
     Image: {
         type: DataTypes.STRING,
         allowNull: true,
-        validate: {
-            isUrl: true
-        }
+        // No se necesita validación adicional para una ruta o nombre de archivo
     }
 }, {
-    tableName: 'products'
+    tableName: 'products' // Asegura que Sequelize use el nombre de tabla especificado
 });
-
 
 module.exports = Product;

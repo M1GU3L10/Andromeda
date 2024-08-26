@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.get('/', serviceController.getAllServices);
 router.get('/:id', serviceController.getServiceById);
-router.post('/', validateService,serviceController.createService);
-router.put('/:id', validateService,serviceController.updateService);
+router.post('/', validateService.validateServiceRegister,serviceController.createService);
+router.put('/:id', validateService.validateServiceUpdate,serviceController.updateService);
 router.delete('/:id', serviceController.deleteService);
 
 module.exports = router;
