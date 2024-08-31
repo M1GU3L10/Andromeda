@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.get('/', absenceController.getAllAbsences);
 router.get('/:id', absenceController.getAbsenceById);
-router.post('/', validateAbsence, absenceController.createAbsence);
-router.put('/:id', validateAbsence, absenceController.updateAbsence);
+router.post('/', validateAbsence.validateAbsence, absenceController.createAbsence);
+router.put('/:id', validateAbsence.validateAbsencesUpdate, absenceController.updateAbsence);
 router.delete('/:id', absenceController.deleteAbsence);
 
 module.exports = router;
