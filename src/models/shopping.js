@@ -35,10 +35,10 @@ const Shopping = sequelize.define('Shopping', {
         },
       },
     status: {
-        type: DataTypes.ENUM('pending', 'completed', 'canceled'),
+        type: DataTypes.ENUM('pendiente', 'completada', 'cancelada'),
         allowNull: false,
         validate: {
-            isIn: [['pending', 'completed', 'canceled']]
+            isIn: [['pendiente', 'completada', 'cancelada']]
         }
     },
     supplierId: {
