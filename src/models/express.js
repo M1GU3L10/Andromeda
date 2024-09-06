@@ -1,8 +1,12 @@
 const express = require('express');
 const multer = require('multer');
+const path = require('path');
 const { body, validationResult } = require('express-validator');
 const Product = require('./models/product'); // Ajusta la ruta según tu estructura
 const app = express();
+// Servir archivos estáticos desde el directorio 'uploads'
+app.use('/uploads', express.static('uploads'));
+
 
 // Configuración de almacenamiento para multer
 const storage = multer.diskStorage({
@@ -68,3 +72,26 @@ app.use('/uploads', express.static('uploads'));
 app.listen(3000, () => {
   console.log('Servidor escuchando en el puerto 3000');
 });
+
+
+app.get('/api/products/image/:id', (req, res) => {
+  const id = req.params.id;
+  db.query('SELECT Image FROM products WHERE id = ?', [id], (err, results) => {
+      if (err) {
+          console.error('Error al obtener la imagen:', err);
+          return res.status(500).send('Error al obtener la imagen');
+      }
+      if (results.length === 0) {
+          return res.status(404).send('Imagen no encontrada');
+      }
+      const imagePath = results[0].Image;
+      console.log('Ruta de la imagen:', imagePath); // Mensaje de depuración
+      res.sendFile(path.resolve(imagePath), (err) => {
+          if (err) {
+              console.error('Error al enviar la imagen:', err);
+              res.status(500).send('Error al enviar la imagen');
+          }
+      });
+  });
+});
+

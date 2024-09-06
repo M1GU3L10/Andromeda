@@ -29,7 +29,6 @@ const updateProductStockForPurchases = async (shoppingDetail, transaction = null
     }
 };
 
-
 const getAllProducts = async () => {
     return await models.Product.findAll();
 };
@@ -39,66 +38,39 @@ const getProductById = async (id) => {
 };
 
 const createProduct = async (productsData) => {
-    const { productsDetails, ...products } = productsData;
-
     // Iniciar una transacción
     const transaction = await sequelize.transaction();
 
     try {
         // Crear producto
-        const createdProduct = await Product.create(products, {
-            include: [productDetail],
-            transaction
-        });
-        console.log('Created products:', createdProduct);
-
-        if (productDetail && productsDetails.length > 0) {
-            // Crear los detalles de producto
-            const detailsWithProductId = productsDetails.map(detail => ({
-                ...detail,
-                product_id: createdProduct.id,
-            }));
-            await productDetail.bulkCreate(detailsWithProductId, { transaction });
-        }
+        const createdProduct = await Product.create(productsData, { transaction });
+        console.log('Created product:', createdProduct);
 
         // Confirmar la transacción
         await transaction.commit();
         console.log('Transaction committed.');
 
         return createdProduct;
-        
+
     } catch (error) {
         // Revertir la transacción en caso de error
         await transaction.rollback();
-        console.error('Transaction rolled back:', error);
+        console.error('Transaction rolled back:', error.message);
+        console.error('Error stack:', error.stack);
         throw error;
     }
 };
 
-const updateProduct = async (id, productData) => {
-    const { productDetails, ...products } = productData;
 
+const updateProduct = async (id, productData) => {
     // Iniciar una transacción
     const transaction = await sequelize.transaction();
 
     try {
-        await Product.update(products, {
+        await Product.update(productData, {
             where: { id },
             transaction
         });
-
-        await productDetail.destroy({
-            where: { product_id: id },
-            transaction
-        });
-
-        if (productDetails && productDetails.length > 0) {
-            const detailsWithProductId = productDetails.map(detail => ({
-                ...detail,
-                product_id: id,
-            }));
-            await productDetail.bulkCreate(detailsWithProductId, { transaction });
-        }
 
         // Confirmar la transacción
         await transaction.commit();
