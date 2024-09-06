@@ -24,12 +24,15 @@ const getRoleById = async (req, res) => {
 
 const createRole = async (req, res) => {
     try {
-        const roles = await roleService.createRole(req.body);
+        // Crea el rol y guarda el resultado en `role`
+        const role = await roleService.createRole(req.body); // Asegúrate de que se usa `role` y no `roles`
+        // Envía la respuesta con el rol recién creado
         sendResponse(res, role, 201);
     } catch (error) {
         sendError(res, error);
     }
 };
+
 
 const updateRole = async (req, res) => {
     try {

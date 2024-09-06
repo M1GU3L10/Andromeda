@@ -11,11 +11,6 @@ const programming = sequelize.define('programming', {
         type: DataTypes.TIME,
         allowNull: false,
     },
-    status: {
-        type: DataTypes.ENUM('pending', 'approved', 'rejected'),
-        allowNull: false,
-        defaultValue: 'pending',
-    },
     day: {
         type: DataTypes.DATEONLY,
         allowNull: false,
