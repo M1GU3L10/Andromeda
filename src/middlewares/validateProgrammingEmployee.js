@@ -16,10 +16,6 @@ const validateProgramming = [
             return true;
         }),
 
-    body('status')
-        .notEmpty().withMessage('El estado es requerido')
-        .isIn(['pending', 'approved', 'rejected']).withMessage('El estado debe ser uno de los siguientes: pending, approved, rejected'),
-
     body('day')
         .notEmpty().withMessage('El día es requerido')
         .isISO8601().withMessage('El día debe estar en formato YYYY-MM-DD'),
