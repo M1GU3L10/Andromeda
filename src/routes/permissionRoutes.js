@@ -7,6 +7,7 @@ const router = express.Router();
 router.get('/', permissionController.getAllPermissions);
 router.get('/:id', permissionController.getPermissionById);
 router.post('/', validatePermission, permissionController.createPermission);
+router.post('/permissions',  validatePermission, permissionController.createMultiplePermissions);
 router.put('/:id', validatePermission, permissionController.updatePermission);
 router.delete('/:id', permissionController.deletePermission);
 

@@ -12,6 +12,8 @@ const createPermission = async (data) => {
     return await models.Permission.create(data);
 };
 
+
+
 const updatePermission = async (id, data) => {
     return await models.Permission.update(data, {
         where: { id }

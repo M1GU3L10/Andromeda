@@ -12,6 +12,17 @@ const createPermission = async (data) => {
     return await permissionRepository.createPermission(data);
 };
 
+
+const createMultiplePermissions = async (permissionNames) => {
+    const permissions = [];
+    for (const name of permissionNames) {
+      const permission = await permissionRepository.createPermission({ name });
+      permissions.push(permission);
+    }
+    return permissions;
+};
+
+
 const updatePermission = async (id, data) => {
     return await permissionRepository.updatePermission(id, data);
 };
@@ -25,6 +36,7 @@ module.exports = {
     getPermissionById,
     createPermission,
     updatePermission,
-    deletePermission
+    deletePermission,
+    createMultiplePermissions
 };
 

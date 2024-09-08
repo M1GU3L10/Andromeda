@@ -1,6 +1,24 @@
 const permissionService = require('../services/permissionService');
 const { sendResponse, sendError } = require('../utils/response');
 
+const createMultiplePermissions = async (req, res) => {
+    try {
+        const permissionNames = req.body.permissions || [
+            'Horizonte', 'Melodía', 'Destello', 'Serenidad', 'Recuerdo',
+            'Espejo', 'Amanecer', 'Silencio', 'Ternura', 'Fantasía',
+            'Fragancia', 'Brisa', 'Murmullo', 'Éxtasis', 'Infinito',
+            'Destino', 'Sombras', 'Susurro', 'Aurora', 'Vértigo'
+        ];
+
+        const permissions = await permissionService.createMultiplePermissions(permissionNames);
+        sendResponse(res, permissions, 201); // Respuesta con todos los permisos creados
+    } catch (error) {
+        sendError(res, error);
+    }
+};
+//registrar pemisos desde la api
+
+//
 const getAllPermissions = async (req, res) => {
     try {
         const permissions = await permissionService.getAllPermissions();
@@ -12,7 +30,7 @@ const getAllPermissions = async (req, res) => {
 const getPermissionById = async (req, res) => {
     try {
         const permission = await permissionService.getPermissionById(req.params.id);
-        if (!category) {
+        if (!permission) {  // Cambié "category" por "permission"
             return sendError(res, 'Permiso no encontrado', 404);
         }
         sendResponse(res, permission);
@@ -20,6 +38,7 @@ const getPermissionById = async (req, res) => {
         sendError(res, error);
     }
 };
+
 const createPermission = async (req, res) => {
     try {
         const permission = await permissionService.createPermission(req.body);
@@ -55,5 +74,6 @@ module.exports = {
     getPermissionById,
     createPermission,
     updatePermission,
-    deletePermission
+    deletePermission,
+    createMultiplePermissions
 };
