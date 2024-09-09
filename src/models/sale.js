@@ -12,7 +12,7 @@ const Sale = sequelize.define('Sale', {
         allowNull: false,
     },
     registrationDate: {
-        type: DataTypes.TIME,
+        type: DataTypes.DATEONLY,
     },
     total_price: {
         type: DataTypes.FLOAT,
@@ -31,6 +31,11 @@ const Sale = sequelize.define('Sale', {
     },
 }, {
     tableName: 'sales',
+    hooks: {
+        beforeCreate: (sale, options) => {
+            sale.registrationDate = new Date().toISOString().split('T')[0];
+        },
+    },
 });
 
 Sale.belongsTo(User, { foreignKey: 'id_usuario' });
