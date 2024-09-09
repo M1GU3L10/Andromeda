@@ -21,11 +21,6 @@ const Shopping = sequelize.define('Shopping', {
     },
     registrationDate: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
-        validate: {
-            notEmpty: true,
-            isDate: true
-        }
     },
     total_price: {
         type: DataTypes.FLOAT,
@@ -54,7 +49,12 @@ const Shopping = sequelize.define('Shopping', {
     }
 }, {
     tableName: 'shopping',
-    timestamps: true
+    timestamps: true,
+    hooks: {
+        beforeCreate: (shopping, options) => {
+            shopping.registrationDate = new Date().toISOString().split('T')[0];
+        },
+    },
 });
 
 Shopping.belongsTo(Supplier, { foreignKey: 'supplierId' });
