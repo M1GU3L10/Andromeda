@@ -17,7 +17,8 @@ const Role = sequelize.define('Role', {
     tableName: 'roles'
 });
 
-Role.belongsToMany(Permission, { through: 'RolePermissions' });
+Role.belongsToMany(Permission, { through: 'permissionsRole' });
+Permission.belongsToMany(Role, { through: 'permissionsRole' });
 
 
 module.exports = Role;
