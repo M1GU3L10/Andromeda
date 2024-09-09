@@ -20,9 +20,9 @@ const Order = sequelize.define('Order', {
         }
     },
     Status: {
-        type: DataTypes.ENUM('Pending', 'Shipped', 'Delivered', 'Cancelled'),
+        type: DataTypes.ENUM('Completado','En proceso', 'Cancelado'),
         allowNull: false,
-        defaultValue: 'Pending'
+        defaultValue: 'En proceso'
     },
     User_Id: {
         type: DataTypes.INTEGER,

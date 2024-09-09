@@ -22,7 +22,7 @@ const validateOrder = [
     
     body('Status')
         .notEmpty().withMessage('El estado es requerido')
-        .isIn(['Pending', 'Shipped', 'Delivered', 'Cancelled']).withMessage('El estado debe ser uno de los siguientes: Pending, Shipped, Delivered, Cancelled'),
+        .isIn(['En proceso', 'Completado', 'Cancelado']).withMessage('El estado debe ser uno de los siguientes: En proceso, Completado, Cancelado'),
 
     body('User_Id')
         .notEmpty().withMessage('El ID del usuario es requerido')

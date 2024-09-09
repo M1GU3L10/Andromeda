@@ -1,42 +1,24 @@
 const Order = require('../models/orders');
-const OrderDetail = require('../models/ordersDetail');
-const productRepository = require('./productsRepository');
 const sequelize = require('../config/database');
 const { Transaction } = require('sequelize');
-
+const productRepository = require('./productsRepository');
 
 const getAllOrders = async () => {
-    return await Order.findAll({
-        include: [OrderDetail]
-    });
+    return await Order.findAll();
 };
 
 const getOrderById = async (id) => {
-    return await Order.findByPk(id, {
-        include: [OrderDetail]
-    });
+    return await Order.findByPk(id);
 };
+
 const createOrder = async (orderData) => {
-    const { orderDetails, ...order } = orderData;
     const transaction = await sequelize.transaction();
 
     try {
-        const createdOrder = await Order.create(order, {
-            include: [OrderDetail],
-            transaction
-        });
+        const createdOrder = await Order.create(orderData, { transaction });
 
-        if (orderDetails) {
-            const detailsWithOrderId = orderDetails.map(detail => ({
-                ...detail,
-                order_id: createdOrder.id,
-            }));
-
-            await OrderDetail.bulkCreate(detailsWithOrderId, { transaction });
-
-            // Asegúrate de que esta función se llame correctamente
-            await productRepository.updateProductStockForOrders(detailsWithOrderId, transaction);
-        }
+        // Asegúrate de que esta función se llame correctamente
+        await productRepository.updateProductStockForOrders(orderData.orderDetails || [], transaction);
 
         await transaction.commit();
         return createdOrder;
@@ -46,32 +28,20 @@ const createOrder = async (orderData) => {
     }
 };
 
-
 const updateOrder = async (id, data) => {
-    const { orderDetails, ...orderData } = data;
-    await Order.update(orderData, {
+    await Order.update(data, {
         where: { id }
     });
-    if (orderDetails && orderDetails.length > 0) {
-        for (const detail of orderDetails) {
-            await OrderDetail.update(detail, {
-                where: { order_id: id, product_id: detail.product_id }
-            });
-        }
-    }
-    return await Order.findByPk(id, {
-        include: OrderDetail
-    });
+
+    return await Order.findByPk(id);
 };
 
 const deleteOrder = async (id) => {
-    await OrderDetail.destroy({
-        where: { order_id: id }
-    });
     return await Order.destroy({
         where: { id }
     });
 };
+
 module.exports = {
     getAllOrders,
     getOrderById,

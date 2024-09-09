@@ -1,61 +1,45 @@
+const express = require('express');
 const multer = require('multer');
-const { body, validationResult } = require('express-validator');
 const path = require('path');
+const { body, validationResult } = require('express-validator');
 
-// Configuración de almacenamiento para multer
+const app = express();
+
+// Configura multer para almacenar archivos en la carpeta 'image'
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
+    destination: (req, file, cb) => {
+        cb(null, 'images'); // Carpeta donde se guardarán las imágenes
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, Date.now() + ext); // Nombre único para el archivo
+    }
 });
+
 const upload = multer({ storage: storage });
 
-// Middleware para procesar datos de formularios
-app.use(express.urlencoded({ extended: true }));
-
-// Validación de datos y carga de imagen
-const validateProduct = [
-    body('Product_Name').notEmpty().withMessage('El nombre del producto es requerido'),
-    body('Price')
-        .isDecimal().withMessage('El precio debe ser un número decimal positivo')
-        .isFloat({ min: 0 }).withMessage('El precio debe ser mayor o igual a 0'),
+// Middleware de validación
+const validateProductUpdate = [
+    body('Product_Name').notEmpty().withMessage('El nombre del producto es obligatorio'),
     body('Stock').isInt({ min: 0 }).withMessage('El stock debe ser un número entero positivo o cero'),
-    (req, res, next) => {
-        if (req.file) {
-            const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            if (!allowedMimeTypes.includes(req.file.mimetype)) {
-                return res.status(400).json({ errors: [{ msg: 'Formato de imagen no válido. Solo se permiten JPEG, PNG y GIF.' }] });
-            }
-            const maxSize = 5 * 1024 * 1024;
-            if (req.file.size > maxSize) {
-                return res.status(400).json({ errors: [{ msg: 'El tamaño de la imagen no debe exceder 5MB.' }] });
-            }
-            req.body.Image = req.file.path; // Guardar la ruta del archivo en lugar del buffer
-        }
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-        next();
-    }
+    body('Price').isFloat({ min: 0 }).withMessage('El precio debe ser un número decimal positivo mayor a cero'),
+    body('Category_Id').isInt({ min: 1 }).withMessage('Debe seleccionar una categoría válida')
 ];
 
-// Ruta para manejar la carga de imágenes
-app.post('/api/products', upload.single('image'), validateProduct, async (req, res) => {
-  try {
-    await Product.create({
-      Product_Name: req.body.Product_Name,
-      Stock: req.body.Stock,
-      Price: req.body.Price,
-      Category_Id: req.body.Category_Id,
-      Image: req.body.Image
-    });
-    res.status(201).send('Producto creado con éxito');
-  } catch (error) {
-    console.error('Error al crear el producto:', error);
-    res.status(500).send('Error al crear el producto');
-  }
+// Ruta para agregar un producto
+app.post('/api/products', upload.single('Images '), validateProductUpdate, (req, res) => {
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Aquí va el código para guardar el producto en la base de datos
+    const { Product_Name, Stock, Price, Category_Id } = req.body;
+    const imagePath = req.file ? req.file.path : null; // Ruta de la imagen si se subió
+
+    // Lógica para guardar el producto y la imagen en la base de datos
+    // ...
+
+    res.status(200).json({ message: 'Producto agregado exitosamente' });
 });
