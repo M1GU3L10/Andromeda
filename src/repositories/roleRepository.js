@@ -23,6 +23,12 @@ const updateRole = async (id, data, permissions) => {
 };
 
 const deleteRole = async (id) => {
+    // Primero, eliminar las asociaciones en la tabla intermedia
+    await PermissionRole.destroy({
+        where: { roleId: id }
+    });
+
+    // Luego, eliminar el rol
     return await models.Role.destroy({
         where: { id }
     });

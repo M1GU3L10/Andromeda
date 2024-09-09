@@ -5,6 +5,12 @@ const Permission = require('./permission');
 
 
 const PermissionRole = sequelize.define('PermissionRole', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false
+    },
     roleId: {
         type: DataTypes.INTEGER,
         allowNull: false,

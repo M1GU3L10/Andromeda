@@ -1,6 +1,9 @@
 // controllers/roleController.js
 const roleService = require('../services/roleService');
 const permissionService = require('../services/permissionService');
+const { sequelize } = require('../models');
+const { Role, PermissionRole } = require('../models');
+
 const { sendResponse, sendError } = require('../utils/response');
 
 
@@ -53,16 +56,34 @@ const updateRole = async (req, res) => {
     }
 };
 
-// Eliminar un rol
 const deleteRole = async (req, res) => {
+    const { id } = req.params;
+
     try {
-        const deleted = await roleService.deleteRole(req.params.id);
-        if (deleted === 0) {
-            return sendError(res, 'Rol no encontrado', 404);
+        // Asegúrate de que PermissionRole esté importado correctamente
+        const PermissionRole = require('../models/permissionRole'); // Asegúrate de que esta ruta sea correcta
+
+        // Primero, eliminar las asociaciones en la tabla intermedia
+        const deletedAssociations = await PermissionRole.destroy({
+            where: { roleId: id }
+        });
+
+        console.log(`Número de asociaciones eliminadas: ${deletedAssociations}`);
+
+        // Luego, eliminar el rol
+        const Role = require('../models/role');
+        const deletedRole = await Role.destroy({
+            where: { id }
+        });
+
+        if (!deletedRole) {
+            return res.status(404).json({ message: 'El rol no fue encontrado o ya fue eliminado.' });
         }
-        sendResponse(res, 'Rol eliminado correctamente');
+
+        res.status(200).json({ message: 'El rol y los permisos asociados fueron eliminados correctamente.' });
     } catch (error) {
-        sendError(res, error);
+        console.error(`Error al eliminar el rol: ${error.message}`);
+        res.status(500).json({ error: error.message });
     }
 };
 
