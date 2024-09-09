@@ -1,9 +1,9 @@
-const categoryService = require('../services/permissionRoleService');
+const permissionRoleService = require('../services/permissionRoleService'); // Cambia el nombre de 'categoryService'
 const { sendResponse, sendError } = require('../utils/response');
 
 const getAllPermissionsRoles = async (req, res) => {
     try {
-        const permissionsRoles = await permissionRoleService.getAllPermissions();
+        const permissionsRoles = await permissionRoleService.getAllPermissionsRoles(); // Aquí debe ser getAllPermissionsRoles
         sendResponse(res, permissionsRoles);
     } catch (error) {
         sendError(res, error);
@@ -12,8 +12,8 @@ const getAllPermissionsRoles = async (req, res) => {
 
 const getPermissionRoleById = async (req, res) => {
     try {
-        const permissionRole = await permissionRoleService.getPermissionRoleById(req.params.id);
-        if (!category) {
+        const permissionRole = await permissionRoleService.getPermissionRoleById(req.params.id); // Utiliza 'permissionRoleService'
+        if (!permissionRole) {
             return sendError(res, 'Permiso rol no encontrado', 404);
         }
         sendResponse(res, permissionRole);
@@ -24,7 +24,7 @@ const getPermissionRoleById = async (req, res) => {
 
 const createPermissionRole = async (req, res) => {
     try {
-        const permissionRole = await permissionRoleService.createPermissionRole(req.body);
+        const permissionRole = await permissionRoleService.createPermissionRole(req.body); // Utiliza 'permissionRoleService'
         sendResponse(res, permissionRole, 201);
     } catch (error) {
         sendError(res, error);
@@ -33,7 +33,7 @@ const createPermissionRole = async (req, res) => {
 
 const updatePermissionRole = async (req, res) => {
     try {
-        const updated = await permissionRoleService.updatePermissionRole(req.params.id, req.body);
+        const updated = await permissionRoleService.updatePermissionRole(req.params.id, req.body); // Utiliza 'permissionRoleService'
         if (updated[0] === 0) {
             return sendError(res, 'Permiso rol no encontrado', 404);
         }
@@ -45,9 +45,9 @@ const updatePermissionRole = async (req, res) => {
 
 const deletePermissionRole = async (req, res) => {
     try {
-        const deleted = await permissionRoleService.deletePermissionRole(req.params.id);
+        const deleted = await permissionRoleService.deletePermissionRole(req.params.id); // Utiliza 'permissionRoleService'
         if (deleted === 0) {
-            return sendError(res, 'Permiso rol no funciona', 404);
+            return sendError(res, 'Permiso rol no encontrado', 404);
         }
         sendResponse(res, 'Permiso rol eliminado correctamente');
     } catch (error) {

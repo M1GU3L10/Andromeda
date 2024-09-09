@@ -8,12 +8,16 @@ const getRoleById = async (id) => {
     return await roleRepository.getRoleById(id);
 };
 
-const createRole = async (data) => {
-    return await roleRepository.createRole(data);
+const createRole = async (data, permissions) => {
+    const role = await roleRepository.createRole(data);
+    if (permissions) {
+        await role.setPermissions(permissions); // Asegúrate de que `permissions` sea un array de IDs de permisos
+    }
+    return role;
 };
 
-const updateRole = async (id, data) => {
-    return await roleRepository.updateRole(id, data);
+const updateRole = async (id, data, permissions) => {
+    return await roleRepository.updateRole(id, data, permissions);
 };
 
 const deleteRole = async (id) => {
@@ -27,4 +31,3 @@ module.exports = {
     updateRole,
     deleteRole
 };
-

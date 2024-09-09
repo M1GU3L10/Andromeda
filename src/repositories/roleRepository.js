@@ -12,10 +12,14 @@ const createRole = async (data) => {
     return await models.Role.create(data);
 };
 
-const updateRole = async (id, data) => {
-    return await models.Role.update(data, {
-        where: { id }
-    });
+const updateRole = async (id, data, permissions) => {
+    const role = await models.Role.findByPk(id);
+    if (!role) return null;
+    await role.update(data);
+    if (permissions) {
+        await role.setPermissions(permissions); // Asegúrate de que `permissions` sea un array de IDs de permisos
+    }
+    return role;
 };
 
 const deleteRole = async (id) => {
@@ -31,4 +35,3 @@ module.exports = {
     updateRole,
     deleteRole
 };
-

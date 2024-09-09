@@ -20,6 +20,11 @@ const supplier = require('./suppliers');
 const Order = require('./orders');
 const OrderDetail = require('./ordersDetail');
 
+// Definir asociaciones
+Role.belongsToMany(Permission, { through: PermissionRole, as: 'permissions', foreignKey: 'roleId' });
+Permission.belongsToMany(Role, { through: PermissionRole, as: 'roles', foreignKey: 'permissionId' });
+
+
 
 const models = {
     Category,
