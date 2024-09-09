@@ -25,10 +25,6 @@ const ShoppingDetail = sequelize.define('ShoppingDetail', {
       min: 0,
     },
   },
-  shopping_date: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
   product_id: {
     type: DataTypes.INTEGER,
     references: {

@@ -1,16 +1,33 @@
 const { models } = require('../models');
 const Product = require('../models/products');
 const sequelize = require('../config/database');
+const { Transaction } = require('sequelize');
 
 // Actualizar el stock basado en órdenes
-const updateProductStockForOrders = async (orderDetails, transaction = null) => {
-    for (const detail of orderDetails) {
-        const product = await Product.findByPk(detail.product_id, { transaction });
+const updateProductStock = async (saleDetails, transaction = null) => {
+    for (const detail of saleDetails) {
+        const product = await Product.findByPk(detail.id_producto, { transaction });
         if (product) {
             // Actualizar el stock restando la cantidad de la orden
             const newStock = product.Stock - detail.quantity;
             if (newStock < 0) {
-                throw new Error(`Stock insuficiente para el producto: ${product.Product_Name}`);
+                throw new Error(`Stock insuficiente para el producto :${product.Product_Name}`);
+            }
+            await product.update({ Stock: newStock }, { transaction });
+        } else {
+            throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
+        }
+    }
+};
+
+const updateProductStockForOrders = async (saleDetails, transaction = null) => {
+    for (const detail of saleDetails) {
+        const product = await Product.findByPk(detail.id_producto, { transaction });
+        if (product) {
+            // Actualizar el stock restando la cantidad de la orden
+            const newStock = product.Stock - detail.quantity;
+            if (newStock < 0) {
+                throw new Error(`Stock insuficiente para el producto :${product.Product_Name}`);
             }
             await product.update({ Stock: newStock }, { transaction });
         } else {
@@ -100,6 +117,8 @@ module.exports = {
     createProduct,
     updateProduct,
     deleteProduct,
+    updateProductStock,
+    updateProductStockForPurchases,
     updateProductStockForOrders, // Nueva función para manejar órdenes
     updateProductStockForPurchases, // Función para manejar compras
 };

@@ -27,7 +27,7 @@ const validateShopping = [
 
     body('status')
         .notEmpty().withMessage('El estado es requerido')
-        .isIn(['pendiente', 'completada', 'cancelada']).withMessage('El estado debe ser uno de los siguientes: pendiente, completada, cancelada'),
+        .isIn(['completada', 'anulada']).withMessage('El estado debe ser uno de los siguientes:  completada, anulada'),
 
     body('supplierId')
         .notEmpty().withMessage('El ID del proveedor es requerido')

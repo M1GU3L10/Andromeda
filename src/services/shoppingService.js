@@ -7,10 +7,10 @@ const createShopping = async (shoppingData) => {
     // Obteniendo el unitPrice desde el repositorio de productos si no está proporcionado
     const updatedShoppingDetails = await Promise.all(shoppingDetails.map(async (detail) => {
         const product = await productRepository.getProductById(detail.product_id);
-        const unitPrice = detail.unit_price || product.unit_price; // Usa el unit_price proporcionado o el del producto
+        const unitPrice = detail.unitPrice || product.unit_price; // Usa el unit_price proporcionado o el del producto
         return {
             ...detail,
-            unit_price: unitPrice,
+            unitPrice: unitPrice,
             total_price: detail.quantity * unitPrice // Calcula el total_price
         };
     }));
