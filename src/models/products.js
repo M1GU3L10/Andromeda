@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Asegúrate de que la configuración de la base de datos esté correcta
-const Category = require('./category'); // Asegúrate de que este archivo exporta el modelo Category
+const sequelize = require('../config/database');
+const Category = require('./category');
 
 const Product = sequelize.define('Product', {
     Product_Name: {
@@ -8,43 +8,50 @@ const Product = sequelize.define('Product', {
         allowNull: false,
         unique: true,
         validate: {
-            notEmpty: true // Asegura que el nombre del producto no esté vacío
+            notEmpty: true
         }
     },
     Stock: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
-            isInt: true, // Asegura que el stock es un número entero
-            min: 0 // Asegura que el stock no sea negativo
+            isInt: true,
+            min: 0
         }
     },
     Price: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {
-            isDecimal: true, // Asegura que el precio es un decimal
-            min: 0 // Asegura que el precio no sea negativo
+            isDecimal: true,
+            min: 0
         }
     },
     Category_Id: {
         type: DataTypes.INTEGER,    
         allowNull: false,
         references: {
-            model: Category, // Asegúrate de que el modelo Category está definido y exportado
+            model: Category,
             key: 'id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
     },
     Image: {
-        type: DataTypes.BLOB('long'), // Cambiado a BLOB para almacenar archivos de imagen
+        type: DataTypes.BLOB('long'),
         allowNull: true
     },
-  
+    status: {
+        type: DataTypes.ENUM('A', 'I'),
+        allowNull: false,
+        defaultValue: 'A',
+        validate: {
+            isIn: [['A', 'I']]
+        }
+    }
 }, {
-    tableName: 'products' // Asegura que Sequelize use el nombre de tabla especificado
+    tableName: 'products',
+    timestamps: true
 });
 
 module.exports = Product;
-

@@ -30,9 +30,7 @@ const Order = sequelize.define('Order', {
         references: {
             model: 'Users',
             key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT'
+        }
     },
     Token_Expiration: {
         type: DataTypes.DATE,
