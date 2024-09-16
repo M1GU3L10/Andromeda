@@ -1,22 +1,21 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Asegúrate de importar la instancia de sequelize correctamente
-const User = require('./User'); // Asegúrate de ajustar la ruta al archivo del modelo de usuario
-const Service = require('./service'); // Importa el modelo de servicio (si es necesario)
+const sequelize = require('../config/database');
+const User = require('./User');
 
 const Appointment = sequelize.define('Appointment', {
-    Init_Time: { // Hora de inicio
+    Init_Time: {
         type: DataTypes.TIME,
         allowNull: false
     },
-    Finish_Time: { // Hora de finalización
+    Finish_Time: {
         type: DataTypes.TIME,
         allowNull: false
     },
-    Date: { // Fecha de la cita
+    Date: {
         type: DataTypes.DATE,
         allowNull: false
     },
-    Total: { // Monto total
+    Total: {  // Se calculará automáticamente
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {
@@ -24,10 +23,14 @@ const Appointment = sequelize.define('Appointment', {
             min: 0
         }
     },
+    tiempo_de_la_cita: {  // Tiempo calculado de la cita
+        type: DataTypes.TIME,
+        allowNull: false
+    },
     status: {
-        type: DataTypes.ENUM('A', 'I'),
+        type: DataTypes.ENUM('pendiente', 'completada', 'cancelada'),
         allowNull: false,
-        defaultValue: 'A'
+        defaultValue: 'pendiente'
     },
     clienteId: {
         type: DataTypes.INTEGER,
@@ -35,15 +38,7 @@ const Appointment = sequelize.define('Appointment', {
         references: {
             model: User,
             key: 'id'
-        },
-    },
-    empleadoId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: User,
-            key: 'id'
-        },
+        }
     }
 }, {
     tableName: 'appointments'
