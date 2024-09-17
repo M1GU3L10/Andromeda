@@ -1,83 +1,120 @@
 const { models } = require('../models');
-const Product = models.Product; // Use the Product model from models
+const Product = require('../models/products');
 const sequelize = require('../config/database');
 const { Transaction } = require('sequelize');
 
-// Helper function to find a product by ID
-const findProductById = async (id, transaction = null) => {
-    const product = await Product.findByPk(id, { transaction });
-    if (!product) {
-        throw new Error(`Producto con ID ${id} no encontrado.`);
-    }
-    return product;
-};
-
-// Update product stock based on sales or purchases
-const updateProductStock = async (details, isOrder = true, transaction = null) => {
-    for (const detail of details) {
-        const product = await findProductById(detail.product_id || detail.id_producto, transaction);
-        const newStock = isOrder 
-            ? product.Stock - detail.quantity 
-            : product.Stock + detail.quantity;
-        
-        if (newStock < 0) {
-            throw new Error(`Stock insuficiente para el producto: ${product.Product_Name}`);
+// Actualizar el stock basado en órdenes
+const updateProductStock = async (saleDetails, transaction = null) => {
+    for (const detail of saleDetails) {
+        const product = await Product.findByPk(detail.id_producto, { transaction });
+        if (product) {
+            // Actualizar el stock restando la cantidad de la orden
+            const newStock = product.Stock - detail.quantity;
+            if (newStock < 0) {
+                throw new Error(`Stock insuficiente para el producto :${product.Product_Name}`);
+            }
+            await product.update({ Stock: newStock }, { transaction });
+        } else {
+            throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
         }
-        
-        await product.update({ Stock: newStock }, { transaction });
     }
 };
 
-// Get all products
+const updateProductStockForOrders = async (saleDetails, transaction = null) => {
+    for (const detail of saleDetails) {
+        const product = await Product.findByPk(detail.id_producto, { transaction });
+        if (product) {
+            // Actualizar el stock restando la cantidad de la orden
+            const newStock = product.Stock - detail.quantity;
+            if (newStock < 0) {
+                throw new Error(`Stock insuficiente para el producto :${product.Product_Name}`);
+            }
+            await product.update({ Stock: newStock }, { transaction });
+        } else {
+            throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
+        }
+    }
+};
+
+// Actualizar el stock basado en compras
+const updateProductStockForPurchases = async (shoppingDetail, transaction = null) => {
+    for (const detail of shoppingDetail) {
+        const product = await Product.findByPk(detail.product_id, { transaction });
+        if (product) {
+            // Incrementar el stock basado en compras
+            const newStock = product.Stock + detail.quantity;
+            await product.update({ Stock: newStock }, { transaction });
+        } else {
+            throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
+        }
+    }
+};
+
+// Obtener todos los productos
 const getAllProducts = async () => {
-    return await Product.findAll();
+    return await models.Product.findAll();
 };
 
-// Get a product by its ID
+// Obtener un producto por su ID
 const getProductById = async (id) => {
-    return await findProductById(id);
+    return await Product.findByPk(id);
 };
 
-// Create a new product
-const createProduct = async (productData) => {
+// Crear un nuevo producto
+const createProduct = async (productsData) => {
     const transaction = await sequelize.transaction();
+
     try {
-        const createdProduct = await Product.create(productData, { transaction });
+        const createdProduct = await Product.create(productsData, { transaction });
+        console.log('Producto creado:', createdProduct);
+
+        // Confirmar la transacción
         await transaction.commit();
+        console.log('Transacción confirmada.');
+
         return createdProduct;
     } catch (error) {
+        // Revertir la transacción en caso de error
         await transaction.rollback();
+        console.error('Transacción revertida:', error.message);
         throw error;
     }
 };
 
-// Update an existing product
+// Actualizar un producto existente o su estado
 const updateProduct = async (id, productData) => {
     const transaction = await sequelize.transaction();
+
     try {
-        const product = await findProductById(id, transaction);
-        await product.update(productData, { transaction });
+        // Actualizar el producto con los datos proporcionados, incluyendo el estado si se pasa
+        await Product.update(productData, {
+            where: { id },
+            transaction
+        });
+
+        // Confirmar la transacción
         await transaction.commit();
-        return product;
+        console.log('Transacción confirmada.');
+
+        // Retornar el producto actualizado
+        return await getProductById(id);
     } catch (error) {
+        // Revertir la transacción en caso de error
         await transaction.rollback();
+        console.error('Transacción revertida:', error);
         throw error;
     }
 };
 
-// Delete a product
+
+// Eliminar un producto
 const deleteProduct = async (id) => {
-    const transaction = await sequelize.transaction();
-    try {
-        const product = await findProductById(id, transaction);
-        await product.destroy({ transaction });
-        await transaction.commit();
-        return true;
-    } catch (error) {
-        await transaction.rollback();
-        throw error;
-    }
+    return await models.Product.destroy({
+        where: { id }
+    });
 };
+
+// Actualizar un producto
 
 module.exports = {
     getAllProducts,
@@ -86,4 +123,7 @@ module.exports = {
     updateProduct,
     deleteProduct,
     updateProductStock,
+    updateProductStockForPurchases,
+    updateProductStockForOrders, // Nueva función para manejar órdenes
+    updateProductStockForPurchases, // Función para manejar compras
 };

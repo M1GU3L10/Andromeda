@@ -3,29 +3,17 @@ const { body, validationResult } = require('express-validator');
 const validateProduct = [
     // Validación del nombre del producto
     body('Product_Name')
-        .notEmpty().withMessage('El nombre del producto es requerido')
-        .isLength({ max: 255 }).withMessage('El nombre del producto no debe exceder 255 caracteres'),
+        .notEmpty().withMessage('El nombre del producto es requerido'),
 
     // Validación del precio
     body('Price')
-        .notEmpty().withMessage('El precio es requerido')
-        .isDecimal().withMessage('El precio debe ser un número decimal')
+        .isDecimal().withMessage('El precio debe ser un número decimal positivo')
         .isFloat({ min: 0 }).withMessage('El precio debe ser mayor o igual a 0'),
 
-    // Validación del stock
-    body('Stock')
-        .notEmpty().withMessage('El stock es requerido')
-        .isInt({ min: 0 }).withMessage('El stock debe ser un número entero positivo o cero'),
-
-    // Validación de la categoría
-    body('Category_Id')
-        .notEmpty().withMessage('La categoría es requerida')
-        .isInt().withMessage('La categoría debe ser un número entero'),
-
-    // Validación del estado
+    // Validación del status (campo opcional pero importante)
     body('status')
-        .optional()
-        .isIn(['A', 'I']).withMessage('El estado debe ser "A" (Activo) o "I" (Inactivo)'),
+        .optional() // El campo es opcional
+        .isIn(['A', 'I']).withMessage('El estado debe ser "A" para activo o "I" para inactivo'),
 
     // Validación y procesamiento de la imagen (opcional)
     (req, res, next) => {

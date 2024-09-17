@@ -44,6 +44,8 @@ const updateProduct = async (req, res) => {
     }
 };
 
+
+
 const deleteProduct = async (req, res) => {
     try {
         const deleted = await productService.deleteProduct(req.params.id);
