@@ -50,6 +50,23 @@ const updateProductStockForPurchases = async (shoppingDetail, transaction = null
     }
 };
 
+const updateProductStockForAnulatedPurchases = async (shoppingDetails, transaction = null) => {
+    for (const detail of shoppingDetails) {
+        const product = await Product.findByPk(detail.product_id, { transaction });
+        if (product) {
+            // Decrementar el stock basado en la compra anulada
+            const newStock = product.Stock - detail.quantity;
+            if (newStock < 0) {
+                throw new Error(`Stock insuficiente para el producto: ${product.Product_Name}`);
+            }
+            await product.update({ Stock: newStock }, { transaction });
+        } else {
+            throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
+        }
+    }
+};
+
+
 // Obtener todos los productos
 const getAllProducts = async () => {
     return await models.Product.findAll();
@@ -126,4 +143,5 @@ module.exports = {
     updateProductStockForPurchases,
     updateProductStockForOrders, // Nueva función para manejar órdenes
     updateProductStockForPurchases, // Función para manejar compras
+    updateProductStockForAnulatedPurchases
 };
