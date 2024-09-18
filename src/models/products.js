@@ -7,17 +7,14 @@ const Product = sequelize.define('Product', {
     allowNull: false,
     unique: true,
   },
-  Description: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
+
   Price: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
   },
   Category_Id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: false,   
   },
   Image: {
     type: DataTypes.BLOB('long'),
@@ -32,7 +29,7 @@ const Product = sequelize.define('Product', {
     type: DataTypes.ENUM('A', 'I'),
     allowNull: false,
     defaultValue: 'A'
-  }
+}
 }, {
   tableName: 'products',
   timestamps: true,

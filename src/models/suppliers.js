@@ -20,7 +20,7 @@ const Supplier = sequelize.define('Supplier', {
         allowNull: false,
         unique: true,
     },   
-     status: {
+    status: {
         type: DataTypes.ENUM('A', 'I'),
         allowNull: false,
         defaultValue: 'A'
