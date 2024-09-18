@@ -22,9 +22,10 @@ const Product = sequelize.define('Product', {
   },
   Stock: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,  // Permitir valores nulos
     defaultValue: 0,  // Inicialmente el stock es 0
   },
+  
   status: {
     type: DataTypes.ENUM('A', 'I'),
     allowNull: false,
