@@ -1,5 +1,7 @@
 const shoppingRepository = require('../repositories/shoppingRepository');
 const productRepository = require('../repositories/productsRepository');
+const sequelize = require('../config/database');
+const { Transaction } = require('sequelize');
 
 const createShopping = async (shoppingData) => {
     const { shoppingDetails, ...shopping } = shoppingData;
@@ -22,6 +24,18 @@ const createShopping = async (shoppingData) => {
     return await shoppingRepository.createShopping({ ...shopping, shoppingDetails: updatedShoppingDetails });
 };
 
+const cancelShopping = async (id) => {
+  const transaction = await sequelize.transaction();
+  try {
+      await shoppingRepository.cancelShopping(id, transaction);
+      await transaction.commit();
+  } catch (error) {
+      await transaction.rollback();
+      throw error;
+  }
+};
+
+
 const getShoppingById = async (id) => {
   return await shoppingRepository.getShoppingById(id);
 };
@@ -33,5 +47,6 @@ const getShoppingAll = async () => {
 module.exports = {
   createShopping,
   getShoppingById,
-  getShoppingAll
+  getShoppingAll,
+  cancelShopping
 };
