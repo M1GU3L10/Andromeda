@@ -76,6 +76,30 @@ const login = async (req, res) => {
     }
 };
 
+//Restablecer contraseña
+
+// Solicitar el restablecimiento de la contraseña
+const requestPasswordReset = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const result = await userService.requestPasswordReset(email);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// Restablecer la contraseña con el token
+const resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+        const result = await userService.resetPassword(token, newPassword);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
 
 module.exports = {
     getAllUsers,
@@ -84,5 +108,7 @@ module.exports = {
     updateUser,
     deleteUser,
     register,
-    login
+    login,
+    requestPasswordReset,
+    resetPassword
 };

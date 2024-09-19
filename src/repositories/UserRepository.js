@@ -1,3 +1,4 @@
+const { Op } = require('sequelize'); 
 const { models } = require('../models');
 
 const getAllUsers = async () => {
@@ -28,11 +29,27 @@ const findUserByEmail = async (email) => {
     return await models.User.findOne({ where: { email } });
 };
 
+//Restablecer contraseña 
+const findUserByResetToken = async (token) => {
+    return await models.User.findOne({ where: { resetPasswordToken: token, resetPasswordExpires: { [Op.gt]: Date.now() } } });
+};
+
+const updateResetPasswordToken = async (id, token, expires) => {
+    return await models.User.update({ resetPasswordToken: token, resetPasswordExpires: expires }, { where: { id } });
+};
+
+const updatePassword = async (id, newPassword) => {
+    return await models.User.update({ password: newPassword, resetPasswordToken: null, resetPasswordExpires: null }, { where: { id } });
+};
+
 module.exports = {
     getAllUsers,
     getUserById,
     createUser,
     updateUser,
     deleteUser,
-    findUserByEmail
+    findUserByEmail,
+    findUserByResetToken,
+    updateResetPasswordToken,
+    updatePassword
 };
