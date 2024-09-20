@@ -1,6 +1,13 @@
 const userService = require('../services/userService');
 const authService = require('../services/authService');
+
+const bcrypt = require('bcrypt');
+require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 const { sendResponse, sendError } = require('../utils/response');
+
+const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 
 const getAllUsers = async (req, res) => {
     try {
@@ -100,6 +107,37 @@ const resetPassword = async (req, res) => {
     }
 };
 
+//Registrar con google
+// Código existente...
+const loginWithGoogle = async (req, res) => {
+    const { tokenId } = req.body;
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: tokenId,
+            audience: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        let user = await userService.findUserByEmail(payload.email);
+
+        if (!user) {
+            const password = await bcrypt.hash('googleAuth' + payload.email, 10);
+            user = await userService.createUser({
+                name: payload.name,
+                email: payload.email,
+                password: password,
+                phone: payload.phone_number || null,
+            });
+        }
+
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.json({ user, token });
+    } catch (error) {
+        console.error('Error verificando token de Google:', error);
+        res.status(400).json({ message: 'Error con la autenticación de Google' });
+    }
+};
 
 module.exports = {
     getAllUsers,
@@ -110,5 +148,6 @@ module.exports = {
     register,
     login,
     requestPasswordReset,
-    resetPassword
+    resetPassword,
+    loginWithGoogle
 };

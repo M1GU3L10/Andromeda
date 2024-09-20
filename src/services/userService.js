@@ -56,7 +56,7 @@ const requestPasswordReset = async (email) => {
     return { message: 'Correo de restablecimiento enviado' };
 };
 
-// Restablecer contraseña: confirmar y actualizar contraseña
+// Restablecer contraseña: confirmar y actualizar contraseña 
 const resetPassword = async (token, newPassword) => {
     const user = await userRepository.findUserByResetToken(token);
     if (!user) {
@@ -72,6 +72,12 @@ const resetPassword = async (token, newPassword) => {
     return { message: 'Contraseña restablecida con éxito' };
 };
 
+//Buscar un usuario por su correo electronico
+const findUserByEmail = async (email) => {
+    return await userRepository.findUserByEmail(email);
+};
+
+
 module.exports = {
     getAllUsers,
     getUserById,
@@ -79,6 +85,7 @@ module.exports = {
     updateUser,
     deleteUser,
     requestPasswordReset,
-    resetPassword
+    resetPassword,
+    findUserByEmail
 };
 

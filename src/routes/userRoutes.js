@@ -16,5 +16,6 @@ router.post('/login', userController.login);
 router.post('/forgot-password', userController.requestPasswordReset);
 router.post('/reset-password', userController.resetPassword);
 
+router.post('/login/google', userController.loginWithGoogle);
 
 module.exports = router;
