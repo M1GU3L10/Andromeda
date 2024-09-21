@@ -1,4 +1,5 @@
 const categoryRepository = require('../repositories/categoryRepository');
+const productRepository = require('../repositories/productsRepository');
 
 const getAllCategories = async () => {
     return await categoryRepository.getAllCategories();
@@ -20,11 +21,17 @@ const deleteCategory = async (id) => {
     return await categoryRepository.deleteCategory(id);
 };
 
+const verifyCategoryAssociation = async (categoryId) => {
+    const products = await productRepository.checkCategoryAssociation(categoryId);
+    return products.length > 0;
+};
+
+
 module.exports = {
     getAllCategories,
     getCategoryById,
     createCategory,
     updateCategory,
-    deleteCategory
+    deleteCategory,
+    verifyCategoryAssociation
 };
-

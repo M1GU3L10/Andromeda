@@ -22,6 +22,24 @@ const getCategoryById = async (req, res) => {
     }
 };
 
+const checkCategoryAssociation = async (req, res) => {
+    const { categoryId } = req.params;
+
+    try {
+        const isAssociated = await categoryService.verifyCategoryAssociation(categoryId);
+
+        if (isAssociated) {
+            return res.json({ isAssociated: true });
+        } else {
+            return res.json({ isAssociated: false });
+        }
+    } catch (error) {
+        console.error('Error al verificar asociación de la categoría:', error);
+        return res.status(500).json({ message: 'Error al verificar asociación de la categoría' });
+    }
+};
+
+
 const createCategory = async (req, res) => {
     try {
         const category = await categoryService.createCategory(req.body);
@@ -60,5 +78,6 @@ module.exports = {
     getCategoryById,
     createCategory,
     updateCategory,
+    checkCategoryAssociation,
     deleteCategory
 };
