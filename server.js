@@ -28,6 +28,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api/categories', categoryRoutes);
+app.use('/uploads', express.static('uploads'));
 app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/permissions', permissionRoutes);

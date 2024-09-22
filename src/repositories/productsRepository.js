@@ -104,29 +104,32 @@ const createProduct = async (productsData) => {
 
 // Actualizar un producto existente o su estado
 const updateProduct = async (id, productData) => {
+    console.log('Repository: Updating product with id:', id, 'and data:', productData);
     const transaction = await sequelize.transaction();
 
     try {
-        // Actualizar el producto con los datos proporcionados, incluyendo el estado si se pasa
-        await Product.update(productData, {
+        const [updatedRowsCount, updatedProducts] = await Product.update(productData, {
             where: { id },
+            returning: true,
             transaction
         });
 
-        // Confirmar la transacción
-        await transaction.commit();
-        console.log('Transacción confirmada.');
+        if (updatedRowsCount === 0) {
+            throw new Error('Producto no encontrado');
+        }
 
-        // Retornar el producto actualizado
-        return await getProductById(id);
+        console.log('Repository: Product updated:', updatedProducts[0]);
+
+        await transaction.commit();
+        console.log('Repository: Transaction committed.');
+
+        return updatedProducts[0];  
     } catch (error) {
-        // Revertir la transacción en caso de error
         await transaction.rollback();
-        console.error('Transacción revertida:', error);
+        console.error('Repository: Error updating product, transaction rolled back:', error);
         throw error;
     }
 };
-
 
 // Eliminar un producto
 const deleteProduct = async (id) => {

@@ -12,24 +12,34 @@ const createProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
     try {
-        const products = await productService.getAllProducts();
-        sendResponse(res, products);
+      const products = await productService.getAllProducts();
+      // Convert image buffer to base64 string for each product
+      const productsWithImageUrls = products.map(product => ({
+        ...product.toJSON(),
+        Image: product.Image ? `data:${product.ImageMimeType};base64,${product.Image.toString('base64')}` : null
+      }));
+      sendResponse(res, productsWithImageUrls);
     } catch (error) {
-        sendError(res, error);
+      sendError(res, error);
     }
-};
+  };
 
-const getProductById = async (req, res) => {
+  const getProductById = async (req, res) => {
     try {
-        const product = await productService.getProductById(req.params.id);
-        if (!product) {
-            return sendError(res, 'Producto no encontrado', 404);
-        }
-        sendResponse(res, product);
+      const product = await productService.getProductById(req.params.id);
+      if (!product) {
+        return sendError(res, 'Producto no encontrado', 404);
+      }
+      // Convert image buffer to base64 string
+      const productWithImageUrl = {
+        ...product.toJSON(),
+        Image: product.Image ? `data:${product.ImageMimeType};base64,${product.Image.toString('base64')}` : null
+      };
+      sendResponse(res, productWithImageUrl);
     } catch (error) {
-        sendError(res, error);
+      sendError(res, error);
     }
-};
+  };
 
 
 const updateProduct = async (req, res) => {

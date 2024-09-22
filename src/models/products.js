@@ -20,6 +20,10 @@ const Product = sequelize.define('Product', {
     type: DataTypes.BLOB('long'),
     allowNull: true,
   },
+  ImageMimeType: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   Stock: {
     type: DataTypes.INTEGER,
     allowNull: true,  // Permitir valores nulos
