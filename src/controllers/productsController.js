@@ -22,9 +22,9 @@ const getAllProducts = async (req, res) => {
     } catch (error) {
       sendError(res, error);
     }
-  };
+};
 
-  const getProductById = async (req, res) => {
+const getProductById = async (req, res) => {
     try {
       const product = await productService.getProductById(req.params.id);
       if (!product) {
@@ -39,21 +39,20 @@ const getAllProducts = async (req, res) => {
     } catch (error) {
       sendError(res, error);
     }
-  };
-
-
-const updateProduct = async (req, res) => {
-    try {
-        const updated = await productService.updateProduct(req.params.id, req.body);
-        if (updated[0] === 0) {
-            return sendError(res, 'Producto no encontrado', 404);
-        }
-        sendResponse(res, 'Producto actualizado correctamente');
-    } catch (error) {
-        sendError(res, error);
-    }
 };
 
+const updateProduct = async (req, res) => {
+  try {
+      // Si estás actualizando solo el estado, utiliza la función correcta:
+      const updated = await productService.updateProductStatus(req.params.id, req.body.status);
+      if (updated[0] === 0) {
+          return sendError(res, 'Producto no encontrado', 404);
+      }
+      sendResponse(res, 'Producto actualizado correctamente');
+  } catch (error) {
+      sendError(res, error);
+  }
+};
 
 
 const deleteProduct = async (req, res) => {
@@ -68,10 +67,26 @@ const deleteProduct = async (req, res) => {
     }
 };
 
+const updateProductStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        
+        const updated = await productService.updateProductStatus(id, status);
+        if (!updated) {
+            return sendError(res, 'Producto no encontrado', 404);
+        }
+        sendResponse(res, 'Estado del producto actualizado correctamente');
+    } catch (error) {
+        sendError(res, error);
+    }
+};
+
 module.exports = {
     getAllProducts,
     getProductById,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    updateProductStatus
 };

@@ -2,11 +2,12 @@ const multer = require('multer');
 const { body, validationResult } = require('express-validator');
 
 // Configuración de multer para almacenar imágenes en memoria
+const storage = multer.memoryStorage(); // O donde desees almacenar los archivos
 const upload = multer({
-  storage: multer.memoryStorage(),
+  storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // Límite de 5MB
-  },
+      fileSize: 10 * 1024 * 1024 // Límite de 10 MB
+  }
 });
 
 // Middleware de validación del producto

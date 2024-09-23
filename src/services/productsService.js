@@ -1,4 +1,5 @@
 const productRepository = require('../repositories/productsRepository');
+const Product = require('../models/products');  // Importa el modelo Product aquí
 
 const getAllProducts = async () => {
     return await productRepository.getAllProducts();
@@ -8,14 +9,24 @@ const getProductById = async (id) => {
     return await productRepository.getProductById(id);
 };
 
+const updateProductStatus = async (id, status) => {
+    const product = await Product.findByPk(id);  // Usa el modelo Product para buscar el producto por su ID
+    if (!product) {
+        return null;
+    }
+    product.status = status;
+    await product.save();
+    return product;
+};
+
 const createProduct = async (productData) => {
     console.log('Service: Creating product with data:', productData);
-    
+
     if (!productData.Product_Name || !productData.Price || !productData.Category_Id) {
         throw new Error('Nombre del producto, precio y categoría son obligatorios');
     }
 
-    // If there's image data, ensure it's properly formatted
+    // Si hay datos de imagen, asegúrate de que estén formateados correctamente
     if (productData.Image) {
         productData.Image = Buffer.from(productData.Image);
     }
@@ -32,12 +43,12 @@ const createProduct = async (productData) => {
 
 const updateProduct = async (id, productData) => {
     console.log('Service: Updating product with id:', id, 'and data:', productData);
-    
+
     if (!id) {
         throw new Error('ID del producto es obligatorio');
     }
 
-    // If there's new image data, ensure it's properly formatted
+    // Si hay datos de nueva imagen, asegúrate de que estén formateados correctamente
     if (productData.Image) {
         productData.Image = Buffer.from(productData.Image);
     }
@@ -61,5 +72,6 @@ module.exports = {
     getProductById,
     createProduct,
     updateProduct,
+    updateProductStatus,  // Asegúrate de exportar la función updateProductStatus
     deleteProduct
 };
