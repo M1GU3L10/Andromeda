@@ -19,6 +19,9 @@ const updateProductStock = async (saleDetails, transaction = null) => {
         }
     }
 };
+const checkCategoryAssociation = async (categoryId) => {
+    return await Product.findAll({ where: { Category_Id: categoryId } });
+};
 
 const updateProductStockForOrders = async (saleDetails, transaction = null) => {
     for (const detail of saleDetails) {
