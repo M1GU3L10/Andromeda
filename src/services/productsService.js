@@ -42,26 +42,49 @@ const createProduct = async (productData) => {
 };
 
 const updateProduct = async (id, productData) => {
-    console.log('Service: Updating product with id:', id, 'and data:', productData);
+  console.log('Service: Updating product with id:', id, 'and data:', productData);
+  
+  if (!id) {
+      throw new Error('ID del producto es obligatorio');
+  }
 
-    if (!id) {
-        throw new Error('ID del producto es obligatorio');
-    }
+  // Busca el producto por su ID
+  const product = await Product.findByPk(id);
+  if (!product) {
+      throw new Error('Producto no encontrado');
+  }
 
-    // Si hay datos de nueva imagen, asegúrate de que estén formateados correctamente
-    if (productData.Image) {
-        productData.Image = Buffer.from(productData.Image);
-    }
+  // Actualiza el estado del producto si se proporciona
+  if (productData.status) {
+      product.status = productData.status;
+  }
 
-    try {
-        const updatedProduct = await productRepository.updateProduct(id, productData);
-        console.log('Service: Product updated successfully:', updatedProduct);
-        return updatedProduct;
-    } catch (error) {
-        console.error('Service: Error updating product:', error);
-        throw new Error(`Error al actualizar el producto: ${error.message}`);
-    }
+  // Actualiza otros campos del producto
+  if (productData.Product_Name) {
+      product.Product_Name = productData.Product_Name;
+  }
+  if (productData.Price) {
+      product.Price = productData.Price;
+  }
+  if (productData.Category_Id) {
+      product.Category_Id = productData.Category_Id;
+  }
+  // Si hay nuevos datos de imagen, asegúrate de que estén en el formato correcto
+  if (productData.Image) {
+      productData.Image = Buffer.from(productData.Image);
+      product.Image = productData.Image; // Actualiza la imagen también
+  }
+
+  try {
+      await product.save();
+      console.log('Service: Product updated successfully:', product);
+      return product;
+  } catch (error) {
+      console.error('Service: Error updating product:', error);
+      throw new Error(`Error al actualizar el producto: ${error.message}`);
+  }
 };
+
 
 const deleteProduct = async (id) => {
     return await productRepository.deleteProduct(id);
