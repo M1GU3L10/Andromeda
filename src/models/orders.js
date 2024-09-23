@@ -20,7 +20,7 @@ const Order = sequelize.define('Order', {
         }
     },
     Status: {
-        type: DataTypes.ENUM('Completado','En proceso', 'Cancelado'),
+        type: DataTypes.ENUM('Completado', 'En proceso', 'Cancelado', 'Inactivo'),
         allowNull: false,
         defaultValue: 'En proceso'
     },
@@ -35,11 +35,11 @@ const Order = sequelize.define('Order', {
     Token_Expiration: {
         type: DataTypes.DATE,
         allowNull: false,
+        // El valor predeterminado se calcula en el hook
         defaultValue: function() {
-            const today = new Date();
-            const randomDays = Math.floor(Math.random() * 3) + 1; // Número aleatorio entre 1 y 3
-            today.setDate(today.getDate() + randomDays);
-            return today;
+            const now = new Date();
+            now.setDate(now.getDate() + 3); // Añadir 3 días
+            return now;
         }
     }
 }, {
@@ -54,3 +54,4 @@ const Order = sequelize.define('Order', {
 });
 
 module.exports = Order;
+    

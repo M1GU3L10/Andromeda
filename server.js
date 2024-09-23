@@ -18,15 +18,16 @@ const shoppingRoutes = require('./src/routes/shoppingRoutes');
 const appointmentRoutes = require('./src/routes/appointmentRoutes');
 const programmingEmployeeRoutes = require('./src/routes/programmingEmployeeRoutes');
 
-
-
-
 dotenv.config();
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
 
+// Configuración del body-parser antes de las rutas
+app.use(bodyParser.json({ limit: '20mb' }));
+app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
+
+app.use('/uploads', express.static('uploads'));
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
@@ -41,7 +42,6 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/shopping', shoppingRoutes);
 app.use('/api/appointment', appointmentRoutes);
 app.use('/api/programming', programmingEmployeeRoutes);
-
 
 const PORT = process.env.PORT || 3000;
 
