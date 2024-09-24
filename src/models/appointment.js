@@ -12,8 +12,8 @@ const Appointment = sequelize.define('Appointment', {
         allowNull: false
     },
     Date: {
-        type: DataTypes.DATE,
-        allowNull: false
+        type: DataTypes.DATEONLY,
+        allowNull: false,
     },
     Total: {  // Se calculará automáticamente
         type: DataTypes.DECIMAL(10, 2),
