@@ -3,7 +3,7 @@ const { models } = require('../models');
 
 const validateSale = [
     body('Billnumber')
-        .isLength({ min: 6, max: 6 }).withMessage('El número de factura debe tener exactamente 6 dígitos')
+        .isLength({ min: 3, max: 3 }).withMessage('El número de factura debe tener exactamente 3 dígitos')
         .isNumeric().withMessage('El número de factura solo debe contener números')
         .custom(async (value) => {
             const sale = await models.Sale.findOne({ where: { Billnumber: value } });
