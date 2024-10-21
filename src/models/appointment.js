@@ -23,8 +23,8 @@ const Appointment = sequelize.define('Appointment', {
             min: 0
         }
     },
-    tiempo_de_la_cita: {  // Tiempo calculado de la cita
-        type: DataTypes.TIME,
+    time_appointment: {  // Tiempo calculado de la cita
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     status: {

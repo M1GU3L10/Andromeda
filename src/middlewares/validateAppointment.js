@@ -11,11 +11,6 @@ const validateAppointment = [
     body('Init_Time')
         .notEmpty().withMessage('La hora de inicio es requerida')
         .custom(isValidTime).withMessage('La hora de inicio debe ser una hora válida (HH:MM:SS)'),
-    
-    body('Finish_Time')
-        .notEmpty().withMessage('La hora de finalización es requerida')
-        .custom(isValidTime).withMessage('La hora de finalización debe ser una hora válida (HH:MM:SS)'),
-    
     body('Date')
         .notEmpty().withMessage('La fecha es requerida')
         .isISO8601().withMessage('La fecha debe ser una fecha válida en formato ISO 8601 (YYYY-MM-DD)'),

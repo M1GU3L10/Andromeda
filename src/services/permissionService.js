@@ -12,15 +12,11 @@ const createPermission = async (data) => {
     return await permissionRepository.createPermission(data);
 };
 
-
 const createMultiplePermissions = async (permissionNames) => {
-    const permissions = [];
-    for (const name of permissionNames) {
-      const permission = await permissionRepository.createPermission({ name });
-      permissions.push(permission);
-    }
-    return permissions;
+    const permissionsData = permissionNames.map(name => ({ name }));
+    return await permissionRepository.createPermission(permissionsData);
 };
+
 
 
 const updatePermission = async (id, data) => {

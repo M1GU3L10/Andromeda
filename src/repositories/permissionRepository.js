@@ -9,8 +9,12 @@ const getPermissionById = async (id) => {
 };
 
 const createPermission = async (data) => {
+    if (Array.isArray(data)) {
+        return await models.Permission.bulkCreate(data, { ignoreDuplicates: true });
+    }
     return await models.Permission.create(data);
 };
+
 
 
 

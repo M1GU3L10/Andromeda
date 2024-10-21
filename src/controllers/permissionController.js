@@ -3,11 +3,19 @@ const { sendResponse, sendError } = require('../utils/response');
 
 const createMultiplePermissions = async (req, res) => {
     try {
-        const permissionNames = req.body.permissions || [
-            'Horizonte', 'Melodía', 'Destello', 'Serenidad', 'Recuerdo',
-            'Espejo', 'Amanecer', 'Silencio', 'Ternura', 'Fantasía',
-            'Fragancia', 'Brisa', 'Murmullo', 'Éxtasis', 'Infinito',
-            'Destino', 'Sombras', 'Susurro', 'Aurora', 'Vértigo'
+        const permissionNames = [
+            'Roles',
+            'Usuarios',
+            'Categorias',
+            'Productos',
+            'Proveedores',
+            'Compras',
+            'Servicios',
+            'Programacion de empleado',
+            'Ausencias',
+            'Citas',
+            'Pedidos',
+            'Ventas'
         ];
 
         const permissions = await permissionService.createMultiplePermissions(permissionNames);
