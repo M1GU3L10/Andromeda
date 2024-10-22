@@ -40,17 +40,17 @@ const createUser = async (req, res) => {
     }
 };
 
-const updateUser = async (req, res) => {
+const editUser = async (req, res) => {
     try {
-        const updated = await userService.updateUser(req.params.id, req.body);
-        if (updated[0] === 0) {
-            return sendError(res, 'Usuario no encontrado', 404);
-        }
-        sendResponse(res, 'Usuario actualizado correctamente');
+        const { id } = req.params;
+        const { name, email, password, phone, roleId } = req.body;
+        const updatedUser = await authService.updateUser(id, { name, email, password, phone, roleId });
+        sendResponse(res, updatedUser, 200, 'Usuario actualizado correctamente');
     } catch (error) {
-        sendError(res, error);
+        sendError(res, error.message, 400);
     }
 };
+
 
 const deleteUser = async (req, res) => {
     try {
@@ -144,7 +144,7 @@ module.exports = {
     getAllUsers,
     getUserById,
     createUser,
-    updateUser,
+    editUser,
     deleteUser,
     register,
     login,

@@ -15,6 +15,27 @@ const register = async (name, email, password, phone, roleId) => {
     return { user, token };
 };
 
+const updateUser = async (id, userData) => {
+    const { password, ...otherData } = userData;
+    let dataToUpdate = { ...otherData };
+
+    if (password) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        dataToUpdate.password = hashedPassword;
+    }
+
+    const updatedUser = await userRepository.updateUser(id, dataToUpdate);
+    
+    if (!updatedUser) {
+        throw new Error('Usuario no encontrado');
+    }
+
+    const { password: _, ...userWithoutPassword } = updatedUser.toJSON();
+    const token = jwtUtils.generateToken(userWithoutPassword);
+    
+    return { user: userWithoutPassword, token };
+};
+
 const login = async (email, password) => {
     const user = await userRepository.findUserByEmail(email);
     if (!user) {
@@ -30,5 +51,6 @@ const login = async (email, password) => {
 
 module.exports = {
     register,
-    login
+    login,
+    updateUser
 };

@@ -14,9 +14,11 @@ const createUser = async (data) => {
 };
 
 const updateUser = async (id, data) => {
-    return await models.User.update(data, {
-        where: { id }
+    const [updatedRowsCount, [updatedUser]] = await models.User.update(data, {
+        where: { id },
+        returning: true,
     });
+    return updatedUser;
 };
 
 const deleteUser = async (id) => {
