@@ -86,6 +86,7 @@ const updateProduct = async (id, productData) => {
 };
 
 
+
 const deleteProduct = async (id) => {
     return await productRepository.deleteProduct(id);
 };
@@ -96,5 +97,6 @@ module.exports = {
     createProduct,
     updateProduct,
     updateProductStatus,  // Asegúrate de exportar la función updateProductStatus
-    deleteProduct
+    deleteProduct,
+ 
 };

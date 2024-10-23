@@ -47,22 +47,17 @@ const cancelShopping = async (id, transaction = null) => {
         include: [ShoppingDetail],
         transaction
     });
-
     if (!shopping) {
         throw new Error('Compra no encontrada');
     }
-
     if (shopping.status === 'anulada') {
         throw new Error('Esta compra ya está anulada');
     }
-
     // Cambiar estado a anulada
     shopping.status = 'anulada';
-
     // Actualizar stock de los productos
     const shoppingDetails = shopping.ShoppingDetails; // Detalles de la compra
     await productRepository.updateProductStockForAnulatedPurchases(shoppingDetails, transaction); // Función que decremente el stock
-
     // Guardar la compra actualizada
     await shopping.save({ transaction });
 };

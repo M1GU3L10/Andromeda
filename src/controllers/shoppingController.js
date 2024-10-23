@@ -30,7 +30,6 @@ const getAllShopping = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
-
 const cancelShopping = async (req, res) => {
     try {
         await shoppingService.cancelShopping(req.params.id);
