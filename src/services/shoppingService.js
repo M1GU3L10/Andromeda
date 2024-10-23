@@ -34,8 +34,6 @@ const cancelShopping = async (id) => {
       throw error;
   }
 };
-
-
 const getShoppingById = async (id) => {
   return await shoppingRepository.getShoppingById(id);
 };

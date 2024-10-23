@@ -50,7 +50,6 @@ const updateProductStockForAnulatedPurchases = async (shoppingDetails, transacti
         } else {
             throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
         }
-        await product.update({ Stock: newStock }, { transaction });
     }
 };
 
