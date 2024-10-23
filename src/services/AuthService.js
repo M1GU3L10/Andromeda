@@ -16,24 +16,21 @@ const register = async (name, email, password, phone, roleId) => {
 };
 
 const updateUser = async (id, userData) => {
-    const { password, ...otherData } = userData;
-    let dataToUpdate = { ...otherData };
+    try {
+        const updatedUser = await userRepository.updateUser(id, userData);
+        
+        if (!updatedUser) {
+            throw new Error('Usuario no encontrado');
+        }
 
-    if (password) {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        dataToUpdate.password = hashedPassword;
+        const { password: _, ...userWithoutPassword } = updatedUser.toJSON();
+        const token = jwtUtils.generateToken(userWithoutPassword);
+        
+        return { user: userWithoutPassword, token };
+    } catch (error) {
+        console.error('Error en AuthService updateUser:', error);
+        throw error;
     }
-
-    const updatedUser = await userRepository.updateUser(id, dataToUpdate);
-    
-    if (!updatedUser) {
-        throw new Error('Usuario no encontrado');
-    }
-
-    const { password: _, ...userWithoutPassword } = updatedUser.toJSON();
-    const token = jwtUtils.generateToken(userWithoutPassword);
-    
-    return { user: userWithoutPassword, token };
 };
 
 const login = async (email, password) => {

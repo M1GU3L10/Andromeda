@@ -43,10 +43,19 @@ const createUser = async (req, res) => {
 const editUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, email, password, phone, roleId } = req.body;
-        const updatedUser = await authService.updateUser(id, { name, email, password, phone, roleId });
+        const { name, email, password, phone, roleId, status } = req.body;
+        
+        let updateData = { name, email, phone, roleId, status };
+        
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            updateData.password = hashedPassword;
+        }
+        
+        const updatedUser = await authService.updateUser(id, updateData);
         sendResponse(res, updatedUser, 200, 'Usuario actualizado correctamente');
     } catch (error) {
+        console.error('Error updating user:', error);
         sendError(res, error.message, 400);
     }
 };

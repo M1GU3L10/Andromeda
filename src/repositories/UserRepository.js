@@ -14,11 +14,21 @@ const createUser = async (data) => {
 };
 
 const updateUser = async (id, data) => {
-    const [updatedRowsCount, [updatedUser]] = await models.User.update(data, {
-        where: { id },
-        returning: true,
-    });
-    return updatedUser;
+    try {
+        const [updatedRowsCount, updatedUsers] = await models.User.update(data, {
+            where: { id },
+            returning: true,
+        });
+
+        if (updatedRowsCount === 0) {
+            throw new Error('No se encontró un usuario con el id proporcionado');
+        }
+
+        return updatedUsers[0];
+    } catch (error) {
+        console.error('Error en updateUser repository:', error);
+        throw error;
+    }
 };
 
 const deleteUser = async (id) => {

@@ -17,7 +17,12 @@ const createUser = async (data) => {
 };
 
 const updateUser = async (id, data) => {
-    return await userRepository.updateUser(id, data);
+    try {
+        return await userRepository.updateUser(id, data);
+    } catch (error) {
+        console.error('Error en updateUser service:', error);
+        throw error;
+    }
 };
 
 const deleteUser = async (id) => {
