@@ -7,11 +7,18 @@ const getAllOrders = async () => {
 const getOrderById = async (id) => {
     return await orderRepository.getOrderById(id);
 };
-
-const createOrder = async (data) => {
-    const newOrder = await orderRepository.createOrder(data);
-    await checkAndConvertToSale(newOrder);
-    return newOrder;
+const createOrder = async (orderData) => {
+    try {
+        // Validar datos antes de enviarlos al repositorio
+        if (!orderData.Total_Amount || !orderData.User_Id || !orderData.Order_Date || !orderData.Order_Time) {
+            throw new Error('Faltan datos requeridos para crear la orden');
+        }
+        
+        return await orderRepository.createOrder(orderData);
+    } catch (error) {
+        console.error('Error en el servicio de creación de orden:', error);
+        throw error; // Re-lanzar el error para manejarlo en el controlador
+    }
 };
 
 const updateOrder = async (id, data) => {
@@ -19,6 +26,7 @@ const updateOrder = async (id, data) => {
     await checkAndConvertToSale(updatedOrder);
     return updatedOrder;
 };
+
 
 const deleteOrder = async (id) => {
     return await orderRepository.deleteOrder(id);
