@@ -1,6 +1,63 @@
 const { models } = require('../models');
 const Product = require('../models/products');
 const sequelize = require('../config/database');
+const { Transaction } = require('sequelize');
+
+const updateProductStock = async (saleDetails, transaction = null) => {
+    for (const detail of saleDetails) {
+        const product = await Product.findByPk(detail.id_producto, { transaction });
+        if (product) {
+            // Actualizar el stock restando la cantidad de la orden
+            const newStock = product.Stock - detail.quantity;
+            if (newStock < 0) {
+                throw new Error(`Stock insuficiente para el producto :${product.Product_Name}`);
+            }
+            await product.update({ Stock: newStock }, { transaction });
+        } else {
+            throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
+        }
+    }
+};
+
+// Actualizar el stock basado en compras
+const updateProductStockForPurchases = async (shoppingDetail, transaction = null) => {
+    for (const detail of shoppingDetail) {
+        const product = await Product.findByPk(detail.product_id, { transaction });
+        if (product) {
+            // Incrementar el stock basado en compras
+            const newStock = product.Stock + detail.quantity;
+            await product.update({ Stock: newStock }, { transaction });
+        } else {
+            throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
+        const newStock = product.Stock - detail.quantity;
+        if (newStock < 0) {
+            throw new Error(`Stock insuficiente para el producto: ${product.Product_Name}`);
+        }
+    }
+};
+}
+
+const updateProductStockForAnulatedPurchases = async (shoppingDetails, transaction = null) => {
+    for (const detail of shoppingDetails) {
+        const product = await Product.findByPk(detail.product_id, { transaction });
+        if (product) {
+            // Decrementar el stock basado en la compra anulada
+            const newStock = product.Stock - detail.quantity;
+            if (newStock < 0) {
+                throw new Error(`Stock insuficiente para el producto: ${product.Product_Name}`);
+            }
+            await product.update({ Stock: newStock }, { transaction });
+        } else {
+            throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
+        }
+        await product.update({ Stock: newStock }, { transaction });
+    }
+};
+
+const checkCategoryAssociation = async (categoryId) => {
+    return await Product.findAll({ where: { Category_Id: categoryId } });
+};
+
 
 // Actualizar el stock basado en órdenes
 const updateProductStockForOrders = async (saleDetails, transaction = null) => {
@@ -17,7 +74,10 @@ const updateProductStockForOrders = async (saleDetails, transaction = null) => {
 
         await product.update({ Stock: newStock }, { transaction });
     }
+
+
 };
+
 
 
 // Obtener todos los productos
@@ -74,6 +134,9 @@ const deleteProduct = async (id) => {
 };
 
 module.exports = {
+    updateProductStockForPurchases,
+    updateProductStockForAnulatedPurchases,
+    updateProductStock,
     getAllProducts,
     getProductById,
     createProduct,
