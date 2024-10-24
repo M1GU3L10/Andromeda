@@ -1,6 +1,14 @@
 const { Op } = require('sequelize'); 
 const { models } = require('../models');
 
+const findUserByEmail = async (email) => {
+    return await models.User.findOne({ where: { email } });
+};
+
+const findUserByPhone = async (phone) => {
+    return await models.User.findOne({ where: { phone } });
+};
+
 const getAllUsers = async () => {
     return await models.User.findAll();
 };
@@ -37,9 +45,6 @@ const deleteUser = async (id) => {
     });
 };
 
-const findUserByEmail = async (email) => {
-    return await models.User.findOne({ where: { email } });
-};
 
 //Restablecer contraseña 
 const findUserByResetToken = async (token) => {
@@ -60,8 +65,9 @@ module.exports = {
     createUser,
     updateUser,
     deleteUser,
-    findUserByEmail,
     findUserByResetToken,
     updateResetPasswordToken,
-    updatePassword
+    updatePassword,
+    findUserByEmail,
+    findUserByPhone
 };

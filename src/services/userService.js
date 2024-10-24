@@ -4,6 +4,16 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const userRepository = require('../repositories/UserRepository');
 
+const checkEmailExists = async (email) => {
+    const user = await userRepository.findUserByEmail(email);
+    return !!user;
+};
+
+const checkPhoneExists = async (phone) => {
+    const user = await userRepository.findUserByPhone(phone);
+    return !!user;
+};
+
 const getAllUsers = async () => {
     return await userRepository.getAllUsers();
 };
@@ -77,11 +87,6 @@ const resetPassword = async (token, newPassword) => {
     return { message: 'Contraseña restablecida con éxito' };
 };
 
-//Buscar un usuario por su correo electronico
-const findUserByEmail = async (email) => {
-    return await userRepository.findUserByEmail(email);
-};
-
 
 module.exports = {
     getAllUsers,
@@ -91,6 +96,7 @@ module.exports = {
     deleteUser,
     requestPasswordReset,
     resetPassword,
-    findUserByEmail
+    checkEmailExists,
+    checkPhoneExists
 };
 

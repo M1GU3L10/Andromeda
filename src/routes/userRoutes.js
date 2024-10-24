@@ -18,4 +18,8 @@ router.post('/reset-password', userController.resetPassword);
 
 router.post('/login/google', userController.loginWithGoogle);
 
+router.get('/check-email/:email', userController.checkEmailExists);
+router.get('/check-phone/:phone', userController.checkPhoneExists);
+
+
 module.exports = router;

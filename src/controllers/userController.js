@@ -9,6 +9,26 @@ const { sendResponse, sendError } = require('../utils/response');
 
 const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 
+const checkEmailExists = async (req, res) => {
+    try {
+        const { email } = req.params;
+        const exists = await userService.checkEmailExists(email);
+        res.json({ exists });
+    } catch (error) {
+        sendError(res, error.message, 500);
+    }
+};
+
+const checkPhoneExists = async (req, res) => {
+    try {
+        const { phone } = req.params;
+        const exists = await userService.checkPhoneExists(phone);
+        res.json({ exists });
+    } catch (error) {
+        sendError(res, error.message, 500);
+    }
+};
+
 const getAllUsers = async (req, res) => {
     try {
         const users = await userService.getAllUsers();
@@ -159,5 +179,7 @@ module.exports = {
     login,
     requestPasswordReset,
     resetPassword,
-    loginWithGoogle
+    loginWithGoogle,
+    checkEmailExists,
+    checkPhoneExists
 };
