@@ -1,4 +1,5 @@
 const orderRepository = require('../repositories/ordersRepository');
+const productRepository = require('../repositories/productsRepository');
 
 const getAllOrders = async () => {
     return await orderRepository.getAllOrders();
@@ -7,19 +8,33 @@ const getAllOrders = async () => {
 const getOrderById = async (id) => {
     return await orderRepository.getOrderById(id);
 };
+
 const createOrder = async (orderData) => {
-    try {
-        // Validar datos antes de enviarlos al repositorio
-        if (!orderData.Total_Amount || !orderData.User_Id || !orderData.Order_Date || !orderData.Order_Time) {
-            throw new Error('Faltan datos requeridos para crear la orden');
-        }
-        
-        return await orderRepository.createOrder(orderData);
-    } catch (error) {
-        console.error('Error en el servicio de creación de orden:', error);
-        throw error; // Re-lanzar el error para manejarlo en el controlador
+    const { orderDetails, ...order } = orderData;
+
+    if (!Array.isArray(orderDetails)) {
+        throw new Error("Faltan datos requeridos para crear la orden: orderDetails no es un array");
     }
+
+    const updatedOrderDetails = await Promise.all(orderDetails.map(async (detail) => {
+        const product = await productRepository.getProductById(detail.id_producto);
+        if (!product) {
+            throw new Error(`Producto no encontrado para id: ${detail.id_producto}`);
+        }
+        const unitPrice = product.Price;
+        return {
+            ...detail,
+            unitPrice: unitPrice,
+            total_price: detail.quantity * unitPrice
+        };
+    }));
+
+    order.total_price = updatedOrderDetails.reduce((acc, detail) => acc + detail.total_price, 0);
+
+    return await orderRepository.createOrder({ ...order, orderDetails: updatedOrderDetails });
 };
+
+
 
 const updateOrder = async (id, data) => {
     const updatedOrder = await orderRepository.updateOrder(id, data);

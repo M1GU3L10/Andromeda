@@ -4,14 +4,14 @@ const Product = require('./products');
 const Order = require('./orders');
 
 const OrderDetail = sequelize.define('OrderDetail', {
-  quantity: {
+    quantity: {
     type: DataTypes.FLOAT,
     allowNull: false,
     validate: {
       min: 0,
     },
   },
-  unit_price: {
+  unitPrice: {
     type: DataTypes.INTEGER,
     allowNull: false,
     validate: {
@@ -19,24 +19,20 @@ const OrderDetail = sequelize.define('OrderDetail', {
     },
   },
   total_price: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.FLOAT,
     allowNull: false,
     validate: {
       min: 0,
     },
   },
-  order_date: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  product_id: {
+  id_producto: {
     type: DataTypes.INTEGER,
     references: {
       model: Product,
       key: 'id',
     },
   },
-  order_id: {
+  id_order: {
     type: DataTypes.INTEGER,
     references: {
       model: Order,
@@ -47,9 +43,9 @@ const OrderDetail = sequelize.define('OrderDetail', {
   tableName: 'order_details',
 });
 
-Order.hasMany(OrderDetail, { foreignKey: 'order_id' });
-OrderDetail.belongsTo(Order, { foreignKey: 'order_id' });
-Product.hasMany(OrderDetail, { foreignKey: 'product_id' });
-OrderDetail.belongsTo(Product, { foreignKey: 'product_id' });
+Order.hasMany(OrderDetail, { foreignKey: 'id_order' });
+OrderDetail.belongsTo(Order, { foreignKey: 'id_order' });
+Product.hasMany(OrderDetail, { foreignKey: 'id_producto' });
+OrderDetail.belongsTo(Product, { foreignKey: 'id_producto' });
 
 module.exports = OrderDetail;

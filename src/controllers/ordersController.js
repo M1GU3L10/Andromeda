@@ -24,18 +24,13 @@ const getOrderById = async (req, res) => {
         sendError(res, error);
     }
 };
+
 const createOrder = async (req, res) => {
-    const orderData = req.body;
-
-    console.log('Datos de la orden recibidos:', orderData); // Log de datos para depuración
-
     try {
-        // Asegúrate de que orderData tenga todos los campos requeridos
-        const createdOrder = await orderService.createOrder(orderData);
-        return res.status(201).json(createdOrder);
+        const order = await orderService.createOrder(req.body);
+        res.status(201).json(order);
     } catch (error) {
-        console.error('Error creando la orden:', error.message); // Log del error
-        return res.status(500).json({ error: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 

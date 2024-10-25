@@ -1,57 +1,53 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const { Op } = require('sequelize');
+const User = require('./User');
 
 const Order = sequelize.define('Order', {
-    Order_Date: {
-        type: DataTypes.DATE,
-        allowNull: false
-    },
-    Order_Time: {
-        type: DataTypes.TIME,
-        allowNull: false
-    },
-    Total_Amount: {
-        type: DataTypes.DECIMAL(10, 2),
+    Billnumber: {
+        type: DataTypes.STRING(100),
         allowNull: false,
-        validate: {
-            isDecimal: true,
-            min: 0
-        }
     },
-    Status: {
-        type: DataTypes.ENUM('Completado', 'En proceso', 'Cancelado', 'Inactivo'),
+    OrderDate: {
+        type: DataTypes.DATEONLY,
         allowNull: false,
-        defaultValue: 'En proceso'
     },
-    User_Id: {
+    registrationDate: {
+        type: DataTypes.DATEONLY,
+    },
+    total_price: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+    },
+    status: {
+        type: DataTypes.ENUM('Completada', 'Cancelada'),
+        allowNull: false,
+    },
+    id_usuario: {
         type: DataTypes.INTEGER,
-        allowNull: false,
         references: {
-            model: 'Users',
-            key: 'id'
-        }
+            model: User,
+            key: 'id',
+        },
     },
     Token_Expiration: {
         type: DataTypes.DATE,
-        allowNull: false,
-        // El valor predeterminado se calcula en el hook
+        allowNull: true,
         defaultValue: function() {
             const now = new Date();
-            now.setDate(now.getDate() + 3); // Añadir 3 días
+            now.setDate(now.getDate() + 3);
             return now;
         }
     }
 }, {
     tableName: 'orders',
-    defaultScope: {
-        where: {
-            Token_Expiration: {
-                [Op.gt]: new Date() // Sólo incluye órdenes con tokens que no hayan expirado
-            }
-        }
-    }
+    hooks: {
+        beforeCreate: (order, options) => {
+            order.registrationDate = new Date().toISOString().split('T')[0];
+        },
+    },
 });
 
+Order.belongsTo(User, { foreignKey: 'id_usuario' });
+User.hasMany(Order, { foreignKey: 'id_usuario' });
+
 module.exports = Order;
-    
