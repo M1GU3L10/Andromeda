@@ -9,7 +9,14 @@ const getAllOrders = async () => {
         include: [OrderDetail]
     });
 };
-
+const getOrdersByUserId = async (userId) => {
+    return await Order.findAll({
+        where: {
+            userId: userId // Filtrar órdenes por ID de usuario
+        },
+        include: [OrderDetail]
+    });
+};
 const getOrderById = async (id) => {
     return await Order.findByPk(id, { include: [OrderDetail] });
 };
@@ -46,7 +53,6 @@ const createOrder = async (orderData) => {
     }
 };
 
-
 const updateOrder = async (id, data) => {
     await Order.update(data, {
         where: { id }
@@ -61,9 +67,11 @@ const deleteOrder = async (id) => {
     });
 };
 
+
 module.exports = {
     getAllOrders,
     getOrderById,
+    getOrdersByUserId,
     createOrder,
     updateOrder,
     deleteOrder

@@ -1,5 +1,5 @@
 const orderService = require('../services/ordersService');
-const productService = require('../repositories/productsRepository'); // Asegúrate de importar el servicio de productos
+const productService = require('../repositories/productsRepository');
 const { sendResponse, sendError } = require('../utils/response');
 
 const getAllOrders = async (req, res) => {
@@ -7,7 +7,7 @@ const getAllOrders = async (req, res) => {
         const orders = await orderService.getAllOrders();
         sendResponse(res, orders);
     } catch (error) {
-        console.error('Error al obtener todas las órdenes:', error); // Log del error
+        console.error('Error al obtener todas las órdenes:', error);
         sendError(res, error);
     }
 };
@@ -20,9 +20,17 @@ const getOrderById = async (req, res) => {
         }
         sendResponse(res, order);
     } catch (error) {
-        console.error('Error al obtener el pedido por ID:', error); // Log del error
+        console.error('Error al obtener el pedido por ID:', error);
         sendError(res, error);
     }
+};
+
+// Nueva función para obtener órdenes por ID de usuario
+const getOrdersByUserId = async (userId) => {
+    return await Order.findAll({
+        where: { id_usuario: userId }, // Filtrar por ID de usuario
+        include: [{ model: OrderDetail }] // Incluir detalles de las órdenes
+    });
 };
 
 const createOrder = async (req, res) => {
@@ -68,7 +76,7 @@ const updateOrder = async (req, res) => {
 
         sendResponse(res, 'Pedido actualizado correctamente');
     } catch (error) {
-        console.error('Error actualizando el pedido:', error); // Log del error
+        console.error('Error actualizando el pedido:', error);
         sendError(res, error);
     }
 };
@@ -81,7 +89,7 @@ const deleteOrder = async (req, res) => {
         }
         sendResponse(res, 'Pedido eliminado correctamente');
     } catch (error) {
-        console.error('Error eliminando el pedido:', error); // Log del error
+        console.error('Error eliminando el pedido:', error);
         sendError(res, error);
     }
 };
@@ -89,6 +97,7 @@ const deleteOrder = async (req, res) => {
 module.exports = {
     getAllOrders,
     getOrderById,
+    getOrdersByUserId, // Exportar la nueva función
     createOrder,
     updateOrder,
     deleteOrder

@@ -9,6 +9,10 @@ const getOrderById = async (id) => {
     return await orderRepository.getOrderById(id);
 };
 
+const getOrdersByUserId = async (userId) => {
+    return await orderRepository.getOrdersByUserId(userId); // Obtener órdenes por ID de usuario
+};
+
 const createOrder = async (orderData) => {
     const { orderDetails, ...order } = orderData;
 
@@ -34,14 +38,11 @@ const createOrder = async (orderData) => {
     return await orderRepository.createOrder({ ...order, orderDetails: updatedOrderDetails });
 };
 
-
-
 const updateOrder = async (id, data) => {
     const updatedOrder = await orderRepository.updateOrder(id, data);
     await checkAndConvertToSale(updatedOrder);
     return updatedOrder;
 };
-
 
 const deleteOrder = async (id) => {
     return await orderRepository.deleteOrder(id);
@@ -62,5 +63,6 @@ module.exports = {
     getOrderById,
     createOrder,
     updateOrder,
+    getOrdersByUserId,
     deleteOrder
 };
