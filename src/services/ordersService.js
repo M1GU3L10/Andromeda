@@ -1,6 +1,8 @@
 const orderRepository = require('../repositories/ordersRepository');
 const productRepository = require('../repositories/productsRepository');
 
+
+
 const getAllOrders = async () => {
     return await orderRepository.getAllOrders();
 };
@@ -8,11 +10,16 @@ const getAllOrders = async () => {
 const getOrderById = async (id) => {
     return await orderRepository.getOrderById(id);
 };
-
-const getOrdersByUserId = async (userId) => {
-    return await orderRepository.getOrdersByUserId(userId); // Obtener órdenes por ID de usuario
+const getOrderByUserId = async (userId) => {
+    try {
+        // Reemplaza esto con tu lógica de búsqueda real
+        const orders = await Order.find({ userId: userId }); // Asegúrate de que 'userId' sea el campo correcto
+        return orders;
+    } catch (error) {
+        console.error('Error al buscar órdenes:', error);
+        throw error; // Lanza el error para que sea manejado en el controlador
+    }
 };
-
 const createOrder = async (orderData) => {
     const { orderDetails, ...order } = orderData;
 
@@ -38,11 +45,14 @@ const createOrder = async (orderData) => {
     return await orderRepository.createOrder({ ...order, orderDetails: updatedOrderDetails });
 };
 
+
+
 const updateOrder = async (id, data) => {
     const updatedOrder = await orderRepository.updateOrder(id, data);
     await checkAndConvertToSale(updatedOrder);
     return updatedOrder;
 };
+
 
 const deleteOrder = async (id) => {
     return await orderRepository.deleteOrder(id);
@@ -63,6 +73,6 @@ module.exports = {
     getOrderById,
     createOrder,
     updateOrder,
-    getOrdersByUserId,
+    getOrderByUserId,
     deleteOrder
 };
