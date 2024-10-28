@@ -9,9 +9,9 @@ const Product = sequelize.define('Product', {
   },
 
   Price: {
-    type: DataTypes.DECIMAL(10, 2),
-    allowNull: false,
+    type: DataTypes.DECIMAL(10, 0), 
   },
+    
   Category_Id: {
     type: DataTypes.INTEGER,
     allowNull: false,   

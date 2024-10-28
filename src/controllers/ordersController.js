@@ -56,7 +56,7 @@ const updateOrder = async (req, res) => {
         }
 
         // Actualizar stock si el estado es 'Completado'
-        if (order.items && status === 'Completado' && order.status !== 'Completado') {
+        if (order.items && status === 'Completada' && order.status !== 'Completada') {
             for (const item of order.items) {
                 const product = await productService.getProductById(item.productId);
                 if (product) {
