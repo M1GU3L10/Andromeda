@@ -95,7 +95,7 @@ const requestPasswordReset = async (email) => {
             <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #003366;">
                 <p style="color: #888888; font-size: 10px; margin-top: 15px; text-align: center;">
                     Este es un correo automático, por favor no responda.<br>
-                    &copy; 2024 Tu Empresa. Todos los derechos reservados.
+                    &copy; 2024 Brberia orion . Todos los derechos reservados.
                 </p>
             </div>
         </div>
