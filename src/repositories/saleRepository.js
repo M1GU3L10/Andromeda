@@ -3,6 +3,7 @@ const SaleDetail = require('../models/saleDetail');
 const productRepository = require('./productsRepository');
 const sequelize = require('../config/database');
 const { Transaction } = require('sequelize');
+const { models } = require('../models');
 
 const createSale = async (saleData) => {
     const { saleDetails, ...sale } = saleData;
@@ -43,8 +44,16 @@ const getSaleAll = async () => {
     });
 };
 
+const updateStatusSales = async (id, status) => {
+    return await models.Sale.update(status, {
+        where: { id }
+    });
+};
+
+
 module.exports = {
     createSale,
     getSaleById,
     getSaleAll,
+    updateStatusSales
 };

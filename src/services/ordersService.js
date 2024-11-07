@@ -1,6 +1,8 @@
 const orderRepository = require('../repositories/ordersRepository');
 const productRepository = require('../repositories/productsRepository');
 
+
+
 const getAllOrders = async () => {
     return await orderRepository.getAllOrders();
 };
@@ -8,7 +10,16 @@ const getAllOrders = async () => {
 const getOrderById = async (id) => {
     return await orderRepository.getOrderById(id);
 };
-
+const getOrderByUserId = async (userId) => {
+    try {
+        // Reemplaza esto con tu lógica de búsqueda real
+        const orders = await Order.find({ userId: userId }); // Asegúrate de que 'userId' sea el campo correcto
+        return orders;
+    } catch (error) {
+        console.error('Error al buscar órdenes:', error);
+        throw error; // Lanza el error para que sea manejado en el controlador
+    }
+};
 const createOrder = async (orderData) => {
     const { orderDetails, ...order } = orderData;
 
@@ -62,5 +73,6 @@ module.exports = {
     getOrderById,
     createOrder,
     updateOrder,
+    getOrderByUserId,
     deleteOrder
 };

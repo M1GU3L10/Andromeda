@@ -4,8 +4,18 @@ const { Transaction } = require('sequelize');
 const productRepository = require('./productsRepository');
 const OrderDetail = require('../models/ordersDetail');
 
+
 const getAllOrders = async () => {
     return await Order.findAll({
+        include: [OrderDetail]
+    });
+};
+
+const getOrderByUserId = async (userId) => {
+    return await Order.findAll({
+        where: {
+            userId // Filtrar órdenes por ID de usuario
+        },
         include: [OrderDetail]
     });
 };
@@ -46,24 +56,33 @@ const createOrder = async (orderData) => {
     }
 };
 
-
 const updateOrder = async (id, data) => {
-    await Order.update(data, {
+    const [updated] = await Order.update(data, {
         where: { id }
     });
 
-    return await Order.findByPk(id);
+    if (updated) {
+        return await Order.findByPk(id);
+    }
+    throw new Error('Pedido no encontrado');
 };
 
 const deleteOrder = async (id) => {
-    return await Order.destroy({
+    const deleted = await Order.destroy({
         where: { id }
     });
+
+    if (!deleted) {
+        throw new Error('Pedido no encontrado');
+    }
+
+    return deleted;
 };
 
 module.exports = {
     getAllOrders,
     getOrderById,
+    getOrderByUserId,
     createOrder,
     updateOrder,
     deleteOrder

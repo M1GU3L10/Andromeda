@@ -6,6 +6,7 @@ const Order = sequelize.define('Order', {
     Billnumber: {
         type: DataTypes.STRING(100),
         allowNull: false,
+        unique: true, // Asegura que el número de factura sea único
     },
     OrderDate: {
         type: DataTypes.DATEONLY,
@@ -19,7 +20,7 @@ const Order = sequelize.define('Order', {
         allowNull: false,
     },
     status: {
-        type: DataTypes.ENUM('Completada', 'Cancelada'),
+        type: DataTypes.ENUM('Completada', 'Cancelada','Pendiente'),
         allowNull: false,
     },
     id_usuario: {

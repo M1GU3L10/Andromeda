@@ -6,5 +6,6 @@ const saleValidate = require('../middlewares/validateSale');
 router.post('/', saleValidate,saleController.createSale);
 router.get('/:id', saleController.getSaleById);
 router.get('/', saleController.getAllSales);
+router.put('/:id/status', saleController.updateStatusSales);
 
 module.exports = router;

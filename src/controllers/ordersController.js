@@ -1,14 +1,15 @@
 const orderService = require('../services/ordersService');
-const productService = require('../repositories/productsRepository'); // Asegúrate de importar el servicio de productos
+const productService = require('../services/productsService'); // Cambiado a servicio
 const { sendResponse, sendError } = require('../utils/response');
+
 
 const getAllOrders = async (req, res) => {
     try {
         const orders = await orderService.getAllOrders();
         sendResponse(res, orders);
     } catch (error) {
-        console.error('Error al obtener todas las órdenes:', error); // Log del error
-        sendError(res, error);
+        console.error('Error al obtener todas las órdenes:', error);
+        sendError(res, 'Error al obtener las órdenes', 500);
     }
 };
 
@@ -20,17 +21,27 @@ const getOrderById = async (req, res) => {
         }
         sendResponse(res, order);
     } catch (error) {
-        console.error('Error al obtener el pedido por ID:', error); // Log del error
-        sendError(res, error);
+        console.error('Error al obtener el pedido por ID:', error);
+        sendError(res, 'Error al obtener el pedido', 500);
+    }
+};
+export const getOrderByUserId = async (req, res) => {
+    const { userId } = req.params; // Asegúrate de que estás pasando el userId correcto
+    try {
+        const orders = await getOrderByUserId(userId);
+        res.status(200).json(orders);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener las órdenes', error });
     }
 };
 
 const createOrder = async (req, res) => {
     try {
         const order = await orderService.createOrder(req.body);
-        res.status(201).json(order);
+        sendResponse(res, order, 201); // Usar sendResponse
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        console.error('Error creando la orden:', error);
+        sendError(res, error.message || 'Error al crear la orden', 400);
     }
 };
 
@@ -39,18 +50,16 @@ const updateOrder = async (req, res) => {
         const { id } = req.params;
         const { status } = req.body;
 
-        // Obtener el pedido actual
         const order = await orderService.getOrderById(id);
         if (!order) {
             return sendError(res, 'Pedido no encontrado', 404);
         }
 
-        // Si el pedido está pasando a "Completado", actualizar el stock de los productos
-        if (status === 'Completado' && order.status !== 'Completado') {
+        // Actualizar stock si el estado es 'Completado'
+        if (order.items && status === 'Completada' && order.status !== 'Completada') {
             for (const item of order.items) {
                 const product = await productService.getProductById(item.productId);
                 if (product) {
-                    // Restar la cantidad del stock del producto
                     const newStock = product.Stock - item.quantity;
                     if (newStock < 0) {
                         return sendError(res, `Stock insuficiente para el producto: ${product.Product_Name}`, 400);
@@ -60,7 +69,6 @@ const updateOrder = async (req, res) => {
             }
         }
 
-        // Actualizar el estado del pedido
         const updated = await orderService.updateOrder(id, { status });
         if (updated[0] === 0) {
             return sendError(res, 'Pedido no encontrado', 404);
@@ -68,8 +76,8 @@ const updateOrder = async (req, res) => {
 
         sendResponse(res, 'Pedido actualizado correctamente');
     } catch (error) {
-        console.error('Error actualizando el pedido:', error); // Log del error
-        sendError(res, error);
+        console.error('Error actualizando el pedido:', error);
+        sendError(res, 'Error al actualizar el pedido', 500);
     }
 };
 
@@ -81,8 +89,8 @@ const deleteOrder = async (req, res) => {
         }
         sendResponse(res, 'Pedido eliminado correctamente');
     } catch (error) {
-        console.error('Error eliminando el pedido:', error); // Log del error
-        sendError(res, error);
+        console.error('Error eliminando el pedido:', error);
+        sendError(res, 'Error al eliminar el pedido', 500);
     }
 };
 
@@ -91,5 +99,6 @@ module.exports = {
     getOrderById,
     createOrder,
     updateOrder,
+    getOrderByUserId,
     deleteOrder
 };

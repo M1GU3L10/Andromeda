@@ -30,8 +30,13 @@ const getSaleAll = async () => {
     return await saleRepository.getSaleAll();
 };
 
+const updateStatusSales = async (id, status) => {
+  return await saleRepository.updateStatusSales(id, status);
+};
+
 module.exports = {
   createSale,
   getSaleById,
-  getSaleAll
+  getSaleAll,
+  updateStatusSales
 };
