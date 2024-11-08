@@ -1,65 +1,102 @@
 const Appointment = require('../models/appointment');
 const AppointmentDetail = require('../models/detailAppointment');
 const Service = require('../models/service');
+const Sale = require('../models/sale');
+const Product = require('../models/products');
 const sequelize = require('../config/database');
-const { Op } = require('sequelize'); // Asegúrate de importar Op si es necesario
+const { Op } = require('sequelize');
 
 const createAppointment = async (appointmentData) => {
     const { appointmentDetails, ...appointment } = appointmentData;
-
-    // Iniciar una transacción
     const transaction = await sequelize.transaction();
 
     try {
-        // Obtener los IDs de los servicios desde los detalles
-        let totalPrice = 0;
+        let totalServicePrice = 0;
+        let totalProductPrice = 0;
         let totalTime = 0;
+        let hasProducts = false;
+        let sale = null;
+
+        // separar productos y servicios
+        const serviceDetails = [];
+        const productDetails = [];
 
         if (appointmentDetails && appointmentDetails.length > 0) {
-            const serviceIds = appointmentDetails.map(detail => detail.serviceId);
-
-            // Obtener los servicios relacionados
-            const services = await Service.findAll({
-                where: { id: serviceIds },
-                transaction
+            // Categorize details into services and products
+            appointmentDetails.forEach(detail => {
+                if (detail.serviceId) serviceDetails.push(detail);
+                if (detail.id_producto) {
+                    productDetails.push(detail);
+                    hasProducts = true;
+                }
             });
 
-            // Sumar los precios de los servicios para calcular el total
-            totalPrice = services.reduce((sum, service) => sum + service.price, 0);
+            // Calculate service totals
+            if (serviceDetails.length > 0) {
+                const serviceIds = serviceDetails.map(detail => detail.serviceId);
+                const services = await Service.findAll({
+                    where: { id: serviceIds },
+                    transaction
+                });
 
-            // Sumar los tiempos de los servicios para calcular el tiempo total de la cita
-            totalTime = services.reduce((sum, service) => sum + service.time, 0);
+                totalServicePrice = services.reduce((sum, service) => sum + service.price, 0);
+                totalTime = services.reduce((sum, service) => sum + service.time, 0);
+            }
+
+            // Calculate product totals
+            if (productDetails.length > 0) {
+                const productIds = productDetails.map(detail => detail.id_producto);
+                const products = await Product.findAll({
+                    where: { id: productIds },
+                    transaction
+                });
+
+                totalProductPrice = products.reduce((sum, product) => sum + product.price, 0);
+            }
         }
 
-        // Calcular Finish_Time sumando time_appointment a Init_Time
+        // Calculate finish time
         const initTime = new Date(`1970-01-01T${appointment.Init_Time}Z`);
-        const finishTime = new Date(initTime.getTime() + totalTime * 60000); // totalTime en minutos
+        const finishTime = new Date(initTime.getTime() + totalTime * 60000);
 
-        // Actualizar los datos de la cita
-        appointment.Total = totalPrice;
+        // Update appointment data
+        const totalAppointmentPrice = totalServicePrice + totalProductPrice;
+        appointment.Total = totalAppointmentPrice;
         appointment.time_appointment = totalTime;
-        appointment.Finish_Time = finishTime.toISOString().substring(11, 19); // Formato HH:mm:ss
+        appointment.Finish_Time = finishTime.toISOString().substring(11, 19);
 
-        // Crear la cita
-        const createdAppointment = await Appointment.create(appointment, {
-            include: [AppointmentDetail],
-            transaction
-        });
+        // Create appointment
+        const createdAppointment = await Appointment.create(appointment, { transaction });
 
-        if (appointmentDetails && appointmentDetails.length > 0) {
-            // Asignar el appointmentId a los detalles y crearlos
-            const detailsWithAppointmentId = appointmentDetails.map(detail => ({
-                ...detail,
-                appointmentId: createdAppointment.id,  // Relaciona el detalle con la cita
-            }));
-            await AppointmentDetail.bulkCreate(detailsWithAppointmentId, { transaction });
+        // Create sale if there are products
+        if (hasProducts) {
+            sale = await Sale.create({
+                Billnumber: `SALE-${Date.now()}`,
+                SaleDate: appointment.Date,
+                total_price: totalAppointmentPrice,
+                status: 'Completada',
+                id_usuario: appointment.clienteId
+            }, { transaction });
         }
 
-        // Confirmar la transacción
+        // Create appointment details
+        if (appointmentDetails && appointmentDetails.length > 0) {
+            const detailsToCreate = appointmentDetails.map(detail => ({
+                ...detail,
+                appointmentId: createdAppointment.id,
+                id_sale: sale ? sale.id : null
+            }));
+
+            await AppointmentDetail.bulkCreate(detailsToCreate, { transaction });
+        }
+
         await transaction.commit();
-        return createdAppointment;
+        return {
+            appointment: createdAppointment,
+            sale: sale,
+            totalAmount: totalAppointmentPrice
+        };
     } catch (error) {
-        // Revertir la transacción en caso de error
         await transaction.rollback();
         throw error;
     }
