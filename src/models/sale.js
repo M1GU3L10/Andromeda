@@ -19,7 +19,7 @@ const Sale = sequelize.define('Sale', {
         allowNull: false,
     },
     status: {
-        type: DataTypes.ENUM('Completada', 'Cancelada'),
+        type: DataTypes.ENUM('Completada', 'Cancelada', 'Pendiente'),
         allowNull: false,
     },
     id_usuario: {

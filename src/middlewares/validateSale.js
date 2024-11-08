@@ -13,7 +13,7 @@ const validateSale = [
             return true;
         }),
     body('status')
-        .isIn(['Completada', 'Cancelada']).withMessage('El estado debe ser Completada o Cancelada'),
+        .isIn(['Completada', 'Cancelada','Pendiente']).withMessage('El estado debe ser Completada o Cancelada'),
     body('id_usuario')
         .custom(async (id_usuario) => {
             const user = await models.User.findByPk(id_usuario);
