@@ -10,8 +10,7 @@ const createSale = async (saleData) => {
   const transaction = await sequelize.transaction();
 
   try {
-    // 1. Crear la venta principal
-    const createdSale = await models.Sale.create({ // Modificar esta línea
+    const createdSale = await models.Sale.create({
       Billnumber: sale.Billnumber,
       SaleDate: sale.SaleDate,
       total_price: sale.total_price,
@@ -25,7 +24,7 @@ const createSale = async (saleData) => {
     const hasServices = saleDetails.some(detail => detail.serviceId);
 
     if (hasServices && appointmentData) {
-      createdAppointment = await models.appointment.create({ // Modificar esta línea
+      createdAppointment = await models.appointment.create({
         Init_Time: appointmentData.Init_Time,
         Finish_Time: appointmentData.Finish_Time,
         Date: appointmentData.Date,
@@ -50,7 +49,7 @@ const createSale = async (saleData) => {
         appointmentId: hasServices ? createdAppointment?.id : null
       }));
 
-      await models.Detail.bulkCreate(detailsWithIds, { // Modificar esta línea
+      await models.Detail.bulkCreate(detailsWithIds, {
         transaction
       });
 
@@ -75,20 +74,62 @@ const createSale = async (saleData) => {
   }
 };
 
+const createSaleFromOrder = async (saleData) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const createdSale = await models.Sale.create({
+      Billnumber: saleData.Billnumber,
+      SaleDate: saleData.SaleDate,
+      total_price: saleData.total_price,
+      status: saleData.status,
+      id_usuario: saleData.id_usuario
+    }, {
+      transaction
+    });
+
+    if (saleData.saleDetails && saleData.saleDetails.length > 0) {
+      const detailsWithIds = saleData.saleDetails.map(detail => ({
+        ...detail,
+        id_sale: createdSale.id
+      }));
+
+      await models.Detail.bulkCreate(detailsWithIds, {
+        transaction
+      });
+    }
+
+    await transaction.commit();
+
+    return {
+      sale: createdSale,
+      message: 'Venta creada exitosamente a partir de la orden'
+    };
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
 const getSaleById = async (id) => {
-  return await saleRepository.getSaleById(id);
+  return await models.Sale.findByPk(id, { include: [models.Detail] });
 };
 
 const getSaleAll = async () => {
-  return await saleRepository.getSaleAll();
+  return await models.Sale.findAll({
+    include: [models.Detail]
+  });
 };
 
 const updateStatusSales = async (id, status) => {
-  return await saleRepository.updateStatusSales(id, status);
+  return await models.Sale.update(status, {
+    where: { id }
+  });
 };
 
 module.exports = {
   createSale,
+  createSaleFromOrder,
   getSaleById,
   getSaleAll,
   updateStatusSales

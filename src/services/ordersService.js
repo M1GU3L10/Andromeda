@@ -1,7 +1,6 @@
 const orderRepository = require('../repositories/ordersRepository');
 const productRepository = require('../repositories/productsRepository');
-
-
+const saleService = require('./saleService');
 
 const getAllOrders = async () => {
     return await orderRepository.getAllOrders();
@@ -10,16 +9,17 @@ const getAllOrders = async () => {
 const getOrderById = async (id) => {
     return await orderRepository.getOrderById(id);
 };
+
 const getOrderByUserId = async (userId) => {
     try {
-        // Reemplaza esto con tu lógica de búsqueda real
-        const orders = await Order.find({ userId: userId }); // Asegúrate de que 'userId' sea el campo correcto
+        const orders = await orderRepository.getOrderByUserId(userId);
         return orders;
     } catch (error) {
         console.error('Error al buscar órdenes:', error);
-        throw error; // Lanza el error para que sea manejado en el controlador
+        throw error;
     }
 };
+
 const createOrder = async (orderData) => {
     const { orderDetails, ...order } = orderData;
 
@@ -45,29 +45,47 @@ const createOrder = async (orderData) => {
     return await orderRepository.createOrder({ ...order, orderDetails: updatedOrderDetails });
 };
 
-
-
 const updateOrder = async (id, data) => {
     const updatedOrder = await orderRepository.updateOrder(id, data);
     await checkAndConvertToSale(updatedOrder);
     return updatedOrder;
 };
 
-
 const deleteOrder = async (id) => {
     return await orderRepository.deleteOrder(id);
 };
 
 const checkAndConvertToSale = async (order) => {
-    if (order.status === 'correcto') {
+    if (order.status === 'Completada' || order.status === 'Cancelada') {
         const saleData = {
-            orderId: order.id,
-            ...order
+            Billnumber: `SAL${order.Billnumber.slice(3)}`,
+            SaleDate: new Date(),
+            total_price: order.total_price,
+            status: order.status,
+            id_usuario: order.id_usuario,
+            saleDetails: []
         };
-        await salesRepository.createSale(saleData);
+        
+        if (order.orderDetails && Array.isArray(order.orderDetails)) {
+            saleData.saleDetails = order.orderDetails.map(detail => ({
+                quantity: detail.quantity,
+                unitPrice: detail.unitPrice,
+                total_price: detail.total_price,
+                id_producto: detail.id_producto
+            }));
+        } else {
+            console.warn('Order details not found or invalid for order:', order.id);
+        }
+        
+        await saleService.createSaleFromOrder(saleData);
+
+        if (order.status === 'Completada' && order.orderDetails && Array.isArray(order.orderDetails)) {
+            for (const detail of order.orderDetails) {
+                await productRepository.updateProductStock(detail.id_producto, -detail.quantity);
+            }
+        }
     }
 };
-
 module.exports = {
     getAllOrders,
     getOrderById,
