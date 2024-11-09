@@ -4,6 +4,7 @@ const Appointment = require('../models/appointment');
 const productRepository = require('../repositories/productsRepository');
 const sequelize = require('../config/database');
 const { models } = require('../models');
+const saleRepository = require('../repositories/saleRepository')
 
 const createSale = async (saleData) => {
   const { saleDetails, appointmentData, ...sale } = saleData;
