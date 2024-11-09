@@ -87,9 +87,97 @@ const updateStatusSales = async (id, status) => {
   return await saleRepository.updateStatusSales(id, status);
 };
 
+const updateSaleAppointment = async (saleId, appointmentId, updateData) => {
+  let transaction;
+  
+  try {
+      transaction = await sequelize.transaction();
+
+      // 1. Verificar que la venta existe
+      const sale = await models.Sale.findByPk(saleId, {
+          include: [{
+              model: models.Detail,
+              where: { appointmentId: appointmentId },
+              required: false
+          }],
+          transaction
+      });
+
+      if (!sale) {
+          throw new Error('Venta no encontrada');
+      }
+
+      // 2. Verificar que la cita existe
+      const appointment = await models.appointment.findByPk(appointmentId, {
+          transaction
+      });
+
+      if (!appointment) {
+          throw new Error('Cita no encontrada');
+      }
+
+      // 3. Actualizar la cita
+      await models.appointment.update({
+          Init_Time: updateData.appointmentData.Init_Time,
+          Finish_Time: updateData.appointmentData.Finish_Time,
+          Date: updateData.appointmentData.Date,
+          time_appointment: updateData.appointmentData.time_appointment,
+          status: updateData.appointmentData.status
+      }, {
+          where: { id: appointmentId },
+          transaction
+      });
+
+      // 4. Si se proporcionan detalles de venta, actualizar el empleado
+      if (updateData.saleDetails && updateData.saleDetails.length > 0) {
+          const updatePromises = updateData.saleDetails.map(detail => {
+              if (detail.id && detail.empleadoId) {
+                  return models.Detail.update(
+                      { empleadoId: detail.empleadoId },
+                      {
+                          where: { 
+                              id: detail.id,
+                              id_sale: saleId,
+                              appointmentId: appointmentId
+                          },
+                          transaction
+                      }
+                  );
+              }
+              return Promise.resolve();
+          });
+
+          await Promise.all(updatePromises);
+      }
+
+      await transaction.commit();
+      transaction = null; // Limpiar la referencia después del commit
+
+      // 5. Obtener la información actualizada
+      const updatedAppointment = await models.appointment.findByPk(appointmentId, {
+          include: [{
+              model: models.Detail,
+          }]
+      });
+
+      return {
+          message: 'Cita actualizada exitosamente',
+          appointment: updatedAppointment
+      };
+
+  } catch (error) {
+      // Solo hacer rollback si la transacción existe y no ha sido committed
+      if (transaction) {
+          await transaction.rollback();
+      }
+      throw error;
+  }
+};
+
 module.exports = {
   createSale,
   getSaleById,
   getSaleAll,
-  updateStatusSales
+  updateStatusSales,
+  updateSaleAppointment
 };

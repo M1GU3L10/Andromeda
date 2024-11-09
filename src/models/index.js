@@ -5,7 +5,6 @@ const User = require('./User');
 const Role = require('./role');
 const Permission = require('./permission');
 const PermissionRole = require('./permissionRole');
-const DetailAppointment = require('./detailAppointment');
 const Shopping = require('./shopping');
 const ShoppingDetail = require('./shoppingDetail');
 const absence = require('./absence');
@@ -44,7 +43,6 @@ const models = {
     Permission,
     PermissionRole,
     ShoppingDetail,
-    DetailAppointment,
     OrderDetail
 };
 

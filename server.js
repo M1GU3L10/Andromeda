@@ -15,7 +15,6 @@ const productRoutes = require('./src/routes/productsRoutes');
 const suppliersRoutes = require('./src/routes/suppliersRoutes');
 const orderRoutes = require('./src/routes/ordersRoutes');
 const shoppingRoutes = require('./src/routes/shoppingRoutes');
-const appointmentRoutes = require('./src/routes/appointmentRoutes');
 const programmingEmployeeRoutes = require('./src/routes/programmingEmployeeRoutes');
 
 dotenv.config();
@@ -40,7 +39,6 @@ app.use('/api/products', productRoutes);
 app.use('/api/suppliers', suppliersRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/shopping', shoppingRoutes);
-app.use('/api/appointment', appointmentRoutes);
 app.use('/api/programming', programmingEmployeeRoutes);
 
 const PORT = process.env.PORT || 3000;

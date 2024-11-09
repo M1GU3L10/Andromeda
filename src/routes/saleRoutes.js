@@ -7,5 +7,6 @@ router.post('/', saleValidate,saleController.createSale);
 router.get('/:id', saleController.getSaleById);
 router.get('/', saleController.getAllSales);
 router.put('/:id/status', saleController.updateStatusSales);
+router.put('/:saleId/appointments/:appointmentId', saleController.updateAppointment);
 
 module.exports = router;
