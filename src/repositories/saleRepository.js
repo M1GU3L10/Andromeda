@@ -75,10 +75,19 @@ const getSaleById = async (id) => {
 
 const getSaleAll = async () => {
     return await Sale.findAll({
-        include: [SaleDetail]
+        include: [
+            {
+                model: SaleDetail,
+                include: [
+                    {
+                        model: models.appointment,
+                        required: true // Solo obtener ventas con citas asociadas
+                    }
+                ]
+            }
+        ]
     });
 };
-
 const updateStatusSales = async (id, status) => {
     return await models.Sale.update(status, {
         where: { id }
