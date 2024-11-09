@@ -1,29 +1,21 @@
 const Order = require('../models/orders');
 const sequelize = require('../config/database');
-const { Transaction } = require('sequelize');
-const productRepository = require('./productsRepository');
+const Product = require('../models/products');
 const OrderDetail = require('../models/ordersDetail');
-const Product = require('../models/products'); 
 
-// Función para actualizar el stock en base al estado del pedido
-const updateProductStock = async (orderDetails, orderStatus, transaction = null) => {
-    if (orderStatus !== 'completada') {
-        // No realizar ninguna actualización de stock si el pedido no está en estado "completado"
-        return;
-    }
-
-    for (const detail of orderDetails) {
-        const product = await Product.findByPk(detail.id_producto, { transaction });
-        if (!product) {
-            throw new Error(`Producto con ID ${detail.id_producto} no encontrado.`);
+// Función para manejar el stock
+const updateProductStock = async (details, increase, transaction = null) => {
+    for (const detail of details) {
+        const product = await Product.findByPk(detail.id_producto || detail.product_id, { transaction });
+        if (product) {
+            const newStock = increase ? product.Stock + detail.quantity : product.Stock - detail.quantity;
+            if (newStock < 0) {
+                throw new Error(`Stock insuficiente para el producto: ${product.Product_Name}`);
+            }
+            await product.update({ Stock: newStock }, { transaction });
+        } else {
+            throw new Error(`Producto con ID ${detail.id_producto || detail.product_id} no encontrado.`);
         }
-
-        const newStock = product.Stock - detail.quantity;
-        if (newStock < 0) {
-            throw new Error(`Stock insuficiente para el producto: ${product.Product_Name}`);
-        }
-
-        await product.update({ Stock: newStock }, { transaction });
     }
 };
 
@@ -38,7 +30,7 @@ const getAllOrders = async () => {
 const getOrderByUserId = async (userId) => {
     return await Order.findAll({
         where: {
-            userId // Filtrar órdenes por ID de usuario
+            userId
         },
         include: [OrderDetail]
     });
@@ -51,34 +43,30 @@ const getOrderById = async (id) => {
 
 // Crear una nueva orden
 const createOrder = async (orderData) => {
-    const { orderDetails, ...order } = orderData; // Separar los detalles de la orden
-
+    const { orderDetails, ...order } = orderData;
     const transaction = await sequelize.transaction();
 
     try {
         // Crear la orden
         const createdOrder = await Order.create(order, { transaction });
 
-        // Verificar si se proporcionaron detalles de la orden
         if (orderDetails && orderDetails.length > 0) {
-            // Añadir el ID de la orden a cada detalle
             const detailsWithOrderId = orderDetails.map(detail => ({
                 ...detail,
-                id_order: createdOrder.id,  // Relacionar con la orden creada
+                id_order: createdOrder.id,
             }));
 
-            // Crear los detalles de la orden
             await OrderDetail.bulkCreate(detailsWithOrderId, { transaction });
 
-            // Actualizar el stock de productos
-            await updateProductStock(detailsWithOrderId, 'completada', transaction);
+            // Restar stock (increase = false) si el estado es 'completada' o 'pendiente'
+            if (order.status === 'Completada' || order.status === 'Pendiente') {
+                await updateProductStock(detailsWithOrderId, false, transaction);
+            }
         }
 
-        // Confirmar la transacción
         await transaction.commit();
         return createdOrder;
     } catch (error) {
-        // En caso de error, hacer rollback
         await transaction.rollback();
         console.error("Error al crear la orden:", error);
         throw error;
@@ -98,13 +86,19 @@ const updateOrder = async (id, data) => {
         const oldStatus = order.status;
         const newStatus = data.status;
 
-        await order.update(data, { transaction });
-
-        if (oldStatus !== newStatus && newStatus === 'completado') {
-            // Restar el stock solo cuando el pedido pasa a estar completado
-            await updateProductStock(order.OrderDetails, 'completada', transaction);
+        // Solo realizar acciones de stock si el estado está cambiando
+        if (oldStatus !== newStatus) {
+            // Si cambia a estado cancelada, aumentar stock (increase = true)
+            if (newStatus === 'Cancelada') {
+                await updateProductStock(order.OrderDetails, true, transaction);
+            }
+            // Si cambia desde cancelada a completada o pendiente, restar stock (increase = false)
+            else if (oldStatus === 'Cancelada' && (newStatus === 'Completada' || newStatus === 'Pendiente')) {
+                await updateProductStock(order.OrderDetails, false, transaction);
+            }
         }
 
+        await order.update(data, { transaction });
         await transaction.commit();
         return order;
     } catch (error) {
@@ -124,11 +118,12 @@ const deleteOrder = async (id) => {
             throw new Error('Pedido no encontrado');
         }
 
-        // Devolver el stock si el pedido se elimina
-        await updateProductStock(order.OrderDetails, 'anulada', transaction);
+        // Solo devolver el stock si la orden estaba en estado cancelada
+        if (order.status === 'Cancelada') {
+            await updateProductStock(order.OrderDetails, true, transaction);
+        }
 
         const deleted = await order.destroy({ transaction });
-
         await transaction.commit();
         return deleted;
     } catch (error) {

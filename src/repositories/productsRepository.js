@@ -1,7 +1,5 @@
-const { models } = require('../models');
 const Product = require('../models/products');
 const sequelize = require('../config/database');
-const { Transaction } = require('sequelize');
 
 // Función genérica para actualizar el stock de productos
 const updateProductStock = async (details, increase, transaction = null) => {
@@ -25,8 +23,8 @@ const updateProductStockForOrders = async (saleDetails, transaction = null) => {
 };
 
 // Actualizar el stock basado en compras
-const updateProductStockForPurchases = async (shoppingDetail, transaction = null) => {
-    return updateProductStock(shoppingDetail, true, transaction);
+const updateProductStockForPurchases = async (shoppingDetails, transaction = null) => {
+    return updateProductStock(shoppingDetails, true, transaction);
 };
 
 // Actualizar el stock basado en compras anuladas
@@ -34,6 +32,7 @@ const updateProductStockForAnulatedPurchases = async (shoppingDetails, transacti
     return updateProductStock(shoppingDetails, false, transaction);
 };
 
+// Verificar si una categoría está asociada a productos
 const checkCategoryAssociation = async (categoryId) => {
     return await Product.findAll({ where: { Category_Id: categoryId } });
 };
@@ -85,9 +84,7 @@ const updateProduct = async (id, productData) => {
 
 // Eliminar un producto
 const deleteProduct = async (id) => {
-    return await Product.destroy({
-        where: { id }
-    });
+    return await Product.destroy({ where: { id } });
 };
 
 module.exports = {
