@@ -1,52 +1,29 @@
 const appointmentService = require('../services/appointmentService');
+const { sendResponse, sendError } = require('../utils/response');
 
-const createAppointment = async (req, res) => {
-  try {
-    const appointment = await appointmentService.createAppointment(req.body);
-    res.status(201).json(appointment);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-const getAppointmentById = async (req, res) => {
-  try {
-    const appointment = await appointmentService.getAppointmentById(req.params.id);
-    if (appointment) {
-      res.json(appointment);
-    } else {
-      res.status(404).json({ error: 'Appointment not found' });
+const getAllAbsences = async (req, res) => {
+    try {
+        const absences = await appointmentService.getAllAbsences();
+        sendResponse(res, absences);
+    } catch (error) {
+        sendError(res, error);
     }
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
 };
 
-const getAllAppointments = async (req, res) => {
-  try {
-    const appointments = await appointmentService.getAppointmentAll();
-    res.json(appointments);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-const updateAppointment = async (req, res) => {
-  try {
-    const appointment = await appointmentService.updateAppointment(req.params.id, req.body);
-    if (appointment) {
-      res.json(appointment);
-    } else {
-      res.status(404).json({ error: 'Appointment not found' });
+const getAbsenceById = async (req, res) => {
+    try {
+        const absence = await appointmentService.getAbsenceById(req.params.id);
+        if (!absence) {
+            return sendError(res, 'cita no encontrada', 404);
+        }
+        sendResponse(res, absence);
+    } catch (error) {
+        sendError(res, error);
     }
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
 };
+
 
 module.exports = {
-  createAppointment,
-  getAppointmentById,
-  getAllAppointments,
-  updateAppointment
+    getAllAbsences,
+    getAbsenceById
 };

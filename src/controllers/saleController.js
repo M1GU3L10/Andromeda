@@ -54,10 +54,43 @@ const updateStatusSales = async (req, res) => {
   }
 };
 
+const updateAppointment = async (req, res) => {
+  try {
+      const { saleId, appointmentId } = req.params;
+      const updateData = req.body;
+
+      // Validaciones
+      if (!updateData.appointmentData) {
+          return sendError(res, 'Datos de la cita son requeridos', 400);
+      }
+
+      const { Init_Time, Finish_Time, Date, time_appointment } = updateData.appointmentData;
+      
+      if (!Init_Time || !Finish_Time || !Date || !time_appointment) {
+          return sendError(res, 'Todos los campos de la cita son requeridos (Init_Time, Finish_Time, Date, time_appointment)', 400);
+      }
+
+      const result = await saleService.updateSaleAppointment(
+          parseInt(saleId), 
+          parseInt(appointmentId), 
+          updateData
+      );
+      
+      return sendResponse(res, result);
+
+  } catch (error) {
+      console.error('Error en updateAppointment:', error);
+      if (error.message.includes('no encontrada')) {
+          return sendError(res, error.message, 404);
+      }
+      return sendError(res, error.message, 500);
+  }
+};
 
 module.exports = {
   createSale,
   getSaleById,
   getAllSales,
-  updateStatusSales
+  updateStatusSales,
+  updateAppointment
 };
