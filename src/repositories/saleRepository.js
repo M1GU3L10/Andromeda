@@ -88,6 +88,7 @@ const getSaleAll = async () => {
         ]
     });
 };
+
 const updateStatusSales = async (id, status) => {
     return await models.Sale.update(status, {
         where: { id }
