@@ -1,16 +1,21 @@
 const { models } = require('../models');
 
-const getAllabsences = async () => {
+const getAllAppointments = async () => {
     return await models.appointment.findAll();
 };
 
-const getAbsenceById = async (id) => {
+const getAppointmentById = async (id) => {
     return await models.appointment.findByPk(id);
 };
 
-
-module.exports = {
-    getAllabsences,
-    getAbsenceById
+const updateStatusAppointment = async (id, status) => {
+    return await models.appointment.update(status, {
+        where: { id }
+    });
 };
 
+module.exports = {
+    getAllAppointments,
+    getAppointmentById,
+    updateStatusAppointment
+};

@@ -123,94 +123,38 @@ const getSaleAll = async () => {
 };
 
 const updateStatusSales = async (id, status) => {
-  return await models.Sale.update(status, {
-    where: { id }
-  });
-};
-
-const updateSaleAppointment = async (saleId, appointmentId, updateData) => {
-  let transaction;
-  
+  const transaction = await sequelize.transaction();
   try {
-      transaction = await sequelize.transaction();
-
-      // 1. Verificar que la venta existe
-      const sale = await models.Sale.findByPk(saleId, {
-          include: [{
-              model: models.Detail,
-              where: { appointmentId: appointmentId },
-              required: false
-          }],
+      // 1. Actualizar el estado de la venta
+      const updatedSale = await models.Sale.update(status, {
+          where: { id },
           transaction
       });
 
-      if (!sale) {
+      if (updatedSale[0] === 0) {
+          await transaction.rollback();
           throw new Error('Venta no encontrada');
       }
 
-      // 2. Verificar que la cita existe
-      const appointment = await models.appointment.findByPk(appointmentId, {
+      // 2. Verificar si la venta está asociada a una cita
+      const appointment = await models.appointment.findOne({
+          where: { id_sale: id },
           transaction
       });
 
-      if (!appointment) {
-          throw new Error('Cita no encontrada');
-      }
-
-      // 3. Actualizar la cita
-      await models.appointment.update({
-          Init_Time: updateData.appointmentData.Init_Time,
-          Finish_Time: updateData.appointmentData.Finish_Time,
-          Date: updateData.appointmentData.Date,
-          time_appointment: updateData.appointmentData.time_appointment,
-          status: updateData.appointmentData.status
-      }, {
-          where: { id: appointmentId },
-          transaction
-      });
-
-      // 4. Si se proporcionan detalles de venta, actualizar el empleado
-      if (updateData.saleDetails && updateData.saleDetails.length > 0) {
-          const updatePromises = updateData.saleDetails.map(detail => {
-              if (detail.id && detail.empleadoId) {
-                  return models.Detail.update(
-                      { empleadoId: detail.empleadoId },
-                      {
-                          where: { 
-                              id: detail.id,
-                              id_sale: saleId,
-                              appointmentId: appointmentId
-                          },
-                          transaction
-                      }
-                  );
-              }
-              return Promise.resolve();
+      if (appointment) {
+          // 3. Actualizar el estado de la cita asociada
+          await models.appointment.update(status, {
+              where: { id: appointment.id },
+              transaction
           });
-
-          await Promise.all(updatePromises);
       }
 
+      // 4. Confirmar la transacción
       await transaction.commit();
-      transaction = null; // Limpiar la referencia después del commit
-
-      // 5. Obtener la información actualizada
-      const updatedAppointment = await models.appointment.findByPk(appointmentId, {
-          include: [{
-              model: models.Detail,
-          }]
-      });
-
-      return {
-          message: 'Cita actualizada exitosamente',
-          appointment: updatedAppointment
-      };
-
+      return { message: 'Estado de la venta y cita actualizados correctamente' };
   } catch (error) {
-      // Solo hacer rollback si la transacción existe y no ha sido committed
-      if (transaction) {
-          await transaction.rollback();
-      }
+      await transaction.rollback();
       throw error;
   }
 };
@@ -220,6 +164,5 @@ module.exports = {
   createSaleFromOrder,
   getSaleById,
   getSaleAll,
-  updateStatusSales,
-  updateSaleAppointment
+  updateStatusSales
 };

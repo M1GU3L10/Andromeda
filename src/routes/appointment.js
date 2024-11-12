@@ -3,7 +3,8 @@ const appointmentController = require('../controllers/appointmentController');
 
 const router = express.Router();
 
-router.get('/', appointmentController.getAllAbsences);
-router.get('/:id', appointmentController.getAbsenceById);
+router.get('/', appointmentController.getAllAppointments);
+router.get('/:id', appointmentController.getAppointmentById);
+router.put('/:id/status', appointmentController.updateStatusAppointment);
 
 module.exports = router;
