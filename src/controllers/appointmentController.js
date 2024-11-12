@@ -24,21 +24,20 @@ const getAppointmentById = async (req, res) => {
 
 const updateStatusAppointment = async (req, res) => {
     try {
-        if (!req.body.status) {
+        const { status } = req.body;
+        if (!status) {
             return sendError(res, 'El estado de la cita es requerido', 400);
         }
 
-        const updated = await appointmentService.updateStatusAppointment(req.params.id, { status: req.body.status });
-
-        if (updated === 0) {
-            return sendError(res, 'Cita no encontrada', 404);
-        }
-
-        sendResponse(res, { message: 'Estado de la cita actualizado correctamente' });
+        const result = await appointmentService.updateStatusAppointment(req.params.id, status);
+        
+        sendResponse(res, result);
     } catch (error) {
-        sendError(res, error, 500);
+        console.error('Error en el controlador al actualizar el estado:', error.message);
+        sendError(res, 'Error al actualizar el estado de la cita y la venta', 500);
     }
 };
+
 
 module.exports = {
     getAllAppointments,
