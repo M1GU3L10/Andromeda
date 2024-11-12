@@ -124,7 +124,7 @@ const updateProduct = async (id, productData) => {
     }
 };
 
-// Eliminar un producto
+
 const deleteProduct = async (id) => {
     const deletedCount = await models.Product.destroy({
         where: { id }
