@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const sequelize = require('./src/config/database');
 const initializePermissions = require('./src/config/initPermissions');
+const initializeRoles = require('./src/config/initRoles');
+const initializeAdminRole = require('./src/config/initializeAdminRole');
 
 // Importación de rutas
 const categoryRoutes = require('./src/routes/categoryRoutes');
@@ -63,6 +65,14 @@ const startServer = async () => {
         // Inicializar los permisos automáticamente
         await initializePermissions();
         console.log('Permisos inicializados correctamente.');
+
+        
+         await initializeRoles();
+         console.log('Roles inicializados correctamente.');
+
+         
+         await initializeAdminRole();
+         console.log('Rol Admin inicializados correctamente.');
 
         // Iniciar el servidor
         const PORT = process.env.PORT || 3000;
