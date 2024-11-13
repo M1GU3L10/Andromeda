@@ -1,37 +1,167 @@
-const saleRepository = require('../repositories/saleRepository');
-const appointmentRepository = require('../repositories/appointment');
+const Sale = require('../models/sale');
+const SaleDetail = require('../models/saleDetail');
+const Appointment = require('../models/appointment');
+const productRepository = require('../repositories/productsRepository');
+const sequelize = require('../config/database');
+const { models } = require('../models');
+const saleRepository = require('../repositories/saleRepository')
 
 const createSale = async (saleData) => {
-  return await saleRepository.createSale(saleData);
+  const { saleDetails, appointmentData, ...sale } = saleData;
+  const transaction = await sequelize.transaction();
+
+  try {
+    const createdSale = await models.Sale.create({
+      Billnumber: sale.Billnumber,
+      SaleDate: sale.SaleDate,
+      total_price: sale.total_price,
+      status: sale.status,
+      id_usuario: sale.id_usuario
+    }, {
+      transaction
+    });
+
+    let createdAppointment = null;
+    const hasServices = saleDetails.some(detail => detail.serviceId);
+
+    if (hasServices && appointmentData) {
+      createdAppointment = await models.appointment.create({
+        Init_Time: appointmentData.Init_Time,
+        Finish_Time: appointmentData.Finish_Time,
+        Date: appointmentData.Date,
+        time_appointment: appointmentData.time_appointment,
+        status: 'Pendiente',
+        Total: sale.total_price,
+        clienteId: sale.id_usuario
+      }, {
+        transaction
+      });
+    }
+
+    if (saleDetails && saleDetails.length > 0) {
+      const detailsWithIds = saleDetails.map(detail => ({
+        quantity: detail.quantity,
+        unitPrice: detail.unitPrice,
+        total_price: detail.total_price,
+        id_producto: detail.id_producto || null,
+        serviceId: detail.serviceId || null,
+        empleadoId: detail.empleadoId,
+        id_sale: createdSale.id,
+        appointmentId: hasServices ? createdAppointment?.id : null
+      }));
+
+      await models.Detail.bulkCreate(detailsWithIds, {
+        transaction
+      });
+
+      const productDetails = detailsWithIds.filter(detail => detail.id_producto);
+      if (productDetails.length > 0) {
+        await productRepository.updateProductStock(productDetails, transaction);
+      }
+    }
+
+    await transaction.commit();
+
+    return {
+      sale: createdSale,
+      appointment: createdAppointment,
+      message: hasServices
+        ? 'Venta y cita creadas exitosamente'
+        : 'Venta creada exitosamente'
+    };
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
+const createSaleFromOrder = async (saleData) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const createdSale = await models.Sale.create({
+      Billnumber: saleData.Billnumber,
+      SaleDate: saleData.SaleDate,
+      total_price: saleData.total_price,
+      status: saleData.status,
+      id_usuario: saleData.id_usuario
+    }, {
+      transaction
+    });
+
+    if (saleData.saleDetails && saleData.saleDetails.length > 0) {
+      const detailsWithIds = saleData.saleDetails.map(detail => ({
+        ...detail,
+        id_sale: createdSale.id
+      }));
+
+      await models.Detail.bulkCreate(detailsWithIds, {
+        transaction
+      });
+    }
+
+    await transaction.commit();
+
+    return {
+      sale: createdSale,
+      message: 'Venta creada exitosamente a partir de la orden'
+    };
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
 };
 
 const getSaleById = async (id) => {
-  return await saleRepository.getSaleById(id);
+  return await models.Sale.findByPk(id, { include: [models.Detail] });
 };
 
 const getSaleAll = async () => {
-  return await saleRepository.getSaleAll();
+  return await models.Sale.findAll({
+    include: [models.Detail]
+  });
 };
 
-const updateStatusSales = async (saleId, newStatus) => {
+const updateStatusSales = async (id, status) => {
+  const transaction = await sequelize.transaction();
   try {
-    const result = await saleRepository.updateStatusSales(saleId, newStatus);
-    
-    // Actualizar el estado de la cita asociada
-    const saleDetail = await saleRepository.getSaleDetailBySaleId(saleId);
-    if (saleDetail && saleDetail.appointmentId) {
-      await appointmentRepository.updateStatusAppointment(saleDetail.appointmentId, newStatus.status);
-    }
-    
-    return result;
+      // 1. Actualizar el estado de la venta
+      const updatedSale = await models.Sale.update(status, {
+          where: { id },
+          transaction
+      });
+
+      if (updatedSale[0] === 0) {
+          await transaction.rollback();
+          throw new Error('Venta no encontrada');
+      }
+
+      // 2. Verificar si la venta está asociada a una cita
+      const appointment = await models.appointment.findOne({
+          where: { id_sale: id },
+          transaction
+      });
+
+      if (appointment) {
+          // 3. Actualizar el estado de la cita asociada
+          await models.appointment.update(status, {
+              where: { id: appointment.id },
+              transaction
+          });
+      }
+
+      // 4. Confirmar la transacción
+      await transaction.commit();
+      return { message: 'Estado de la venta y cita actualizados correctamente' };
   } catch (error) {
-    console.error('Error en el servicio al actualizar el estado de la venta:', error);
-    throw error;
+      await transaction.rollback();
+      throw error;
   }
 };
 
 module.exports = {
   createSale,
+  createSaleFromOrder,
   getSaleById,
   getSaleAll,
   updateStatusSales
