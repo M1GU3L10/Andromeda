@@ -2,7 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const { connectDb } = require('./src/models/index');
+const sequelize = require('./src/config/database');
+const initializePermissions = require('./src/config/initPermissions');
+
+// Importación de rutas
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const roleRoutes = require('./src/routes/roleRoutes');
@@ -16,18 +19,21 @@ const suppliersRoutes = require('./src/routes/suppliersRoutes');
 const orderRoutes = require('./src/routes/ordersRoutes');
 const shoppingRoutes = require('./src/routes/shoppingRoutes');
 const programmingEmployeeRoutes = require('./src/routes/programmingEmployeeRoutes');
-const appointment = require('./src/routes/appointment')
+const appointment = require('./src/routes/appointment');
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
 
-// Configuración del body-parser antes de las rutas
+// Configuración del body-parser
 app.use(bodyParser.json({ limit: '20mb' }));
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 
+// Configuración de rutas estáticas
 app.use('/uploads', express.static('uploads'));
+
+// Configuración de rutas de la API
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
@@ -43,10 +49,31 @@ app.use('/api/shopping', shoppingRoutes);
 app.use('/api/programming', programmingEmployeeRoutes);
 app.use('/api/appointment', appointment);
 
-const PORT = process.env.PORT || 3000;
+// Función para iniciar el servidor
+const startServer = async () => {
+    try {
+        // Conectar a la base de datos
+        await sequelize.authenticate();
+        console.log('Conexión a la base de datos establecida correctamente.');
 
-connectDb().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
-});
+        // Sincronizar los modelos con la base de datos
+        await sequelize.sync();
+        console.log('Modelos sincronizados con la base de datos.');
+
+        // Inicializar los permisos automáticamente
+        await initializePermissions();
+        console.log('Permisos inicializados correctamente.');
+
+        // Iniciar el servidor
+        const PORT = process.env.PORT || 3000;
+        app.listen(PORT, () => {
+            console.log(`Servidor corriendo en el puerto ${PORT}`);
+        });
+    } catch (error) {
+        console.error('Error al iniciar el servidor:', error);
+        process.exit(1);
+    }
+};
+
+// Iniciar el servidor
+startServer();
