@@ -6,7 +6,7 @@ const getAllAppointments = async (req, res) => {
         const appointments = await appointmentService.getAllAppointments();
         sendResponse(res, appointments);
     } catch (error) {
-        sendError(res, error);
+        sendError(res, 'Error al obtener las citas', 500);
     }
 };
 
@@ -18,7 +18,7 @@ const getAppointmentById = async (req, res) => {
         }
         sendResponse(res, appointment);
     } catch (error) {
-        sendError(res, error);
+        sendError(res, 'Error al obtener la cita', 500);
     }
 };
 
@@ -30,13 +30,13 @@ const updateStatusAppointment = async (req, res) => {
         }
 
         const result = await appointmentService.updateStatusAppointment(req.params.id, status);
-        
         sendResponse(res, result);
     } catch (error) {
         console.error('Error en el controlador al actualizar el estado:', error.message);
-        sendError(res, 'Error al actualizar el estado de la cita y la venta', 500);
+        sendError(res, error.message || 'Error al actualizar el estado de la cita y la venta', 500);
     }
 };
+
 
 module.exports = {
     getAllAppointments,
