@@ -1,6 +1,7 @@
 const express = require('express');
 const userController = require('../controllers/userController');
 const validateUser = require('../middlewares/validateUser');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
@@ -20,6 +21,10 @@ router.post('/login/google', userController.loginWithGoogle);
 
 router.get('/check-email/:email', userController.checkEmailExists);
 router.get('/check-phone/:phone', userController.checkPhoneExists);
+
+router.get('/profile', authMiddleware,userController.getProfile);
+router.put('/profile', authMiddleware,userController.updateProfile);
+
 
 
 module.exports = router;
