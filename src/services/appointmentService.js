@@ -1,6 +1,5 @@
 const appointmentRepository = require('../repositories/appointment');
-const { updateSaleStatus } = require('../repositories/saleRepository');
-const { models } = require('../models'); // Asegúrate de que "../models" apunta a la ubicación correcta
+const saleRepository = require('../repositories/saleRepository');
 
 const getAllAppointments = async () => {
   return await appointmentRepository.getAllAppointments();
@@ -12,20 +11,17 @@ const getAppointmentById = async (id) => {
 
 const updateStatusAppointment = async (appointmentId, newStatus) => {
   try {
-    // Asegúrate de que `Appointment` esté importado correctamente
-    const appointment = await models.appointment.findByPk(appointmentId);
-    if (!appointment) throw new Error("Cita no encontrada");
-
-    appointment.status = newStatus;
-    await appointment.save();
-
-    // Actualizar el estado de la venta relacionada
-    if (newStatus === "completada") {
-      await updateSaleStatus(appointment.saleId, "completada");
+    const result = await appointmentRepository.updateStatusAppointment(appointmentId, newStatus);
+    
+    // Actualizar el estado de la venta asociada
+    const saleDetail = await appointmentRepository.getSaleDetailByAppointmentId(appointmentId);
+    if (saleDetail) {
+      await saleRepository.updateStatusSales(saleDetail.id_sale, { status: newStatus });
     }
-
-    return appointment;
+    
+    return result;
   } catch (error) {
+    console.error('Error en el servicio al actualizar el estado:', error);
     throw error;
   }
 };

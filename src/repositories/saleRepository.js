@@ -1,19 +1,19 @@
-const Sale = require('../models/sale');
-const SaleDetail = require('../models/saleDetail');
+const { Op } = require('sequelize');
+const { models, sequelize } = require('../models');
+const Sale = models.Sale;
+const SaleDetail = models.SaleDetail;
+const Appointment = models.appointment;
 const productRepository = require('./productsRepository');
-const sequelize = require('../config/database');
-const { Transaction } = require('sequelize');
-const { models } = require('../models');
 
 const createSale = async (saleData) => {
-    const { saleDetails, appointmentData, ...sale } = saleData;
-    const Transaction = await sequelize.transaction();
-
+    let transaction;
     try {
+        // Iniciar transacción
+        transaction = await sequelize.transaction();
+        const { saleDetails, appointmentData, ...sale } = saleData;
+
         // 1. Crear la venta principal
-        const createdSale = await Sale.create(sale, {
-            transaction: Transaction
-        });
+        const createdSale = await Sale.create(sale, { transaction });
 
         let createdAppointment = null;
         // 2. Verificar si hay servicios en los detalles
@@ -24,14 +24,12 @@ const createSale = async (saleData) => {
             createdAppointment = await Appointment.create({
                 Init_Time: appointmentData.Init_Time,
                 Finish_Time: appointmentData.Finish_Time,
-                Date: appointmentData.Date || sale.SaleDate, // Usar la fecha de venta si no se especifica
-                Total: sale.total_price, // Usar el total de la venta
+                Date: appointmentData.Date || sale.SaleDate,
+                Total: sale.total_price,
                 time_appointment: appointmentData.time_appointment,
                 status: 'pendiente',
-                clienteId: sale.id_usuario // Usar el usuario de la venta como cliente
-            }, {
-                transaction: Transaction
-            });
+                clienteId: sale.id_usuario
+            }, { transaction });
         }
 
         // 3. Crear los detalles de venta
@@ -42,18 +40,17 @@ const createSale = async (saleData) => {
                 appointmentId: hasServices ? createdAppointment.id : null
             }));
 
-            await SaleDetail.bulkCreate(detailsWithIds, {
-                transaction: Transaction
-            });
+            await SaleDetail.bulkCreate(detailsWithIds, { transaction });
 
             // 4. Actualizar el stock solo para los productos (no servicios)
             const productDetails = detailsWithIds.filter(detail => detail.id_producto);
             if (productDetails.length > 0) {
-                await productRepository.updateProductStock(productDetails, Transaction);
+                await productRepository.updateProductStock(productDetails, transaction);
             }
         }
 
-        await Transaction.commit();
+        // Commit transaction
+        await transaction.commit();
 
         return {
             sale: createdSale,
@@ -64,11 +61,51 @@ const createSale = async (saleData) => {
         };
 
     } catch (error) {
-        await Transaction.rollback();
+        // Rollback transaction en caso de error
+        if (transaction) await transaction.rollback();
         throw error;
     }
 };
 
+const updateStatusSales = async (saleId, newStatus) => {
+    let transaction;
+    try {
+        // Iniciar la transacción
+        transaction = await sequelize.transaction();
+
+        // Actualizar el estado
+        const [updatedCount] = await Sale.update(
+            { status: newStatus },
+            {
+                where: { id: saleId },
+                transaction: transaction // Pasar la transacción explícitamente
+            }
+        );
+
+        if (updatedCount === 0) {
+            // Si no se encontró la venta, hacemos rollback y lanzamos error
+            if (transaction) await transaction.rollback();
+            throw new Error('Venta no encontrada');
+        }
+
+        // Si todo sale bien, hacemos commit
+        await transaction.commit();
+        
+        return { 
+            success: true,
+            message: 'Estado de la venta actualizado correctamente',
+            updatedStatus: newStatus
+        };
+
+    } catch (error) {
+        // En caso de error, hacemos rollback si la transacción existe
+        if (transaction) await transaction.rollback();
+        console.error('Error al actualizar el estado de la venta:', error);
+        throw new Error(`Error al actualizar el estado: ${error.message}`);
+    }
+};
+
+// Los otros métodos no necesitan transacciones ya que son solo consultas
 const getSaleById = async (id) => {
     return await Sale.findByPk(id, { include: [SaleDetail] });
 };
@@ -80,8 +117,8 @@ const getSaleAll = async () => {
                 model: SaleDetail,
                 include: [
                     {
-                        model: models.appointment,
-                        required: true // Solo obtener ventas con citas asociadas
+                        model: Appointment,
+                        required: true
                     }
                 ]
             }
@@ -89,23 +126,16 @@ const getSaleAll = async () => {
     });
 };
 
-const updateStatusSales = async (saleId, newStatus) => {
-    try {
-        const sale = await Sale.findByPk(saleId);
-        if (!sale) throw new Error("Venta no encontrada");
-
-        models.appointment.status = newStatus;
-        await sale.save();
-        return sale;
-    } catch (error) {
-        throw error;
-    }
+const getSaleDetailBySaleId = async (saleId) => {
+    return await SaleDetail.findOne({
+        where: { id_sale: saleId }
+    });
 };
-
 
 module.exports = {
     createSale,
     getSaleById,
     getSaleAll,
-    updateStatusSales
+    updateStatusSales,
+    getSaleDetailBySaleId
 };
