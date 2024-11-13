@@ -13,7 +13,8 @@ const defaultPermissions = [
     'Citas',
     'Pedidos',
     'Ventas',
-    'Perfil'
+    'Perfil',
+    'Dashboard'
 ];
 
 const initializePermissions = async () => {

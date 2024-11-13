@@ -56,36 +56,48 @@ const deleteOrder = async (id) => {
 };
 
 const checkAndConvertToSale = async (order) => {
-    if (order.status === 'Completada' || order.status === 'Cancelada') {
-        const saleData = {
-            Billnumber: `SAL${order.Billnumber.slice(3)}`,
-            SaleDate: new Date(),
-            total_price: order.total_price,
-            status: order.status,
-            id_usuario: order.id_usuario,
-            saleDetails: []
-        };
-        
-        if (order.orderDetails && Array.isArray(order.orderDetails)) {
-            saleData.saleDetails = order.orderDetails.map(detail => ({
-                quantity: detail.quantity,
-                unitPrice: detail.unitPrice,
-                total_price: detail.total_price,
-                id_producto: detail.id_producto
-            }));
-        } else {
-            console.warn('Order details not found or invalid for order:', order.id);
-        }
-        
-        await saleService.createSaleFromOrder(saleData);
+    try {
+        console.log(order);  // Imprime la orden para ver si contiene los detalles
+        if (order.status === 'Completada' || order.status === 'Cancelada') {
+            const saleData = {
+                Billnumber: `SAL${order.Billnumber.slice(3)}`,
+                SaleDate: new Date(),
+                total_price: order.total_price,
+                status: order.status,
+                id_usuario: order.id_usuario,
+                saleDetails: []
+            };
 
-        if (order.status === 'Completada' && order.orderDetails && Array.isArray(order.orderDetails)) {
-            for (const detail of order.orderDetails) {
-                await productRepository.updateProductStock(detail.id_producto, -detail.quantity);
+            if (order.OrderDetails && Array.isArray(order.OrderDetails)) {
+                saleData.saleDetails = order.OrderDetails.map(detail => ({
+                    quantity: detail.dataValues.quantity,
+                    unitPrice: detail.dataValues.unitPrice,
+                    total_price: detail.dataValues.total_price,
+                    id_producto: detail.dataValues.id_producto
+                }));
+            } else {
+                console.log('Detalles de la orden no encontrados o inválidos para la orden:', order.id);
+                return;
             }
+            
+
+            const newSale = await saleService.createSaleFromOrder(saleData);
+
+            if (order.status === 'Completada') {
+                for (const detail of order.orderDetails) {
+                    await productRepository.updateProductStock(detail.id_producto, -detail.quantity);
+                }
+            }
+
+            console.log(`Venta registrada exitosamente con ID: ${newSale.id}`);
         }
+    } catch (error) {
+        console.error('Error al registrar la venta desde la orden:', error.message);
     }
 };
+
+
+
 module.exports = {
     getAllOrders,
     getOrderById,
