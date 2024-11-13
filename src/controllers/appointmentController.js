@@ -38,7 +38,6 @@ const updateStatusAppointment = async (req, res) => {
     }
 };
 
-
 module.exports = {
     getAllAppointments,
     getAppointmentById,

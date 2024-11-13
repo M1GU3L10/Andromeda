@@ -18,7 +18,7 @@ const createSale = async (saleData) => {
         let createdAppointment = null;
         // 2. Verificar si hay servicios en los detalles
         const hasServices = saleDetails.some(detail => detail.serviceId);
-
+        
         if (hasServices && appointmentData) {
             // Crear la cita si hay servicios
             createdAppointment = await Appointment.create({
@@ -42,8 +42,8 @@ const createSale = async (saleData) => {
                 appointmentId: hasServices ? createdAppointment.id : null
             }));
 
-            await SaleDetail.bulkCreate(detailsWithIds, {
-                transaction: Transaction
+            await SaleDetail.bulkCreate(detailsWithIds, { 
+                transaction: Transaction 
             });
 
             // 4. Actualizar el stock solo para los productos (no servicios)
@@ -54,12 +54,12 @@ const createSale = async (saleData) => {
         }
 
         await Transaction.commit();
-
+        
         return {
             sale: createdSale,
             appointment: createdAppointment,
-            message: hasServices
-                ? 'Venta y cita creadas exitosamente'
+            message: hasServices 
+                ? 'Venta y cita creadas exitosamente' 
                 : 'Venta creada exitosamente'
         };
 
@@ -88,19 +88,12 @@ const getSaleAll = async () => {
         ]
     });
 };
-
-const updateStatusSales = async (saleId, newStatus) => {
-    try {
-        const sale = await Sale.findByPk(saleId);
-        if (!sale) throw new Error("Venta no encontrada");
-
-        models.appointment.status = newStatus;
-        await sale.save();
-        return sale;
-    } catch (error) {
-        throw error;
-    }
+const updateStatusSales = async (id, status) => {
+    return await models.Sale.update(status, {
+        where: { id }
+    });
 };
+
 
 
 module.exports = {
