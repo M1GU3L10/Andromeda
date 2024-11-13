@@ -41,7 +41,6 @@ const updateStatusSales = async (req, res) => {
     if (!status) {
         return res.status(400).json({ error: 'El estado es requerido' });
     }
-
     const result = await salesRepository.updateStatusSales(id, status);
     res.json(result);
 } catch (error) {
