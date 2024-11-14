@@ -3,27 +3,12 @@ const { sendResponse, sendError } = require('../utils/response');
 
 const createMultiplePermissions = async (req, res) => {
     try {
-        const permissionNames = [
-            'Roles',
-            'Usuarios',
-            'Categorias',
-            'Productos',
-            'Proveedores',
-            'Compras',
-            'Servicios',
-            'Programacion de empleado',
-            'Ausencias',
-            'Citas',
-            'Pedidos',
-            'Ventas'
-        ];
-
-        const permissions = await permissionService.createMultiplePermissions(permissionNames);
-        sendResponse(res, permissions, 201); // Respuesta con todos los permisos creados
+      const permissions = await permissionService.createMultiplePermissions(req.body);
+      sendResponse(res, { message: 'Permissions created successfully', permissions }, 201);
     } catch (error) {
-        sendError(res, error);
+      sendError(res, error);
     }
-};
+  };
 //registrar pemisos desde la api
 
 //

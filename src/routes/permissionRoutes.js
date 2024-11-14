@@ -11,5 +11,6 @@ router.post('/permissions',  validatePermission, permissionController.createMult
 router.put('/:id', validatePermission, permissionController.updatePermission);
 router.delete('/:id', permissionController.deletePermission);
 router.post('/initialize', permissionController.createMultiplePermissions);
+router.post('/multiple', validatePermission, permissionController.createMultiplePermissions);
 
 module.exports = router;

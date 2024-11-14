@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Asegúrate de importar la instancia de sequelize correctamente
+const sequelize = require('../config/database');
 
 const Permission = sequelize.define('Permission', {
     name: {
@@ -13,6 +13,5 @@ const Permission = sequelize.define('Permission', {
 }, {
     tableName: 'permissions'
 });
-
 
 module.exports = Permission;
