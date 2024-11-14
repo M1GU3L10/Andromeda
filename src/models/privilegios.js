@@ -6,12 +6,8 @@ const Privilege = sequelize.define('Privilege', {
     name: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
-        validate: {
-            notEmpty: true
-        }
     },
-    Idpermission: {
+    permissionId: {  // Cambiamos Idpermission por permissionId para seguir las convenciones de Sequelize
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
@@ -23,7 +19,7 @@ const Privilege = sequelize.define('Privilege', {
     tableName: 'privileges'
 });
 
-Privilege.belongsTo(Permission);
-Permission.hasMany(Privilege);
+Privilege.belongsTo(Permission, { foreignKey: 'permissionId' });
+Permission.hasMany(Privilege, { foreignKey: 'permissionId' });
 
 module.exports = Privilege;

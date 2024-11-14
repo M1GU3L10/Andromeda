@@ -31,13 +31,13 @@ const deleteRole = async (id) => {
 };
 
 const assignPrivilegeToPermission = async (permissionId, privilegeId) => {
-    const permission = await permissionRepository.getPermissionById(permissionId);
-    const privilege = await privilegeRepository.getPrivilegeById(privilegeId);
-    if (permission && privilege) {
-        await permission.addPrivilege(privilege);
-        return true;
-    }
-    return false;
+  const permission = await permissionRepository.getPermissionById(permissionId);
+  const privilege = await privilegeRepository.getPrivilegeById(privilegeId);
+  if (permission && privilege) {
+      await privilege.setPermission(permission);  // Usa setPermission en lugar de addPrivilege
+      return true;
+  }
+  return false;
 };
 
 module.exports = {
