@@ -8,10 +8,8 @@ const PermissionRole = require('./permissionRole');
 const Shopping = require('./shopping');
 const ShoppingDetail = require('./shoppingDetail');
 const absence = require('./absence');
-const programming = require('./programmingEmployee');
 const appointment = require('./appointment');
 const Absence = require('./absence');
-const Programmingemployees = require('./programmingEmployee');
 const Sale = require('./sale');
 const Detail = require('./saleDetail');
 const Product = require('./products');
@@ -36,10 +34,8 @@ const models = {
     Role,
     Shopping,
     absence,
-    programming,
     appointment,
     Absence,
-    Programmingemployees,
     Sale,
     Detail,
     Product,

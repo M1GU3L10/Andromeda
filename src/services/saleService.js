@@ -6,6 +6,37 @@ const sequelize = require('../config/database');
 const { models } = require('../models');
 const saleRepository = require('../repositories/saleRepository')
 
+const getSaleDetailsByAppointmentId = async (appointmentId) => {
+  try {
+    const saleDetails = await saleRepository.getSaleDetailsByAppointmentId(appointmentId);
+
+    if (!saleDetails || saleDetails.length === 0) {
+      return [];
+    }
+
+    return saleDetails.map((detail) => ({
+      id: detail.id,
+      quantity: detail.quantity,
+      price: detail.unitPrice,
+      total: detail.total_price,
+      type: detail.Product ? 'Product' : 'Service',
+      name: detail.Product ? detail.Product.name : (detail.Service ? detail.Service.name : 'Unknown'),
+      employeeName: detail.Employee ? detail.Employee.name : null,
+      saleInfo: detail.Sale ? {
+        billNumber: detail.Sale.Billnumber,
+        saleDate: detail.Sale.SaleDate,
+        totalPrice: detail.Sale.total_price,
+        clientName: detail.Sale.User ? detail.Sale.User.name : 'Unknown',
+        clientEmail: detail.Sale.User ? detail.Sale.User.email : 'Unknown',
+      } : null,
+    }));
+  } catch (error) {
+    console.error('Error fetching sale details by appointmentId:', error);
+    throw new Error('Failed to fetch sale details');
+  }
+};
+
+
 const createSale = async (saleData) => {
   const { saleDetails, appointmentData, ...sale } = saleData;
   const transaction = await sequelize.transaction();
@@ -164,5 +195,6 @@ module.exports = {
   createSaleFromOrder,
   getSaleById,
   getSaleAll,
-  updateStatusSales
+  updateStatusSales,
+  getSaleDetailsByAppointmentId
 };

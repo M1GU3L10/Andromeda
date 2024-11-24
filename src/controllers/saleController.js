@@ -2,6 +2,23 @@ const saleService = require('../services/saleService');
 const salesRepository = require('../repositories/saleRepository');
 const { sendError, sendResponse } = require('../utils/response')
 
+const getSaleDetailsByAppointmentId = async (req, res) => {
+  try {
+      const { appointmentId } = req.params;
+      const saleDetails = await saleService.getSaleDetailsByAppointmentId(appointmentId);
+
+      if (!saleDetails || saleDetails.length === 0) {
+          return res.status(404).json({ message: 'No sale details found for the specified appointment' });
+      }
+
+      res.json(saleDetails);
+  } catch (error) {
+      console.error('Error in getSaleDetailsByAppointmentId controller:', error);
+      res.status(500).json({ error: error.message });
+  }
+};
+
+
 const createSale = async (req, res) => {
     try {
       const sale = await saleService.createSale(req.body);
@@ -53,5 +70,6 @@ module.exports = {
   createSale,
   getSaleById,
   getAllSales,
-  updateStatusSales
+  updateStatusSales,
+  getSaleDetailsByAppointmentId
 };
