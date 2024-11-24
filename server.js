@@ -23,6 +23,7 @@ const shoppingRoutes = require('./src/routes/shoppingRoutes');
 const programmingEmployeeRoutes = require('./src/routes/programmingEmployeeRoutes');
 const appointment = require('./src/routes/appointment');
 const privilegeRoutes = require('./src/routes/privilegiosRoutes');
+const privilegePermissionRoleRoutes = require('./src/routes/privilegePermissionRoleRoutes');
 
 dotenv.config();
 
@@ -39,7 +40,7 @@ app.use('/uploads', express.static('uploads'));
 // Configuración de rutas de la API
 
 app.use('/api/privileges', privilegeRoutes);
-
+app.use('/api/privilege-permission-roles', privilegePermissionRoleRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
@@ -54,6 +55,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/shopping', shoppingRoutes);
 app.use('/api/programming', programmingEmployeeRoutes);
 app.use('/api/appointment', appointment);
+
 
 // Función para iniciar el servidor
 const startServer = async () => {

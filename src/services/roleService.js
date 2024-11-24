@@ -1,6 +1,7 @@
 const roleRepository = require('../repositories/roleRepository');
 const permissionRepository = require('../repositories/permissionRepository');
 const privilegeRepository = require('../repositories/privilegiosRepository');
+const privilegePermissionRoleRepository = require('../repositories/privilegePermissionRoleRepository');
 
 const getAllRoles = async () => {
     return await roleRepository.getAllRoles();
@@ -40,11 +41,26 @@ const assignPrivilegeToPermission = async (permissionId, privilegeId) => {
   return false;
 };
 
+const assignPrivilegesToRole = async (roleId, permissionId, privilegeIds) => {
+  const permissionRole = await privilegePermissionRoleRepository.getPrivilegePermissionRoleById(roleId, permissionId);
+  if (!permissionRole) {
+      throw new Error('PermissionRole not found');
+  }
+
+  const assignments = privilegeIds.map(privilegeId => ({
+      permissionRoleId: permissionRole.id,
+      privilegeId
+  }));
+
+  return await privilegePermissionRoleRepository.createMultiplePrivilegePermissionRoles(assignments);
+};
+
 module.exports = {
     getAllRoles,
     getRoleById,
     createRole,
     updateRole,
     deleteRole,
-    assignPrivilegeToPermission
+    assignPrivilegeToPermission,
+    assignPrivilegesToRole
 };

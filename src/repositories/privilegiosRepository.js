@@ -1,11 +1,11 @@
 const { models } = require('../models');
 
 const getAllPrivileges = async () => {
-    return await models.Privilege.findAll({ include: models.Permission });
+    return await models.Privilege.findAll();
 };
 
 const getPrivilegeById = async (id) => {
-    return await models.Privilege.findByPk(id, { include: models.Permission });
+    return await models.Privilege.findByPk(id);
 };
 
 const createPrivilege = async (data) => {

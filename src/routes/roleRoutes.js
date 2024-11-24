@@ -9,6 +9,6 @@ router.get('/:id', roleController.getRoleById);
 router.post('/', validateRole, roleController.createRole);
 router.put('/:id', validateRole, roleController.updateRole);
 router.delete('/:id', roleController.deleteRole);
-router.post('/assign-privilege', roleController.assignPrivilegeToPermission);
+router.post('/assign-privileges', roleController.assignPrivilegesToRole);
 
 module.exports = router;

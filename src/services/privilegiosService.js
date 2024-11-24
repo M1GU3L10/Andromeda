@@ -1,4 +1,6 @@
+// services/privilegiosService.js
 const privilegeRepository = require('../repositories/privilegiosRepository');
+const privilegePermissionRoleRepository = require('../repositories/privilegePermissionRoleRepository');
 
 const getAllPrivileges = async () => {
     return await privilegeRepository.getAllPrivileges();
@@ -24,11 +26,19 @@ const createMultiplePrivileges = async (privilegesData) => {
     return await privilegeRepository.createMultiplePrivileges(privilegesData);
 };
 
+const assignPrivilegeToPermissionRole = async (privilegeId, permissionRoleId) => {
+    return await privilegePermissionRoleRepository.createPrivilegePermissionRole({
+        privilegeId,
+        permissionRoleId
+    });
+};
+
 module.exports = {
     getAllPrivileges,
     getPrivilegeById,
     createPrivilege,
     updatePrivilege,
     deletePrivilege,
-    createMultiplePrivileges
+    createMultiplePrivileges,
+    assignPrivilegeToPermissionRole
 };

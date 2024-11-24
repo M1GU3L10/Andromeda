@@ -19,6 +19,7 @@ const supplier = require('./suppliers');
 const Order = require('./orders');
 const OrderDetail = require('./ordersDetail');
 const Privilege = require('./privilegios');
+const PrivilegePermissionRole = require('./privilegePermissionRole')
 
 
 // Definir asociaciones
@@ -27,6 +28,7 @@ Permission.belongsToMany(Role, { through: PermissionRole, as: 'roles', foreignKe
 
 
 const models = {
+    PrivilegePermissionRole,
     Privilege,
     Category,
     Service,

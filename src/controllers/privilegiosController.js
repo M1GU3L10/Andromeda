@@ -64,11 +64,22 @@ const deletePrivilege = async (req, res) => {
     }
 };
 
+const assignPrivilegeToPermissionRole = async (req, res) => {
+    try {
+        const { privilegeId, permissionRoleId } = req.body;
+        const assigned = await privilegeService.assignPrivilegeToPermissionRole(privilegeId, permissionRoleId);
+        sendResponse(res, { message: 'Privilege assigned to PermissionRole successfully', assigned }, 201);
+    } catch (error) {
+        sendError(res, error);
+    }
+};
+
 module.exports = {
     getAllPrivileges,
     getPrivilegeById,
     createPrivilege,
     updatePrivilege,
     deletePrivilege,
-    createMultiplePrivileges
+    createMultiplePrivileges,
+    assignPrivilegeToPermissionRole
 };
