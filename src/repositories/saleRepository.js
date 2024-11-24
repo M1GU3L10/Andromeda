@@ -4,6 +4,44 @@ const productRepository = require('./productsRepository');
 const sequelize = require('../config/database');
 const { Transaction } = require('sequelize');
 const { models } = require('../models');
+const { Appointment } = require('../models');
+
+const getSaleDetailsByAppointmentId = async (appointmentId) => {
+    try {
+      return await SaleDetail.findAll({
+        where: { appointmentId },
+        include: [
+          {
+            model: Product,
+            attributes: ['name', 'price'],
+          },
+          {
+            model: Service,
+            attributes: ['name', 'price'],
+          },
+          {
+            model: User,
+            as: 'Employee',
+            attributes: ['name'],
+          },
+          {
+            model: Sale,
+            attributes: ['Billnumber', 'SaleDate', 'total_price'],
+            include: [
+              {
+                model: User,
+                attributes: ['name', 'email'],
+              },
+            ],
+          },
+        ],
+      });
+    } catch (error) {
+      console.error('Error in getSaleDetailsByAppointmentId repository:', error);
+      throw error;
+    }
+  };
+
 
 const createSale = async (saleData) => {
     const { saleDetails, appointmentData, ...sale } = saleData;
@@ -80,14 +118,32 @@ const getSaleAll = async () => {
                 model: SaleDetail,
                 include: [
                     {
+                        model: models.Product,
+                        attributes: ['name', 'price'],
+                    },
+                    {
+                        model: models.Service,
+                        attributes: ['name', 'price'],
+                    },
+                    {
+                        model: models.User,
+                        as: 'Employee',
+                        attributes: ['name'],
+                    },
+                    {
                         model: models.appointment,
-                        required: true // Solo obtener ventas con citas asociadas
+                        required: false
                     }
                 ]
+            },
+            {
+                model: models.User,
+                attributes: ['name', 'email']
             }
         ]
     });
 };
+
 const updateStatusSales = async (id, status) => {
     return await models.Sale.update(status, {
         where: { id }
@@ -100,5 +156,6 @@ module.exports = {
     createSale,
     getSaleById,
     getSaleAll,
-    updateStatusSales
+    updateStatusSales,
+    getSaleDetailsByAppointmentId
 };

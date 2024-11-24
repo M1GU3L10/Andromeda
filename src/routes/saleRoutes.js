@@ -7,7 +7,7 @@ router.post('/', saleValidate,saleController.createSale);
 router.get('/:id', saleController.getSaleById);
 router.get('/', saleController.getAllSales);
 router.put('/:id/status', saleController.updateStatusSales);
-
+router.get('/SaleDetails/:appointmentId', saleController.getSaleDetailsByAppointmentId);
 
 
 module.exports = router;
