@@ -15,7 +15,7 @@ const Service = sequelize.define('Service', {
         allowNull: true
     },
     description: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: true
     },
     time: {
