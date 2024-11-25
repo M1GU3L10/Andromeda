@@ -14,7 +14,8 @@ const defaultPermissions = [
     'Pedidos',
     'Ventas',
     'Perfil',
-    'Dashboard'
+    'Dashboard',
+    'Vista Cliente'
 ];
 
 const initializePermissions = async () => {
