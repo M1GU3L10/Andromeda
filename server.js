@@ -6,6 +6,8 @@ const sequelize = require('./src/config/database');
 const initializePermissions = require('./src/config/initPermissions');
 const initializeRoles = require('./src/config/initRoles');
 const initializeAdminRole = require('./src/config/initializeAdminRole');
+const seedPrivileges = require('./src/config/privilegesSeeder');
+const seedPrivilegePermissionRoles = require('./src/config/privilegePermissionRoleseeder');
 
 // Importación de rutas
 const categoryRoutes = require('./src/routes/categoryRoutes');
@@ -70,13 +72,19 @@ const startServer = async () => {
         await initializePermissions();
         console.log('Permisos inicializados correctamente.');
 
-        
-         await initializeRoles();
-         console.log('Roles inicializados correctamente.');
+        await initializeRoles();
+        console.log('Roles inicializados correctamente.');
 
-         
-         await initializeAdminRole();
-         console.log('Rol Admin inicializados correctamente.');
+        await initializeAdminRole();
+        console.log('Rol Admin inicializado correctamente.');
+
+        // Ejecutar el seeder de privilegios
+        await seedPrivileges();
+        console.log('Privilegios sembrados correctamente.');
+
+        // Ejecutar el seeder de PrivilegePermissionRoles
+        await seedPrivilegePermissionRoles();
+        console.log('PrivilegePermissionRoles sembrados correctamente.');
 
         // Iniciar el servidor
         const PORT = process.env.PORT || 3000;
