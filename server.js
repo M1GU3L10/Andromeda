@@ -8,6 +8,8 @@ const initializeRoles = require('./src/config/initRoles');
 const initializeAdminRole = require('./src/config/initializeAdminRole');
 const seedPrivileges = require('./src/config/privilegesSeeder');
 const seedPrivilegePermissionRoles = require('./src/config/privilegePermissionRoleseeder');
+const initializeUserAdmin = require('./src/config/initializeUserAdmin');
+
 
 // Importación de rutas
 const categoryRoutes = require('./src/routes/categoryRoutes');
@@ -85,6 +87,10 @@ const startServer = async () => {
         // Ejecutar el seeder de PrivilegePermissionRoles
         await seedPrivilegePermissionRoles();
         console.log('PrivilegePermissionRoles sembrados correctamente.');
+
+         await initializeUserAdmin();
+         console.log('Usuario Admin inicializado correctamente.');
+
 
         // Iniciar el servidor
         const PORT = process.env.PORT || 3000;

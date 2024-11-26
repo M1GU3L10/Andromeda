@@ -11,49 +11,27 @@ const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 
 const getProfile = async (req, res) => {
     try {
-        const user = req.user;
-        if (!user) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-        
-        const { password, ...userProfile } = user.toJSON();
-        res.json(userProfile);
+        const profile = await userService.getUserProfile(req.user.id);
+        res.json(profile);
     } catch (error) {
-        console.error('Error al obtener el perfil del usuario:', error);
-        res.status(500).json({ message: 'Error al obtener el perfil del usuario' });
+        console.error('Error al obtener perfil:', error);
+        res.status(500).json({ message: error.message });
     }
 };
 
 const updateProfile = async (req, res) => {
     try {
-        const userId = req.user.id;
         const { name, email, phone, password } = req.body;
-
-        if (!name || !email) {
-            return res.status(400).json({ message: 'Nombre y email son requeridos' });
-        }
-
-        const updateData = {
+        const updatedProfile = await userService.updateProfile(req.user.id, {
             name,
             email,
-            phone: phone || null
-        };
-
-        if (password) {
-            updateData.password = password;
-        }
-
-        const updatedUser = await userService.updateUser(userId, updateData);
-        
-        if (!updatedUser) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-
-        const { password: _, ...userProfile } = updatedUser.toJSON();
-        res.json(userProfile);
+            phone,
+            password
+        });
+        res.json(updatedProfile);
     } catch (error) {
-        console.error('Error al actualizar el perfil del usuario:', error);
-        res.status(500).json({ message: 'Error al actualizar el perfil del usuario' });
+        console.error('Error al actualizar perfil:', error);
+        res.status(400).json({ message: error.message });
     }
 };
 

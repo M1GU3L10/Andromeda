@@ -24,6 +24,6 @@ router.get('/check-email/:email', userController.checkEmailExists);
 router.get('/check-phone/:phone', userController.checkPhoneExists);
 
 router.get('/profile', authMiddleware, userController.getProfile);
-router.put('/profile', authMiddleware, userController.updateProfile);
+router.put('/profile/:id', authMiddleware, userController.updateProfile);
 
 module.exports = router;
