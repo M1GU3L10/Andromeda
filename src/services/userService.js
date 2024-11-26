@@ -4,6 +4,42 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const userRepository = require('../repositories/UserRepository');
 
+const getUserProfile = async (userId) => {
+    const user = await userRepository.getUserById(userId);
+    if (!user) {
+        throw new Error('Usuario no encontrado');
+    }
+    const { password, ...userWithoutPassword } = user.toJSON();
+    return userWithoutPassword;
+};
+
+const updateProfile = async (userId, userData) => {
+    // Verificar email único
+    if (userData.email) {
+        const existingUser = await userRepository.findUserByEmail(userData.email);
+        if (existingUser && existingUser.id !== userId) {
+            throw new Error('El correo electrónico ya está en uso');
+        }
+    }
+
+    // Verificar teléfono único
+    if (userData.phone) {
+        const existingPhone = await userRepository.findUserByPhone(userData.phone);
+        if (existingPhone && existingPhone.id !== userId) {
+            throw new Error('El número de teléfono ya está en uso');
+        }
+    }
+
+    // Hash de la contraseña si se proporciona una nueva
+    if (userData.password) {
+        userData.password = await bcrypt.hash(userData.password, 10);
+    }
+
+    const updatedUser = await userRepository.updateUser(userId, userData);
+    const { password, ...userWithoutPassword } = updatedUser.toJSON();
+    return userWithoutPassword;
+};
+
 const checkEmailExists = async (email) => {
     const user = await userRepository.findUserByEmail(email);
     return !!user;
@@ -135,5 +171,7 @@ module.exports = {
     requestPasswordReset,
     resetPassword,
     checkEmailExists,
-    checkPhoneExists
+    checkPhoneExists,
+    getUserProfile,
+    updateProfile
 };
