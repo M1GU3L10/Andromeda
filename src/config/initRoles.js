@@ -12,13 +12,13 @@ const initializeRoles = async () => {
                 where: { name: roleName },
                 defaults: { name: roleName },
             });
-
+ 
             if (created) {
                 console.log(`Rol creado: ${roleName}`);
             } else {
                 console.log(`Rol ya existente: ${roleName}`);
             }
-        }
+        }   
 
         console.log('Roles sincronizados exitosamente.');
     } catch (error) {

@@ -34,7 +34,7 @@ const initializeUserAdmin = async () => {
 
         console.log('Usuario administrador creado exitosamente.');
 
-        // 5. Generar un token JWT
+        // 5. Generar un token JWT  
         const token = jwt.sign(
             {
                 id: adminUser.id,

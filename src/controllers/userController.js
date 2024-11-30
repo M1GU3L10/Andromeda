@@ -21,19 +21,32 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
+        const userId = req.user.id;
         const { name, email, phone, password } = req.body;
-        const updatedProfile = await userService.updateProfile(req.user.id, {
+        
+        const updatedProfile = await userService.updateProfile(userId, {
             name,
             email,
             phone,
-            password
+            ...(password && { password })
         });
-        res.json(updatedProfile);
+
+        const token = jwt.sign(
+            { id: userId, ...updatedProfile },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+        
+        res.json({
+            user: updatedProfile,
+            token
+        });
     } catch (error) {
         console.error('Error al actualizar perfil:', error);
         res.status(400).json({ message: error.message });
     }
 };
+
 
 const checkEmailExists = async (req, res) => {
     try {

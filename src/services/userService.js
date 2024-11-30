@@ -9,34 +9,42 @@ const getUserProfile = async (userId) => {
     if (!user) {
         throw new Error('Usuario no encontrado');
     }
-    const { password, ...userWithoutPassword } = user.toJSON();
+    const userObj = user.toJSON();
+    const { password, ...userWithoutPassword } = userObj;
     return userWithoutPassword;
 };
 
 const updateProfile = async (userId, userData) => {
-    // Verificar email único
+    const existingUser = await userRepository.getUserById(userId);
+    if (!existingUser) {
+        throw new Error('Usuario no encontrado');
+    }
+
     if (userData.email) {
-        const existingUser = await userRepository.findUserByEmail(userData.email);
-        if (existingUser && existingUser.id !== userId) {
+        const emailUser = await userRepository.findUserByEmail(userData.email);
+        if (emailUser && emailUser.id !== userId) {
             throw new Error('El correo electrónico ya está en uso');
         }
     }
 
-    // Verificar teléfono único
     if (userData.phone) {
-        const existingPhone = await userRepository.findUserByPhone(userData.phone);
-        if (existingPhone && existingPhone.id !== userId) {
+        const phoneUser = await userRepository.findUserByPhone(userData.phone);
+        if (phoneUser && phoneUser.id !== userId) {
             throw new Error('El número de teléfono ya está en uso');
         }
     }
 
-    // Hash de la contraseña si se proporciona una nueva
     if (userData.password) {
         userData.password = await bcrypt.hash(userData.password, 10);
     }
 
     const updatedUser = await userRepository.updateUser(userId, userData);
-    const { password, ...userWithoutPassword } = updatedUser.toJSON();
+    if (!updatedUser) {
+        throw new Error('Error al actualizar el usuario');
+    }
+
+    const userObj = updatedUser.toJSON();
+    const { password, ...userWithoutPassword } = userObj;
     return userWithoutPassword;
 };
 

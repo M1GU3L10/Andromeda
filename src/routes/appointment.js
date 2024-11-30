@@ -7,4 +7,4 @@ router.get('/', appointmentController.getAllAppointments);
 router.get('/:id', appointmentController.getAppointmentById);
 router.put('/:id/status', appointmentController.updateStatusAppointment);
 
-module.exports = router;
+module.exports = router; 

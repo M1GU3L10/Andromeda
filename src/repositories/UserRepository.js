@@ -32,12 +32,19 @@ const updateUser = async (id, data) => {
             throw new Error('No se encontró un usuario con el id proporcionado');
         }
 
-        return updatedUsers[0];
+        // Fetch the updated user to ensure we have the complete object
+        const updatedUser = await models.User.findByPk(id);
+        if (!updatedUser) {
+            throw new Error('Error al recuperar el usuario actualizado');
+        }
+
+        return updatedUser;
     } catch (error) {
         console.error('Error en updateUser repository:', error);
         throw error;
     }
 };
+
 
 const deleteUser = async (id) => {
     return await models.User.destroy({
