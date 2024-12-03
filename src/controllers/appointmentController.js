@@ -37,9 +37,64 @@ const updateStatusAppointment = async (req, res) => {
     }
 };
 
+const getAppointmentWithDetails = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const appointmentDetails = await appointmentService.getAppointmentWithDetails(id);
+      
+      if (!appointmentDetails) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Appointment not found' 
+        });
+      }
+      
+      res.json({
+        success: true,
+        data: appointmentDetails
+      });
+    } catch (error) {
+      console.error('Error in getAppointmentWithDetails:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Error fetching appointment details',
+        error: error.message 
+      });
+    }
+  }
+
+
+const getSaleDetailsByAppointmentId = async (req, res) => {
+    try {
+        const { appointmentId } = req.params;
+        const saleDetails = await appointmentService.getSaleDetailsByAppointmentId(appointmentId);
+        
+        if (!saleDetails || saleDetails.length === 0) {
+          return res.status(404).json({ 
+            success: false, 
+            message: 'No sale details found for this appointment' 
+          });
+        }
+        
+        res.json({
+          success: true,
+          data: saleDetails
+        });
+      } catch (error) {
+        console.error('Error in getSaleDetailsByAppointmentId:', error);
+        res.status(500).json({ 
+          success: false, 
+          message: 'Error fetching sale details',
+          error: error.message 
+        });
+      }
+  };
+  
 
 module.exports = {
     getAllAppointments,
     getAppointmentById,
-    updateStatusAppointment
+    updateStatusAppointment,
+    getSaleDetailsByAppointmentId,
+    getAppointmentWithDetails
 };
