@@ -65,8 +65,8 @@ const getSaleDetailsByAppointmentId = async (appointmentId) => {
 
     return saleDetails.map(detail => ({
       id: detail.id,
-      type: detail.Product ? 'Product' : 'Service',
-      name: detail.Product?.name || detail.Service?.name || 'Unknown',
+      type: detail.Product ? 'Producto' : 'Servicio',
+      name: detail.Product?.Product_Name || detail.Service?.name || 'Unknown',
       quantity: detail.quantity,
       price: detail.unitPrice,
       total: detail.total_price,
@@ -78,7 +78,8 @@ const getSaleDetailsByAppointmentId = async (appointmentId) => {
         id_producto: detail.id_producto,
         empleadoId: detail.empleadoId,
         status: detail.Sale?.status,
-        id_usuario: detail.Sale?.id_usuario
+        id_usuario: detail.Sale?.id_usuario,
+        serviceId:detail.serviceId
       }
     }));
   } catch (error) {
