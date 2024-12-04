@@ -42,12 +42,15 @@ const defaultPermissions = [
     'Servicios cambiar estado',
     'Servicios ver',
     'Programacion de empleado',
+    'Programacion ver',
     'Ausencias',
     'Ausencias registrar',
     'Ausencias editar',
     'Ausencias eliminar',
     'Ausencias cambiar estado',
     'Citas',
+    'Citas registrar',
+    'Citas cambiar estado',
     'Citas ver',
     'Pedidos',
     'Pedidos registrar',
@@ -60,8 +63,7 @@ const defaultPermissions = [
     'Ventas imprimir',
     'Ventas ver',
     'Perfil',
-    'Dashboard',
-    'Vista Cliente'
+    'Dashboard'
 ];
 
 const initializePermissions = async () => {
