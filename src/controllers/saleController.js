@@ -50,26 +50,27 @@ const getAllSales = async (req, res) => {
     }
 };
 
-const updateStatusSales = async (req, res) => {
+const updateStatusSale = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { status } = req.body;
-    
-    if (!status) {
-        return res.status(400).json({ error: 'El estado es requerido' });
-    }
-    const result = await salesRepository.updateStatusSales(id, status);
-    res.json(result);
-} catch (error) {
-    console.error('Error en el controlador:', error);
-    res.status(500).json({ error: error.message });
-}
+      const { id } = req.params;
+      const { status } = req.body;
+      
+      if (!status) {
+          return sendError(res, 'El estado de la venta es requerido', 400);
+      }
+
+      const result = await salesRepository.updateStatusSales(id, status);
+      sendResponse(res, result);
+  } catch (error) {
+      console.error('Error al actualizar el estado de la venta:', error.message);
+      sendError(res, error.message || 'Error al actualizar el estado de la venta', 500);
+  }
 };
 
 module.exports = {
   createSale,
   getSaleById,
   getAllSales,
-  updateStatusSales,
+  updateStatusSale,
   getSaleDetailsByAppointmentId
 };

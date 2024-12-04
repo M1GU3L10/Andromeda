@@ -145,9 +145,44 @@ const getSaleAll = async () => {
 };
 
 const updateStatusSales = async (id, status) => {
-    return await models.Sale.update(status, {
-        where: { id }
-    });
+    const transaction = await sequelize.transaction();
+    try {
+        // 1. Actualizar el estado de la venta
+        const [updatedRows] = await models.Sale.update({ status }, {
+            where: { id },
+            transaction
+        });
+
+        if (updatedRows === 0) {
+            await transaction.rollback();
+            throw new Error('Venta no encontrada');
+        }
+
+        // 2. Buscar los detalles de la venta para encontrar la cita asociada
+        const saleDetails = await models.Detail.findOne({
+            where: { id_sale: id },
+            include: [{ model: models.appointment }],
+            transaction
+        });
+
+        // 3. Si hay una cita asociada, actualizar su estado
+        if (saleDetails && saleDetails.appointment) {
+            await models.appointment.update({ status }, {
+                where: { id: saleDetails.appointment.id },
+                transaction
+            });
+        }
+
+        // 4. Confirmar la transacción
+        await transaction.commit();
+        return { 
+            message: 'Estado de la venta actualizado correctamente',
+            updatedAppointment: saleDetails && saleDetails.appointment ? true : false
+        };
+    } catch (error) {
+        await transaction.rollback();
+        throw error;
+    }
 };
 
 

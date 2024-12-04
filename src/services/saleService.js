@@ -153,40 +153,72 @@ const getSaleAll = async () => {
   });
 };
 
-const updateStatusSales = async (id, status) => {
+const updateStatusSales = async (id, newStatus) => {
   const transaction = await sequelize.transaction();
   try {
-      // 1. Actualizar el estado de la venta
-      const updatedSale = await models.Sale.update(status, {
-          where: { id },
-          transaction
-      });
+    // 1. Actualizar el estado de la venta
+    const [updatedRows] = await models.Sale.update({ status: newStatus }, {
+      where: { id },
+      transaction
+    });
 
-      if (updatedSale[0] === 0) {
-          await transaction.rollback();
-          throw new Error('Venta no encontrada');
-      }
-
-      // 2. Verificar si la venta está asociada a una cita
-      const appointment = await models.appointment.findOne({
-          where: { id_sale: id },
-          transaction
-      });
-
-      if (appointment) {
-          // 3. Actualizar el estado de la cita asociada
-          await models.appointment.update(status, {
-              where: { id: appointment.id },
-              transaction
-          });
-      }
-
-      // 4. Confirmar la transacción
-      await transaction.commit();
-      return { message: 'Estado de la venta y cita actualizados correctamente' };
-  } catch (error) {
+    if (updatedRows === 0) {
       await transaction.rollback();
-      throw error;
+      throw new Error('Venta no encontrada');
+    }
+
+    // 2. Buscar los detalles de la venta
+    const saleDetails = await models.Detail.findAll({
+      where: { id_sale: id },
+      include: [
+        {
+          model: models.Service,
+          required: false
+        }
+      ],
+      transaction
+    });
+
+    let updatedAppointment = false;
+
+    // 3. Si hay detalles con servicios, buscar y actualizar la cita asociada
+    for (const detail of saleDetails) {
+      if (detail.Service) {
+        const appointment = await models.appointment.findOne({
+          where: {
+            [sequelize.Op.or]: [
+              { id: detail.appointmentId },
+              { '$Details.id$': detail.id }
+            ]
+          },
+          include: [{
+            model: models.Detail,
+            required: false
+          }],
+          transaction
+        });
+
+        if (appointment) {
+          await appointment.update({ status: newStatus }, { transaction });
+          updatedAppointment = true;
+          break; // Asumimos que solo hay una cita por venta
+        }
+      }
+    }
+
+    // 4. Confirmar la transacción
+    await transaction.commit();
+    
+    return { 
+      message: updatedAppointment 
+        ? 'Estado de la venta y cita asociada actualizados correctamente'
+        : 'Estado de la venta actualizado correctamente',
+      updatedAppointment
+    };
+  } catch (error) {
+    await transaction.rollback();
+    console.error('Error al actualizar el estado de la venta:', error);
+    throw error;
   }
 };
 
