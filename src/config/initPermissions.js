@@ -47,7 +47,7 @@ const defaultPermissions = [
     'Ausencias registrar',
     'Ausencias editar',
     'Ausencias eliminar',
-    'Ausencias cambiar estado',
+    'Ausencias ver',
     'Citas',
     'Citas registrar',
     'Citas cambiar estado',
