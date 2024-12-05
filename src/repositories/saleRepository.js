@@ -8,101 +8,128 @@ const { Appointment } = require('../models');
 
 const getSaleDetailsByAppointmentId = async (appointmentId) => {
     try {
-      return await SaleDetail.findAll({
-        where: { appointmentId },
-        include: [
-          {
-            model: Product,
-            attributes: ['name', 'price'],
-          },
-          {
-            model: Service,
-            attributes: ['name', 'price'],
-          },
-          {
-            model: User,
-            as: 'Employee',
-            attributes: ['name'],
-          },
-          {
-            model: Sale,
-            attributes: ['Billnumber', 'SaleDate', 'total_price'],
+        return await SaleDetail.findAll({
+            where: { appointmentId },
             include: [
-              {
-                model: User,
-                attributes: ['name', 'email'],
-              },
+                {
+                    model: Product,
+                    attributes: ['name', 'price'],
+                },
+                {
+                    model: Service,
+                    attributes: ['name', 'price'],
+                },
+                {
+                    model: User,
+                    as: 'Employee',
+                    attributes: ['name'],
+                },
+                {
+                    model: Sale,
+                    attributes: ['Billnumber', 'SaleDate', 'total_price'],
+                    include: [
+                        {
+                            model: User,
+                            attributes: ['name', 'email'],
+                        },
+                    ],
+                },
             ],
-          },
-        ],
-      });
+        });
     } catch (error) {
-      console.error('Error in getSaleDetailsByAppointmentId repository:', error);
-      throw error;
+        console.error('Error in getSaleDetailsByAppointmentId repository:', error);
+        throw error;
     }
-  };
-
+};
 
 const createSale = async (saleData) => {
     const { saleDetails, appointmentData, ...sale } = saleData;
-    const Transaction = await sequelize.transaction();
+    const transaction = await sequelize.transaction();
 
     try {
-        // 1. Crear la venta principal
-        const createdSale = await Sale.create(sale, {
-            transaction: Transaction
-        });
+        // Generar un número aleatorio de tres dígitos
+        const sharedId = Math.floor(100 + Math.random() * 900);
+
+        console.log(`ID generado para la venta y cita: ${sharedId}`);
+
+        // 1. Crear la venta principal con el ID generado
+        const createdSale = await Sale.create({
+            ...sale,
+            id: sharedId,
+            registrationDate: new Date().toISOString().split('T')[0] // Añadir fecha de registro
+        }, { transaction });
+
+        console.log(`Venta creada con ID: ${createdSale.id}`);
 
         let createdAppointment = null;
-        // 2. Verificar si hay servicios en los detalles
-        const hasServices = saleDetails.some(detail => detail.serviceId);
-        
-        if (hasServices && appointmentData) {
-            // Crear la cita si hay servicios
+        if (appointmentData) {
+            // Crear la cita usando el mismo ID que la venta
             createdAppointment = await Appointment.create({
-                Init_Time: appointmentData.Init_Time,
-                Finish_Time: appointmentData.Finish_Time,
-                Date: appointmentData.Date || sale.SaleDate, // Usar la fecha de venta si no se especifica
-                Total: sale.total_price, // Usar el total de la venta
-                time_appointment: appointmentData.time_appointment,
-                status: 'pendiente',
-                clienteId: sale.id_usuario // Usar el usuario de la venta como cliente
-            }, {
-                transaction: Transaction
-            });
+                ...appointmentData,
+                id: sharedId,
+                Total: sale.total_price,
+                status: 'Pendiente',
+                clienteId: sale.id_usuario
+            }, { transaction });
+
+            console.log(`Cita creada con ID: ${createdAppointment.id}`);
         }
 
         // 3. Crear los detalles de venta
         if (saleDetails && saleDetails.length > 0) {
             const detailsWithIds = saleDetails.map(detail => ({
                 ...detail,
-                id_sale: createdSale.id,
-                appointmentId: hasServices ? createdAppointment.id : null
+                id_sale: sharedId,
+                appointmentId: createdAppointment ? sharedId : null
             }));
 
-            await SaleDetail.bulkCreate(detailsWithIds, { 
-                transaction: Transaction 
-            });
+            await SaleDetail.bulkCreate(detailsWithIds, { transaction });
 
             // 4. Actualizar el stock solo para los productos (no servicios)
             const productDetails = detailsWithIds.filter(detail => detail.id_producto);
             if (productDetails.length > 0) {
-                await productRepository.updateProductStock(productDetails, Transaction);
+                await productRepository.updateProductStock(productDetails, transaction);
             }
         }
 
-        await Transaction.commit();
-        
-        return {
-            sale: createdSale,
-            appointment: createdAppointment,
-            message: hasServices 
-                ? 'Venta y cita creadas exitosamente' 
-                : 'Venta creada exitosamente'
+        await transaction.commit();
+
+        // Formatear la respuesta
+        const response = {
+            sale: {
+                id: createdSale.id,
+                Billnumber: createdSale.Billnumber,
+                SaleDate: createdSale.SaleDate,
+                total_price: createdSale.total_price,
+                status: createdSale.status,
+                id_usuario: createdSale.id_usuario,
+                updatedAt: createdSale.updatedAt,
+                createdAt: createdSale.createdAt,
+                registrationDate: createdSale.registrationDate
+            },
+            message: createdAppointment ? 'Venta y cita creadas exitosamente' : 'Venta creada exitosamente'
         };
 
+        if (createdAppointment) {
+            response.appointment = {
+                id: createdAppointment.id,
+                Init_Time: createdAppointment.Init_Time,
+                Finish_Time: createdAppointment.Finish_Time,
+                Date: createdAppointment.Date,
+                Total: createdAppointment.Total,
+                time_appointment: createdAppointment.time_appointment,
+                status: createdAppointment.status,
+                clienteId: createdAppointment.clienteId,
+                updatedAt: createdAppointment.updatedAt,
+                createdAt: createdAppointment.createdAt
+            };
+        }
+
+        return response;
+
     } catch (error) {
-        await Transaction.rollback();
+        await transaction.rollback();
+        console.error('Error en createSale:', error);
         throw error;
     }
 };
@@ -144,47 +171,51 @@ const getSaleAll = async () => {
     });
 };
 
-const updateStatusSales = async (id, status) => {
+const updateStatusSales = async (id, newStatus) => {
     const transaction = await sequelize.transaction();
     try {
         // 1. Actualizar el estado de la venta
-        const [updatedRows] = await models.Sale.update({ status }, {
-            where: { id },
-            transaction
-        });
+        const [updatedSaleRows] = await models.Sale.update(
+            { status: newStatus },
+            {
+                where: { id },
+                transaction
+            }
+        );
 
-        if (updatedRows === 0) {
+        if (updatedSaleRows === 0) {
             await transaction.rollback();
             throw new Error('Venta no encontrada');
         }
 
-        // 2. Buscar los detalles de la venta para encontrar la cita asociada
-        const saleDetails = await models.Detail.findOne({
-            where: { id_sale: id },
-            include: [{ model: models.appointment }],
-            transaction
-        });
-
-        // 3. Si hay una cita asociada, actualizar su estado
-        if (saleDetails && saleDetails.appointment) {
-            await models.appointment.update({ status }, {
-                where: { id: saleDetails.appointment.id },
+        // 2. Intentar actualizar la cita asociada (si existe)
+        const [updatedAppointmentRows] = await models.appointment.update(
+            { status: newStatus },
+            {
+                where: { id },
                 transaction
-            });
-        }
+            }
+        );
 
-        // 4. Confirmar la transacción
+        // 3. Confirmar la transacción
         await transaction.commit();
-        return { 
-            message: 'Estado de la venta actualizado correctamente',
-            updatedAppointment: saleDetails && saleDetails.appointment ? true : false
+
+        // 4. Preparar el mensaje de respuesta
+        const message = updatedAppointmentRows > 0
+            ? 'Estado de la venta y cita asociada actualizados correctamente'
+            : 'Estado de la venta actualizado correctamente';
+
+        return {
+            message,
+            updatedSale: true,
+            updatedAppointment: updatedAppointmentRows > 0
         };
     } catch (error) {
         await transaction.rollback();
+        console.error('Error al actualizar el estado de la venta:', error);
         throw error;
     }
 };
-
 
 
 module.exports = {
