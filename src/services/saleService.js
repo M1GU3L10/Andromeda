@@ -42,21 +42,27 @@ const createSale = async (saleData) => {
   const transaction = await sequelize.transaction();
 
   try {
+    const hasServices = saleDetails.some(detail => detail.serviceId);
+
+    // Generar un número aleatorio de tres dígitos para el ID
+    const saleId = hasServices && appointmentData
+      ? Math.floor(100 + Math.random() * 900)
+      : null;
+
+    // Crear la venta con el ID generado o el secuencial
     const createdSale = await models.Sale.create({
+      id: saleId || undefined,
       Billnumber: sale.Billnumber,
       SaleDate: sale.SaleDate,
       total_price: sale.total_price,
       status: sale.status,
       id_usuario: sale.id_usuario
-    }, {
-      transaction
-    });
+    }, { transaction });
 
     let createdAppointment = null;
-    const hasServices = saleDetails.some(detail => detail.serviceId);
-
     if (hasServices && appointmentData) {
       createdAppointment = await models.appointment.create({
+        id: createdSale.id, // Usar el ID de la venta
         Init_Time: appointmentData.Init_Time,
         Finish_Time: appointmentData.Finish_Time,
         Date: appointmentData.Date,
@@ -64,26 +70,17 @@ const createSale = async (saleData) => {
         status: 'Pendiente',
         Total: sale.total_price,
         clienteId: sale.id_usuario
-      }, {
-        transaction
-      });
+      }, { transaction });
     }
 
-    if (saleDetails && saleDetails.length > 0) {
+    if (saleDetails.length > 0) {
       const detailsWithIds = saleDetails.map(detail => ({
-        quantity: detail.quantity,
-        unitPrice: detail.unitPrice,
-        total_price: detail.total_price,
-        id_producto: detail.id_producto || null,
-        serviceId: detail.serviceId || null,
-        empleadoId: detail.empleadoId,
+        ...detail,
         id_sale: createdSale.id,
         appointmentId: hasServices ? createdAppointment?.id : null
       }));
 
-      await models.Detail.bulkCreate(detailsWithIds, {
-        transaction
-      });
+      await models.Detail.bulkCreate(detailsWithIds, { transaction });
 
       const productDetails = detailsWithIds.filter(detail => detail.id_producto);
       if (productDetails.length > 0) {
@@ -105,6 +102,7 @@ const createSale = async (saleData) => {
     throw error;
   }
 };
+
 
 const createSaleFromOrder = async (saleData) => {
   const transaction = await sequelize.transaction();

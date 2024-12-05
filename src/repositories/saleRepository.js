@@ -44,95 +44,71 @@ const getSaleDetailsByAppointmentId = async (appointmentId) => {
 
 const createSale = async (saleData) => {
     const { saleDetails, appointmentData, ...sale } = saleData;
-    const transaction = await sequelize.transaction();
+    const Transaction = await sequelize.transaction();
 
     try {
-        // Generar un número aleatorio de tres dígitos
-        const sharedId = Math.floor(100 + Math.random() * 900);
+        // Generar un número aleatorio de tres dígitos si hay una cita, de lo contrario usar el ID secuencial
+        const saleId = appointmentData
+            ? Math.floor(100 + Math.random() * 900)
+            : (await Sale.findOne({ order: [['id', 'DESC']], transaction: Transaction }))?.id + 1 || 1;
 
-        console.log(`ID generado para la venta y cita: ${sharedId}`);
+        console.log(`ID generado para venta y cita: ${saleId}`);
 
-        // 1. Crear la venta principal con el ID generado
+        // Crear la venta con el ID generado
         const createdSale = await Sale.create({
             ...sale,
-            id: sharedId,
-            registrationDate: new Date().toISOString().split('T')[0] // Añadir fecha de registro
-        }, { transaction });
+            id: saleId
+        }, { transaction: Transaction });
 
         console.log(`Venta creada con ID: ${createdSale.id}`);
 
         let createdAppointment = null;
         if (appointmentData) {
-            // Crear la cita usando el mismo ID que la venta
+            // Crear la cita usando el mismo ID
             createdAppointment = await Appointment.create({
-                ...appointmentData,
-                id: sharedId,
+                id: saleId, // Usar el mismo ID que la venta
+                Init_Time: appointmentData.Init_Time,
+                Finish_Time: appointmentData.Finish_Time,
+                Date: appointmentData.Date || sale.SaleDate,
                 Total: sale.total_price,
-                status: 'Pendiente',
+                time_appointment: appointmentData.time_appointment,
+                status: 'pendiente',
                 clienteId: sale.id_usuario
-            }, { transaction });
+            }, { transaction: Transaction });
 
             console.log(`Cita creada con ID: ${createdAppointment.id}`);
         }
 
-        // 3. Crear los detalles de venta
         if (saleDetails && saleDetails.length > 0) {
             const detailsWithIds = saleDetails.map(detail => ({
                 ...detail,
-                id_sale: sharedId,
-                appointmentId: createdAppointment ? sharedId : null
+                id_sale: saleId,
+                appointmentId: createdAppointment ? saleId : null
             }));
 
-            await SaleDetail.bulkCreate(detailsWithIds, { transaction });
+            await SaleDetail.bulkCreate(detailsWithIds, { transaction: Transaction });
 
-            // 4. Actualizar el stock solo para los productos (no servicios)
             const productDetails = detailsWithIds.filter(detail => detail.id_producto);
             if (productDetails.length > 0) {
-                await productRepository.updateProductStock(productDetails, transaction);
+                await productRepository.updateProductStock(productDetails, Transaction);
             }
         }
 
-        await transaction.commit();
-
-        // Formatear la respuesta
-        const response = {
-            sale: {
-                id: createdSale.id,
-                Billnumber: createdSale.Billnumber,
-                SaleDate: createdSale.SaleDate,
-                total_price: createdSale.total_price,
-                status: createdSale.status,
-                id_usuario: createdSale.id_usuario,
-                updatedAt: createdSale.updatedAt,
-                createdAt: createdSale.createdAt,
-                registrationDate: createdSale.registrationDate
-            },
-            message: createdAppointment ? 'Venta y cita creadas exitosamente' : 'Venta creada exitosamente'
+        await Transaction.commit();
+        return {
+            sale: createdSale,
+            appointment: createdAppointment,
+            message: createdAppointment
+                ? 'Venta y cita creadas exitosamente'
+                : 'Venta creada exitosamente'
         };
-
-        if (createdAppointment) {
-            response.appointment = {
-                id: createdAppointment.id,
-                Init_Time: createdAppointment.Init_Time,
-                Finish_Time: createdAppointment.Finish_Time,
-                Date: createdAppointment.Date,
-                Total: createdAppointment.Total,
-                time_appointment: createdAppointment.time_appointment,
-                status: createdAppointment.status,
-                clienteId: createdAppointment.clienteId,
-                updatedAt: createdAppointment.updatedAt,
-                createdAt: createdAppointment.createdAt
-            };
-        }
-
-        return response;
-
     } catch (error) {
-        await transaction.rollback();
+        await Transaction.rollback();
         console.error('Error en createSale:', error);
         throw error;
     }
 };
+
 
 const getSaleById = async (id) => {
     return await Sale.findByPk(id, { include: [SaleDetail] });
