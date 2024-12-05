@@ -51,7 +51,6 @@ const updateStatusAppointment = async (id, status) => {
   }
 };
 
-
 const getSaleDetailsByAppointmentId = async (appointmentId) => {
   try {
     return await models.Detail.findAll({
@@ -89,9 +88,16 @@ const getSaleDetailsByAppointmentId = async (appointmentId) => {
   }
   };
 
+  const getSaleDetailByAppointmentId = async (appointmentId) => {
+    return await models.Detail.findOne({
+        where: { appointmentId }
+    });
+};
+
 module.exports = {
     getAllAppointments,
     getAppointmentById,
     updateStatusAppointment,
-    getSaleDetailsByAppointmentId
+    getSaleDetailsByAppointmentId,
+    getSaleDetailByAppointmentId
 };
