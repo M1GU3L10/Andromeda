@@ -24,30 +24,51 @@ const getAppointmentById = async (id) => {
 };
 
 const updateStatusAppointment = async (id, status) => {
-  const Transaction = await sequelize.transaction();
+  const transaction = await sequelize.transaction();
   try {
-      if (!Transaction) {
-          throw new Error("Failed to initialize transaction.");
+    if (!transaction) {
+      throw new Error("Failed to initialize transaction.");
+    }
+
+    // 1. Actualizar el estado de la cita
+    const [updatedAppointmentCount] = await models.appointment.update(
+      { status },
+      {
+        where: { id },
+        transaction
       }
+    );
 
-      const [updatedAppointmentCount] = await models.appointment.update(
-          { status },
-          {
-              where: { id },
-              transaction: Transaction
-          }
-      );
+    if (updatedAppointmentCount === 0) {
+      throw new Error('Cita no encontrada');
+    }
 
-      if (updatedAppointmentCount === 0) {
-          throw new Error('Cita no encontrada');
+    // 2. Intentar actualizar la venta asociada (si existe)
+    const [updatedSaleCount] = await models.Sale.update(
+      { status },
+      {
+        where: { id },
+        transaction
       }
+    );
 
-      await Transaction.commit();
-      return { message: 'Estado de la cita actualizado correctamente' };
+    // 3. Confirmar la transacción
+    await transaction.commit();
+
+    // 4. Preparar el mensaje de respuesta
+    const message = updatedSaleCount > 0
+      ? 'Estado de la cita y venta asociada actualizados correctamente'
+      : 'Estado de la cita actualizado correctamente';
+
+    return {
+      message,
+      updatedAppointment: true,
+      updatedSale: updatedSaleCount > 0
+    };
   } catch (error) {
-      if (Transaction) await Transaction.rollback();
-      console.error('Error en el repositorio al actualizar el estado:', error.message);
-      throw error;
+    if (transaction) await transaction.rollback();
+    console.error('Error al actualizar el estado de la cita:', error);
+    throw error;
   }
 };
 

@@ -17,16 +17,10 @@ const updateStatusAppointment = async (appointmentId, status) => {
       throw new Error("Failed to update appointment status.");
     }
 
-    // Retrieve associated sale detail by appointment ID
-    const saleDetail = await appointmentRepository.getSaleDetailByAppointmentId(appointmentId);
-    if (saleDetail) {
-      await saleRepository.updateStatusSales(saleDetail.id_sale, { status });
-    }
-
     return result;
   } catch (error) {
     console.error('Error en el servicio al actualizar el estado:', error.message);
-    throw new Error('No se pudo actualizar el estado de la cita y la venta asociada');
+    throw error; // Propaga el error original en lugar de crear uno nuevo
   }
 };
 
