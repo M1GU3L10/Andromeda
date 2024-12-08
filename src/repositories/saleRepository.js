@@ -193,11 +193,31 @@ const updateStatusSales = async (id, newStatus) => {
     }
 };
 
+const cancelSale = async (id, transaction = null) => {
+    const sale = await Sale.findByPk(id, {
+        include: [SaleDetail],
+        transaction
+    });
+    if (!sale) {
+        throw new Error('Venta no encontrada');
+    }
+    if (sale.status === 'anulada') {
+        throw new Error('Esta venta ya está anulada');
+    }
+    // Cambiar estado a anulada
+    sale.status = 'anulada';
+    // Actualizar stock de los productos
+    const salesDetails = sale.SaleDetails; // Detalles de la venta
+    await productRepository.updateProductStockForAnulatedSales(salesDetails, transaction); 
+    // Guardar la venta actualizada
+    await sale.save({ transaction });
+};
 
 module.exports = {
     createSale,
     getSaleById,
     getSaleAll,
     updateStatusSales,
+    cancelSale,
     getSaleDetailsByAppointmentId
 };

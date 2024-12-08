@@ -53,6 +53,19 @@ const updateProductStockForAnulatedPurchases = async (shoppingDetails, transacti
     }
 };
 
+const updateProductStockForAnulatedSales = async (salesDetails, transaction = null) => {
+    for (const detail of salesDetails) {
+        const product = await Product.findByPk(detail.product_id, { transaction });
+        if (product) {
+            // Incrementar el stock basado en la venta anulada
+            const newStock = product.Stock + detail.quantity;
+            await product.update({ Stock: newStock }, { transaction });
+        } else {
+            throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
+        }
+    }
+};
+
 const checkCategoryAssociation = async (categoryId) => {
     return await Product.findAll({ where: { Category_Id: categoryId } });
 };
@@ -133,6 +146,7 @@ const deleteProduct = async (id) => {
 };
 
 module.exports = {
+    updateProductStockForAnulatedSales,
     updateProductStockForPurchases,
     updateProductStockForAnulatedPurchases,
     updateProductStock,
