@@ -29,12 +29,12 @@ const updateProductStockForPurchases = async (shoppingDetail, transaction = null
             await product.update({ Stock: newStock }, { transaction });
         } else {
             throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
-        const newStock = product.Stock - detail.quantity;
-        if (newStock < 0) {
-            throw new Error(`Stock insuficiente para el producto: ${product.Product_Name}`);
+            const newStock = product.Stock - detail.quantity;
+            if (newStock < 0) {
+                throw new Error(`Stock insuficiente para el producto: ${product.Product_Name}`);
+            }
         }
-    }
-};
+    };
 }
 
 const updateProductStockForAnulatedPurchases = async (shoppingDetails, transaction = null) => {
@@ -141,5 +141,6 @@ module.exports = {
     createProduct,
     updateProduct,
     deleteProduct,
+    checkCategoryAssociation,
     updateProductStockForOrders
 };
