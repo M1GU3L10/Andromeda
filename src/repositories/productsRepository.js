@@ -60,6 +60,7 @@ const updateProductStockForAnulatedSales = async (salesDetails, transaction = nu
             // Incrementar el stock basado en la venta anulada
             const newStock = product.Stock + detail.quantity;
             await product.update({ Stock: newStock }, { transaction });
+            console.log(`Stock updated for product ${product.id}: ${product.Stock} -> ${newStock}`);
         } else {
             throw new Error(`Producto con ID ${detail.product_id} no encontrado.`);
         }
@@ -157,4 +158,4 @@ module.exports = {
     deleteProduct,
     checkCategoryAssociation,
     updateProductStockForOrders
-};
+}

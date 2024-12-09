@@ -161,7 +161,19 @@ const updateSaleStatus = async (id, newStatus) => {
   }
 };
 
+const cancelSale = async (id) => {
+  const transaction = await sequelize.transaction();
+  try {
+      await saleRepository.cancelSale(id, transaction);
+      await transaction.commit();
+  } catch (error) {
+      await transaction.rollback();
+      throw error;
+  }
+};
+
 module.exports = {
+  cancelSale,
   createSale,
   createSaleFromOrder,
   getSaleById,

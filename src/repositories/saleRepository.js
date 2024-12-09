@@ -201,14 +201,21 @@ const cancelSale = async (id, transaction = null) => {
     if (!sale) {
         throw new Error('Venta no encontrada');
     }
-    if (sale.status === 'anulada') {
-        throw new Error('Esta venta ya está anulada');
+    if (sale.status === 'Cancelada') {
+        throw new Error('Esta venta ya está cancelada');
     }
-    // Cambiar estado a anulada
-    sale.status = 'anulada';
+    // Cambiar estado a cancelada
+    sale.status = 'Cancelada';
     // Actualizar stock de los productos
-    const salesDetails = sale.SaleDetails; // Detalles de la venta
-    await productRepository.updateProductStockForAnulatedSales(salesDetails, transaction); 
+    const saleDetails = sale.SaleDetails; // Detalles de la venta
+    for (const detail of saleDetails) {
+        if (detail.id_producto) {
+            await productRepository.updateProductStockForAnulatedSales([{
+                product_id: detail.id_producto,
+                quantity: detail.quantity
+            }], transaction);
+        }
+    }
     // Guardar la venta actualizada
     await sale.save({ transaction });
 };
