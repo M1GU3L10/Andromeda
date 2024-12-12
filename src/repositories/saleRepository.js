@@ -113,31 +113,11 @@ const createSale = async (saleData) => {
 const getSaleById = async (id) => {
     return await Sale.findByPk(id, { include: [SaleDetail] });
 };
-
 const getSaleAll = async () => {
     return await Sale.findAll({
         include: [
             {
-                model: SaleDetail,
-                include: [
-                    {
-                        model: models.Product,
-                        attributes: ['name', 'price'],
-                    },
-                    {
-                        model: models.Service,
-                        attributes: ['name', 'price'],
-                    },
-                    {
-                        model: models.User,
-                        as: 'Employee',
-                        attributes: ['name'],
-                    },
-                    {
-                        model: models.Appointment,
-                        required: false
-                    }
-                ]
+                model: SaleDetail
             },
             {
                 model: models.User,
@@ -146,6 +126,7 @@ const getSaleAll = async () => {
         ]
     });
 };
+
 
 const updateStatusSales = async (id, newStatus) => {
     const transaction = await sequelize.transaction();
