@@ -4,12 +4,10 @@ const productRepository = require('./productsRepository');
 const sequelize = require('../config/database');
 const { Transaction } = require('sequelize');
 const { models } = require('../models');
-const { Appointment } = require('../models');
-const Product = require('./products');
-const Service = require('./service');
-const User = require('./User');
-const Appointment = require('./appointment');
-const SaleDetail = require('./saleDetail');
+const Product = require('../models/products');
+const Service = require('../models/service');
+const User = require('../models/User');
+
 
 const getSaleDetailsByAppointmentId = async (appointmentId) => {
     try {
@@ -49,13 +47,13 @@ const getSaleDetailsByAppointmentId = async (appointmentId) => {
 
 const createSale = async (saleData) => {
     const { saleDetails, appointmentData, ...sale } = saleData;
-    const Transaction = await sequelize.transaction();
+    const transaction = await sequelize.transaction();
 
     try {
         // Generar un número aleatorio de tres dígitos si hay una cita, de lo contrario usar el ID secuencial
         const saleId = appointmentData
             ? Math.floor(100 + Math.random() * 900)
-            : (await Sale.findOne({ order: [['id', 'DESC']], transaction: Transaction }))?.id + 1 || 1;
+            : (await Sale.findOne({ order: [['id', 'DESC']], transaction: transaction }))?.id + 1 || 1;
 
         console.log(`ID generado para venta y cita: ${saleId}`);
 
@@ -63,7 +61,7 @@ const createSale = async (saleData) => {
         const createdSale = await Sale.create({
             ...sale,
             id: saleId
-        }, { transaction: Transaction });
+        }, { transaction: transaction });
 
         console.log(`Venta creada con ID: ${createdSale.id}`);
 
@@ -79,7 +77,7 @@ const createSale = async (saleData) => {
                 time_appointment: appointmentData.time_appointment,
                 status: 'pendiente',
                 clienteId: sale.id_usuario
-            }, { transaction: Transaction });
+            }, { transaction: transaction });
 
             console.log(`Cita creada con ID: ${createdAppointment.id}`);
         }
@@ -91,15 +89,15 @@ const createSale = async (saleData) => {
                 appointmentId: createdAppointment ? saleId : null
             }));
 
-            await SaleDetail.bulkCreate(detailsWithIds, { transaction: Transaction });
+            await SaleDetail.bulkCreate(detailsWithIds, { transaction: transaction });
 
             const productDetails = detailsWithIds.filter(detail => detail.id_producto);
             if (productDetails.length > 0) {
-                await productRepository.updateProductStock(productDetails, Transaction);
+                await productRepository.updateProductStock(productDetails, transaction);
             }
         }
 
-        await Transaction.commit();
+        await transaction.commit();
         return {
             sale: createdSale,
             appointment: createdAppointment,
@@ -108,16 +106,26 @@ const createSale = async (saleData) => {
                 : 'Venta creada exitosamente'
         };
     } catch (error) {
-        await Transaction.rollback();
+        await transaction.rollback();
         console.error('Error en createSale:', error);
         throw error;
     }
 };
 
-
 const getSaleById = async (id) => {
-    return await Sale.findByPk(id, { include: [SaleDetail] });
+    return await Sale.findByPk(id, { 
+        include: [
+            {
+                model: SaleDetail,
+                include: [
+                    { model: Product },
+                    { model: Service }
+                ]
+            }
+        ] 
+    });
 };
+
 const getSaleAll = async () => {
     return await Sale.findAll({
         include: [
@@ -125,38 +133,37 @@ const getSaleAll = async () => {
                 model: SaleDetail,
                 include: [
                     {
-                        model: Product,  // Cambia models.Product por Product
+                        model: Product,
                         attributes: ['name', 'price'],
                     },
                     {
-                        model: Service,  // Cambia models.Service por Service
+                        model: Service,
                         attributes: ['name', 'price'],
                     },
                     {
-                        model: User,     // Cambia models.User por User
+                        model: User,
                         as: 'Employee',
                         attributes: ['name'],
                     },
                     {
-                        model: Appointment,  // Cambia models.Appointment por Appointment
+                        model: models.Appointment,
                         required: false
                     }
                 ]
             },
             {
-                model: User,  // Cambia models.User por User
+                model: User,
                 attributes: ['name', 'email']
             }
         ]
     });
 };
 
-
 const updateStatusSales = async (id, newStatus) => {
     const transaction = await sequelize.transaction();
     try {
         // 1. Actualizar el estado de la venta
-        const [updatedSaleRows] = await models.Sale.update(
+        const [updatedSaleRows] = await Sale.update(
             { status: newStatus },
             {
                 where: { id },
@@ -170,7 +177,7 @@ const updateStatusSales = async (id, newStatus) => {
         }
 
         // 2. Intentar actualizar la cita asociada (si existe)
-        const [updatedAppointmentRows] = await models.Appointment.update(
+        const [updatedAppointmentRows] = await Appointment.update(
             { status: newStatus },
             {
                 where: { id },
