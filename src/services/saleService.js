@@ -80,7 +80,7 @@ const createSale = async (saleData) => {
         appointmentId: hasServices ? createdAppointment?.id : null
       }));
 
-      await models.Detail.bulkCreate(detailsWithIds, { transaction });
+      await models.SaleDetail.bulkCreate(detailsWithIds, { transaction });
 
       const productDetails = detailsWithIds.filter(detail => detail.id_producto);
       if (productDetails.length > 0) {
@@ -124,7 +124,7 @@ const createSaleFromOrder = async (saleData) => {
         id_sale: createdSale.id
       }));
 
-      await models.Detail.bulkCreate(detailsWithIds, {
+      await models.SaleDetail.bulkCreate(detailsWithIds, {
         transaction
       });
     }
@@ -142,7 +142,7 @@ const createSaleFromOrder = async (saleData) => {
 };
 
 const getSaleById = async (id) => {
-  return await models.Sale.findByPk(id, { include: [models.Detail] });
+  return await models.Sale.findByPk(id, { include: [models.SaleDetail] });
 };
 
 const getSaleAll = async () => {
