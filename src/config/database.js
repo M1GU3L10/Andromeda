@@ -7,7 +7,7 @@ const sequelize = new Sequelize(
     process.env.DB_PASSWORD,
     {
         host: process.env.DB_HOST,
-        port: parseInt(process.env.DB_PORT, 10),
+        port: parseInt(process.env.PORT, 10), // Changed from DB_PORT to PORT
         dialect: process.env.DB_DIALECT,
         logging: false,
         pool: {
@@ -22,6 +22,8 @@ const sequelize = new Sequelize(
                 rejectUnauthorized: false
             }
         },
+        // Add this to increase the connection timeout
+        connectTimeout: 60000
     }
 );
 
