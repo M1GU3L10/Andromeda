@@ -6,7 +6,7 @@ const Role = require('./role');
 const Permission = require('./permission');
 const PermissionRole = require('./permissionRole');
 const Shopping = require('./shopping');
-const ShoppingDetail = require('./shoppingDetail'); 
+const ShoppingDetail = require('./shoppingDetail');
 const Absence = require('./absence');
 const Appointment = require('./appointment');
 const Sale = require('./sale');
@@ -68,13 +68,6 @@ const models = {
     PermissionRole,
     ShoppingDetail
 };
-
-// Asegúrate de que todas las asociaciones estén definidas antes de exportar
-Object.values(models).forEach(model => {
-    if (model.associate) {
-        model.associate(models);
-    }
-});
 
 const connectDb = async () => {
     try {

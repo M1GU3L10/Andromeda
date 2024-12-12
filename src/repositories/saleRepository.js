@@ -1,12 +1,10 @@
 const Sale = require('../models/sale');
 const SaleDetail = require('../models/saleDetail');
-const Product = require('../models/products'); // Nombre del archivo correcto
-
-const Service = require('../models/service');
-const User = require('../models/User');
-const Appointment = require('../models/appointment');
 const productRepository = require('./productsRepository');
 const sequelize = require('../config/database');
+const { Transaction } = require('sequelize');
+const { models } = require('../models');
+const { Appointment } = require('../models');
 
 const getSaleDetailsByAppointmentId = async (appointmentId) => {
     try {
@@ -22,7 +20,7 @@ const getSaleDetailsByAppointmentId = async (appointmentId) => {
                     attributes: ['name', 'price'],
                 },
                 {
-                    model: User, // Asegúrate de que este alias coincide con el definido en las asociaciones
+                    model: User,
                     as: 'Employee',
                     attributes: ['name'],
                 },
@@ -44,25 +42,31 @@ const getSaleDetailsByAppointmentId = async (appointmentId) => {
     }
 };
 
-
 const createSale = async (saleData) => {
     const { saleDetails, appointmentData, ...sale } = saleData;
-    const transaction = await sequelize.transaction();
+    const Transaction = await sequelize.transaction();
 
     try {
+        // Generar un número aleatorio de tres dígitos si hay una cita, de lo contrario usar el ID secuencial
         const saleId = appointmentData
             ? Math.floor(100 + Math.random() * 900)
-            : (await Sale.findOne({ order: [['id', 'DESC']], transaction }))?.id + 1 || 1;
+            : (await Sale.findOne({ order: [['id', 'DESC']], transaction: Transaction }))?.id + 1 || 1;
 
+        console.log(`ID generado para venta y cita: ${saleId}`);
+
+        // Crear la venta con el ID generado
         const createdSale = await Sale.create({
             ...sale,
             id: saleId
-        }, { transaction });
+        }, { transaction: Transaction });
+
+        console.log(`Venta creada con ID: ${createdSale.id}`);
 
         let createdAppointment = null;
         if (appointmentData) {
+            // Crear la cita usando el mismo ID
             createdAppointment = await Appointment.create({
-                id: saleId,
+                id: saleId, // Usar el mismo ID que la venta
                 Init_Time: appointmentData.Init_Time,
                 Finish_Time: appointmentData.Finish_Time,
                 Date: appointmentData.Date || sale.SaleDate,
@@ -70,7 +74,9 @@ const createSale = async (saleData) => {
                 time_appointment: appointmentData.time_appointment,
                 status: 'pendiente',
                 clienteId: sale.id_usuario
-            }, { transaction });
+            }, { transaction: Transaction });
+
+            console.log(`Cita creada con ID: ${createdAppointment.id}`);
         }
 
         if (saleDetails && saleDetails.length > 0) {
@@ -80,15 +86,15 @@ const createSale = async (saleData) => {
                 appointmentId: createdAppointment ? saleId : null
             }));
 
-            await SaleDetail.bulkCreate(detailsWithIds, { transaction });
+            await SaleDetail.bulkCreate(detailsWithIds, { transaction: Transaction });
 
             const productDetails = detailsWithIds.filter(detail => detail.id_producto);
             if (productDetails.length > 0) {
-                await productRepository.updateProductStock(productDetails, transaction);
+                await productRepository.updateProductStock(productDetails, Transaction);
             }
         }
 
-        await transaction.commit();
+        await Transaction.commit();
         return {
             sale: createdSale,
             appointment: createdAppointment,
@@ -97,77 +103,60 @@ const createSale = async (saleData) => {
                 : 'Venta creada exitosamente'
         };
     } catch (error) {
-        await transaction.rollback();
+        await Transaction.rollback();
         console.error('Error en createSale:', error);
         throw error;
     }
 };
 
+
 const getSaleById = async (id) => {
-    try {
-        return await Sale.findByPk(id, {
-            include: [
-                {
-                    model: SaleDetail,
-                    include: [
-                        {
-                            model: Product,
-                            attributes: ['name', 'price'],
-                        },
-                        {
-                            model: Service,
-                            attributes: ['name', 'price'],
-                        },
-                    ],
-                },
-            ],
-        });
-    } catch (error) {
-        console.error('Error in getSaleById:', error);
-        throw error;
-    }
+    return await Sale.findByPk(id, { include: [SaleDetail] });
 };
 
 const getSaleAll = async () => {
-    try {
-        return await Sale.findAll({
-            include: [
-                {
-                    model: SaleDetail,
-                    include: [
-                        {
-                            model: Product,
-                            attributes: ['name', 'price'],
-                        },
-                        {
-                            model: Service,
-                            attributes: ['name', 'price'],
-                        },
-                        {
-                            model: User,
-                            as: 'Employee',
-                            attributes: ['name'],
-                        },
-                    ],
-                },
-                {
-                    model: User,
-                    attributes: ['name', 'email'],
-                },
-            ],
-        });
-    } catch (error) {
-        console.error('Error in getSaleAll:', error);
-        throw error;
-    }
+    return await Sale.findAll({
+        include: [
+            {
+                model: SaleDetail,
+                include: [
+                    {
+                        model: models.Product,
+                        attributes: ['name', 'price'],
+                    },
+                    {
+                        model: models.Service,
+                        attributes: ['name', 'price'],
+                    },
+                    {
+                        model: models.User,
+                        as: 'Employee',
+                        attributes: ['name'],
+                    },
+                    {
+                        model: models.Appointment,
+                        required: false
+                    }
+                ]
+            },
+            {
+                model: models.User,
+                attributes: ['name', 'email']
+            }
+        ]
+    });
 };
 
 const updateStatusSales = async (id, newStatus) => {
     const transaction = await sequelize.transaction();
     try {
-        const [updatedSaleRows] = await Sale.update(
+        // 1. Actualizar el estado de la venta
+        const [updatedSaleRows] = await models.Sale.update(
             { status: newStatus },
-            { where: { id }, transaction }
+            {
+                where: { id },
+                transaction
+            }
         );
 
         if (updatedSaleRows === 0) {
@@ -175,18 +164,28 @@ const updateStatusSales = async (id, newStatus) => {
             throw new Error('Venta no encontrada');
         }
 
-        const [updatedAppointmentRows] = await Appointment.update(
+        // 2. Intentar actualizar la cita asociada (si existe)
+        const [updatedAppointmentRows] = await models.Appointment.update(
             { status: newStatus },
-            { where: { id }, transaction }
+            {
+                where: { id },
+                transaction
+            }
         );
 
+        // 3. Confirmar la transacción
         await transaction.commit();
 
+        // 4. Preparar el mensaje de respuesta
         const message = updatedAppointmentRows > 0
             ? 'Estado de la venta y cita asociada actualizados correctamente'
             : 'Estado de la venta actualizado correctamente';
 
-        return { message, updatedSale: true, updatedAppointment: updatedAppointmentRows > 0 };
+        return {
+            message,
+            updatedSale: true,
+            updatedAppointment: updatedAppointmentRows > 0
+        };
     } catch (error) {
         await transaction.rollback();
         console.error('Error al actualizar el estado de la venta:', error);
@@ -195,36 +194,30 @@ const updateStatusSales = async (id, newStatus) => {
 };
 
 const cancelSale = async (id, transaction = null) => {
-    try {
-        const sale = await Sale.findByPk(id, {
-            include: [SaleDetail],
-            transaction,
-        });
-
-        if (!sale) {
-            throw new Error('Venta no encontrada');
-        }
-
-        if (sale.status === 'Cancelada') {
-            throw new Error('Esta venta ya está cancelada');
-        }
-
-        sale.status = 'Cancelada';
-
-        const saleDetails = sale.SaleDetails;
-        for (const detail of saleDetails) {
-            if (detail.id_producto) {
-                await productRepository.updateProductStockForAnulatedSales([
-                    { product_id: detail.id_producto, quantity: detail.quantity }
-                ], transaction);
-            }
-        }
-
-        await sale.save({ transaction });
-    } catch (error) {
-        console.error('Error al cancelar la venta:', error);
-        throw error;
+    const sale = await Sale.findByPk(id, {
+        include: [SaleDetail],
+        transaction
+    });
+    if (!sale) {
+        throw new Error('Venta no encontrada');
     }
+    if (sale.status === 'Cancelada') {
+        throw new Error('Esta venta ya está cancelada');
+    }
+    // Cambiar estado a cancelada
+    sale.status = 'Cancelada';
+    // Actualizar stock de los productos
+    const saleDetails = sale.SaleDetails; // Detalles de la venta
+    for (const detail of saleDetails) {
+        if (detail.id_producto) {
+            await productRepository.updateProductStockForAnulatedSales([{
+                product_id: detail.id_producto,
+                quantity: detail.quantity
+            }], transaction);
+        }
+    }
+    // Guardar la venta actualizada
+    await sale.save({ transaction });
 };
 
 module.exports = {
@@ -233,5 +226,5 @@ module.exports = {
     getSaleAll,
     updateStatusSales,
     cancelSale,
-    getSaleDetailsByAppointmentId,
+    getSaleDetailsByAppointmentId
 };

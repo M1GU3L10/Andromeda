@@ -7,31 +7,28 @@ const Service = sequelize.define('Service', {
         allowNull: false,
         unique: true,
         validate: {
-            notEmpty: true,
-        },
+            notEmpty: true
+        }
     },
-    price: {
+    price : {
         type: DataTypes.FLOAT,
-        allowNull: false,
-        validate: { min: 0 },
+        allowNull: true
     },
     description: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: true
     },
     time: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: { min: 1 },
+        allowNull: false
     },
     status: {
         type: DataTypes.ENUM('A', 'I'),
         allowNull: false,
-        defaultValue: 'A',
-    },
+        defaultValue: 'A'
+    }
 }, {
-    tableName: 'services',
-    timestamps: false,
+    tableName: 'services'
 });
 
 module.exports = Service;

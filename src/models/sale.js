@@ -13,7 +13,6 @@ const Sale = sequelize.define('Sale', {
     },
     registrationDate: {
         type: DataTypes.DATEONLY,
-        defaultValue: DataTypes.NOW,
     },
     total_price: {
         type: DataTypes.FLOAT,
@@ -26,13 +25,18 @@ const Sale = sequelize.define('Sale', {
     id_usuario: {
         type: DataTypes.INTEGER,
         references: {
-            model: User, // Aquí se referencia al modelo User
+            model: User,
             key: 'id',
         },
     },
 }, {
     tableName: 'sales',
-    timestamps: false,
+    hooks: {
+        beforeCreate: (sale, options) => {
+            sale.registrationDate = new Date().toISOString().split('T')[0];
+        },
+    },
 });
+
 
 module.exports = Sale;
