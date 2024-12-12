@@ -127,38 +127,8 @@ const getSaleById = async (id) => {
 };
 
 const getSaleAll = async () => {
-    try {
-        return await Sale.findAll({
-            include: [
-                {
-                    model: SaleDetail,
-                    include: [
-                        {
-                            model: Product,
-                            attributes: ['name', 'price'],
-                        },
-                        {
-                            model: Service,
-                            attributes: ['name', 'price'],
-                        },
-                        {
-                            model: User,
-                            as: 'Employee',
-                            attributes: ['name'],
-                        },
-                    ],
-                },
-                {
-                    model: User,
-                    attributes: ['name', 'email'],
-                },
-            ],
-        });
-    } catch (error) {
-        console.error('Error in getSaleAll:', error);
-        throw error;
-    }
-};
+    return await Sale.findAll();
+}
 
 const updateStatusSales = async (id, newStatus) => {
     const transaction = await sequelize.transaction();
