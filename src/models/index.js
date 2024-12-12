@@ -71,7 +71,11 @@ const models = {
 
 const connectDb = async () => {
     try {
-        await sequelize.sync({ alter: true });
+        if (process.env.NODE_ENV === 'production') {
+            await sequelize.sync();
+        } else {
+            await sequelize.sync({ alter: true });
+        }
         console.log('Base de datos sincronizada exitosamente.');
     } catch (error) {
         console.error('Error al sincronizar la base de datos:', error);
