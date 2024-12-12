@@ -1,6 +1,7 @@
 const Sale = require('../models/sale');
 const SaleDetail = require('../models/saleDetail');
-const Product = require('../models/products');
+const Product = require('../models/products'); // Nombre del archivo correcto
+
 const Service = require('../models/service');
 const User = require('../models/User');
 const Appointment = require('../models/appointment');
@@ -21,7 +22,7 @@ const getSaleDetailsByAppointmentId = async (appointmentId) => {
                     attributes: ['name', 'price'],
                 },
                 {
-                    model: User,
+                    model: User, // Asegúrate de que este alias coincide con el definido en las asociaciones
                     as: 'Employee',
                     attributes: ['name'],
                 },
@@ -42,6 +43,7 @@ const getSaleDetailsByAppointmentId = async (appointmentId) => {
         throw error;
     }
 };
+
 
 const createSale = async (saleData) => {
     const { saleDetails, appointmentData, ...sale } = saleData;

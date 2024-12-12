@@ -26,7 +26,7 @@ const Sale = sequelize.define('Sale', {
     id_usuario: {
         type: DataTypes.INTEGER,
         references: {
-            model: User,
+            model: User, // Aquí se referencia al modelo User
             key: 'id',
         },
     },

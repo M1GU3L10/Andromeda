@@ -63,19 +63,10 @@ const SaleDetail = sequelize.define('SaleDetail', {
 });
 
 // Relaciones
-Sale.hasMany(SaleDetail, { foreignKey: 'id_sale' });
+SaleDetail.belongsTo(Product, { foreignKey: 'id_producto' });
+SaleDetail.belongsTo(Service, { foreignKey: 'serviceId' });
+SaleDetail.belongsTo(User, { foreignKey: 'empleadoId', as: 'Employee' });
 SaleDetail.belongsTo(Sale, { foreignKey: 'id_sale' });
 
-Product.hasMany(SaleDetail, { foreignKey: 'id_producto' });
-SaleDetail.belongsTo(Product, { foreignKey: 'id_producto' });
-
-Service.hasMany(SaleDetail, { foreignKey: 'serviceId' });
-SaleDetail.belongsTo(Service, { foreignKey: 'serviceId' });
-
-User.hasMany(SaleDetail, { foreignKey: 'empleadoId' });
-SaleDetail.belongsTo(User, { foreignKey: 'empleadoId' });
-
-Appointment.hasMany(SaleDetail, { foreignKey: 'appointmentId' });
-SaleDetail.belongsTo(Appointment, { foreignKey: 'appointmentId' });
 
 module.exports = SaleDetail;
