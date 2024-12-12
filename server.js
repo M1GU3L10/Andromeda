@@ -6,8 +6,6 @@ const sequelize = require('./src/config/database');
 const initializePermissions = require('./src/config/initPermissions');
 const initializeRoles = require('./src/config/initRoles');
 const initializeAdminRole = require('./src/config/initializeAdminRole');
-const seedPrivileges = require('./src/config/privilegesSeeder');
-const seedPrivilegePermissionRoles = require('./src/config/privilegePermissionRoleseeder');
 const initializeUserAdmin = require('./src/config/initializeUserAdmin');
 
 
@@ -25,8 +23,6 @@ const suppliersRoutes = require('./src/routes/suppliersRoutes');
 const orderRoutes = require('./src/routes/ordersRoutes');
 const shoppingRoutes = require('./src/routes/shoppingRoutes');
 const appointment = require('./src/routes/appointment');
-const privilegeRoutes = require('./src/routes/privilegiosRoutes');
-const privilegePermissionRoleRoutes = require('./src/routes/privilegePermissionRoleRoutes');
 
 dotenv.config();
 
@@ -42,8 +38,6 @@ app.use('/uploads', express.static('uploads'));
 
 // Configuración de rutas de la API
 
-app.use('/api/privileges', privilegeRoutes);
-app.use('/api/privilege-permission-roles', privilegePermissionRoleRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
@@ -80,13 +74,6 @@ const startServer = async () => {
         await initializeAdminRole();
         console.log('Rol Admin inicializado correctamente.');
 
-        // Ejecutar el seeder de privilegios
-        await seedPrivileges();
-        console.log('Privilegios sembrados correctamente.');
-
-        // Ejecutar el seeder de PrivilegePermissionRoles
-        await seedPrivilegePermissionRoles();
-        console.log('PrivilegePermissionRoles sembrados correctamente.');
 
          await initializeUserAdmin();
          console.log('Usuario Admin inicializado correctamente.');

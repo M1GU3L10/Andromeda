@@ -15,8 +15,6 @@ const Product = require('./products');
 const Supplier = require('./suppliers');
 const Order = require('./orders');
 const OrderDetail = require('./ordersDetail');
-const Privilege = require('./privilegios');
-const PrivilegePermissionRole = require('./privilegePermissionRole');
 
 // Define associations
 Appointment.belongsTo(User, { foreignKey: 'clienteId' });
@@ -53,8 +51,6 @@ Permission.belongsToMany(Role, {
 });
 
 const models = {
-    PrivilegePermissionRole,
-    Privilege,
     Category,
     Service,
     User,
@@ -75,11 +71,7 @@ const models = {
 
 const connectDb = async () => {
     try {
-        if (process.env.NODE_ENV === 'production') {
-            await sequelize.sync();
-        } else {
-            await sequelize.sync({ alter: true });
-        }
+        await sequelize.sync({ alter: true });
         console.log('Base de datos sincronizada exitosamente.');
     } catch (error) {
         console.error('Error al sincronizar la base de datos:', error);

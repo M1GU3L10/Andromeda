@@ -3,6 +3,7 @@ const roleService = require('../services/roleService');
 const permissionService = require('../services/permissionService');
 const { sequelize } = require('../models');
 const { Role, PermissionRole } = require('../models');
+
 const { sendResponse, sendError } = require('../utils/response');
 
 
@@ -36,24 +37,24 @@ const getRoleById = async (req, res) => {
 // controllers/roleController.js
 const createRole = async (req, res) => {
     try {
-      const { name, status, permissions } = req.body;
-      const role = await roleService.createRole({ name, status }, permissions);
-      sendResponse(res, { message: 'Role created successfully', role }, 201);
+        const { name, status, permissions } = req.body;
+        const newRole = await roleService.createRole({ name, status }, permissions);
+        sendResponse(res, { message: 'Rol creado exitosamente', role: newRole }, 201);
     } catch (error) {
-      sendError(res, error);
+        sendError(res, error);
     }
-  };
+};
 
-  const updateRole = async (req, res) => {
+const updateRole = async (req, res) => {
     try {
-      const { name, status, permissions } = req.body;
-      const { id } = req.params;
-      const role = await roleService.updateRole(id, { name, status }, permissions);
-      sendResponse(res, { message: 'Role updated successfully', role });
+        const { name, status, permissions } = req.body;
+        const { id } = req.params;
+        const role = await roleService.updateRole(id, { name, status }, permissions);
+        sendResponse(res, 'Rol actualizado exitosamente');
     } catch (error) {
-      sendError(res, error);
+        sendError(res, error);
     }
-  };
+};
 
 const deleteRole = async (req, res) => {
     const { id } = req.params;
@@ -86,35 +87,11 @@ const deleteRole = async (req, res) => {
     }
 };
 
-const assignPrivilegeToPermission = async (req, res) => {
-    try {
-        const { permissionId, privilegeId } = req.body;
-        const assigned = await roleService.assignPrivilegeToPermission(permissionId, privilegeId);
-        if (!assigned) {
-            return sendError(res, 'No se pudo asignar el privilegio al permiso', 400);
-        }
-        sendResponse(res, 'Privilegio asignado correctamente al permiso');
-    } catch (error) {
-        sendError(res, error);
-    }
-};
-
-const assignPrivilegesToRole = async (req, res) => {
-    try {
-        const { roleId, permissionId, privilegeIds } = req.body;
-        const assigned = await roleService.assignPrivilegesToRole(roleId, permissionId, privilegeIds);
-        sendResponse(res, { message: 'Privileges assigned to Role successfully', assigned }, 201);
-    } catch (error) {
-        sendError(res, error);
-    }
-};
 
 module.exports = {
     getAllRoles,
     getRoleById,
     createRole,
     updateRole,
-    deleteRole,
-    assignPrivilegeToPermission,
-    assignPrivilegesToRole
+    deleteRole
 };
