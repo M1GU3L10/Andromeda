@@ -75,8 +75,8 @@ const startServer = async () => {
         console.log('Rol Admin inicializado correctamente.');
 
 
-         await initializeUserAdmin();
-         console.log('Usuario Admin inicializado correctamente.');
+        await initializeUserAdmin();
+        console.log('Usuario Admin inicializado correctamente.');
 
 
         // Iniciar el servidor

@@ -10,8 +10,8 @@ const initializeAdminRole = async () => {
         const [adminRole] = await Role.findOrCreate({
             where: { name: 'Administrador' },
             defaults: {
-                name: 'Administrador',
-                description: 'Rol con acceso completo al sistema'
+                name: 'Administrador'
+                // description: 'Rol con acceso completo al sistema'
             }
         });
 
@@ -21,8 +21,8 @@ const initializeAdminRole = async () => {
         const [employeeRole] = await Role.findOrCreate({
             where: { name: 'Empleado' },
             defaults: {
-                name: 'Empleado',
-                description: 'Rol con permisos limitados en el sistema'
+                name: 'Empleado'
+                // description: 'Rol con permisos limitados en el sistema'
             }
         });
 
@@ -30,8 +30,8 @@ const initializeAdminRole = async () => {
         const [clientRole] = await Role.findOrCreate({
             where: { name: 'Cliente' },
             defaults: {
-                name: 'Cliente',
-                description: 'Rol con acceso limitado a funcionalidades de cliente'
+                name: 'Cliente'
+                // description: 'Rol con acceso limitado a funcionalidades de cliente'
             }
         });
 
