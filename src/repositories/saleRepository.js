@@ -132,10 +132,6 @@ const getSaleAll = async () => {
                         model: models.User,
                         as: 'Employee',
                         attributes: ['name'],
-                    },
-                    {
-                        model: models.Appointment,
-                        required: false
                     }
                 ]
             },
