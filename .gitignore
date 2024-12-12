@@ -4,7 +4,4 @@ node_modules/
 # Archivos de dependencias
 package-lock.json
 
-# Variables de entorno
-.env
-
 # No deberías ignorar package.json, ya que es importante para definir las dependencias del proyecto
