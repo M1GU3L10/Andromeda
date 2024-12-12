@@ -4,10 +4,7 @@ const productRepository = require('./productsRepository');
 const sequelize = require('../config/database');
 const { Transaction } = require('sequelize');
 const { models } = require('../models');
-const Product = require('../models/products');
-const Service = require('../models/service');
-const User = require('../models/User');
-
+const  Appointment  = require('../models/appointment');
 
 const getSaleDetailsByAppointmentId = async (appointmentId) => {
     try {
@@ -15,15 +12,15 @@ const getSaleDetailsByAppointmentId = async (appointmentId) => {
             where: { appointmentId },
             include: [
                 {
-                    model: Product,
+                    model: models.Product,
                     attributes: ['name', 'price'],
                 },
                 {
-                    model: Service,
+                    model: models.Service,
                     attributes: ['name', 'price'],
                 },
                 {
-                    model: User,
+                    model: models.Service,
                     as: 'Employee',
                     attributes: ['name'],
                 },
@@ -32,7 +29,7 @@ const getSaleDetailsByAppointmentId = async (appointmentId) => {
                     attributes: ['Billnumber', 'SaleDate', 'total_price'],
                     include: [
                         {
-                            model: User,
+                            model: models.User,
                             attributes: ['name', 'email'],
                         },
                     ],
@@ -47,13 +44,13 @@ const getSaleDetailsByAppointmentId = async (appointmentId) => {
 
 const createSale = async (saleData) => {
     const { saleDetails, appointmentData, ...sale } = saleData;
-    const transaction = await sequelize.transaction();
+    const Transaction = await sequelize.transaction();
 
     try {
         // Generar un número aleatorio de tres dígitos si hay una cita, de lo contrario usar el ID secuencial
         const saleId = appointmentData
             ? Math.floor(100 + Math.random() * 900)
-            : (await Sale.findOne({ order: [['id', 'DESC']], transaction: transaction }))?.id + 1 || 1;
+            : (await Sale.findOne({ order: [['id', 'DESC']], transaction: Transaction }))?.id + 1 || 1;
 
         console.log(`ID generado para venta y cita: ${saleId}`);
 
@@ -61,7 +58,7 @@ const createSale = async (saleData) => {
         const createdSale = await Sale.create({
             ...sale,
             id: saleId
-        }, { transaction: transaction });
+        }, { transaction: Transaction });
 
         console.log(`Venta creada con ID: ${createdSale.id}`);
 
@@ -77,7 +74,7 @@ const createSale = async (saleData) => {
                 time_appointment: appointmentData.time_appointment,
                 status: 'pendiente',
                 clienteId: sale.id_usuario
-            }, { transaction: transaction });
+            }, { transaction: Transaction });
 
             console.log(`Cita creada con ID: ${createdAppointment.id}`);
         }
@@ -89,15 +86,15 @@ const createSale = async (saleData) => {
                 appointmentId: createdAppointment ? saleId : null
             }));
 
-            await SaleDetail.bulkCreate(detailsWithIds, { transaction: transaction });
+            await SaleDetail.bulkCreate(detailsWithIds, { transaction: Transaction });
 
             const productDetails = detailsWithIds.filter(detail => detail.id_producto);
             if (productDetails.length > 0) {
-                await productRepository.updateProductStock(productDetails, transaction);
+                await productRepository.updateProductStock(productDetails, Transaction);
             }
         }
 
-        await transaction.commit();
+        await Transaction.commit();
         return {
             sale: createdSale,
             appointment: createdAppointment,
@@ -106,24 +103,15 @@ const createSale = async (saleData) => {
                 : 'Venta creada exitosamente'
         };
     } catch (error) {
-        await transaction.rollback();
+        await Transaction.rollback();
         console.error('Error en createSale:', error);
         throw error;
     }
 };
 
+
 const getSaleById = async (id) => {
-    return await Sale.findByPk(id, { 
-        include: [
-            {
-                model: SaleDetail,
-                include: [
-                    { model: Product },
-                    { model: Service }
-                ]
-            }
-        ] 
-    });
+    return await Sale.findByPk(id, { include: [SaleDetail] });
 };
 
 const getSaleAll = async () => {
@@ -133,15 +121,15 @@ const getSaleAll = async () => {
                 model: SaleDetail,
                 include: [
                     {
-                        model: Product,
+                        model: models.Product,
                         attributes: ['name', 'price'],
                     },
                     {
-                        model: Service,
+                        model: models.Service,
                         attributes: ['name', 'price'],
                     },
                     {
-                        model: User,
+                        model: models.User,
                         as: 'Employee',
                         attributes: ['name'],
                     },
@@ -152,7 +140,7 @@ const getSaleAll = async () => {
                 ]
             },
             {
-                model: User,
+                model: models.User,
                 attributes: ['name', 'email']
             }
         ]
@@ -163,7 +151,7 @@ const updateStatusSales = async (id, newStatus) => {
     const transaction = await sequelize.transaction();
     try {
         // 1. Actualizar el estado de la venta
-        const [updatedSaleRows] = await Sale.update(
+        const [updatedSaleRows] = await models.Sale.update(
             { status: newStatus },
             {
                 where: { id },
@@ -177,7 +165,7 @@ const updateStatusSales = async (id, newStatus) => {
         }
 
         // 2. Intentar actualizar la cita asociada (si existe)
-        const [updatedAppointmentRows] = await Appointment.update(
+        const [updatedAppointmentRows] = await models.Appointment.update(
             { status: newStatus },
             {
                 where: { id },
