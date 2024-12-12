@@ -5,6 +5,11 @@ const sequelize = require('../config/database');
 const { Transaction } = require('sequelize');
 const { models } = require('../models');
 const { Appointment } = require('../models');
+const Product = require('./products');
+const Service = require('./service');
+const User = require('./User');
+const Appointment = require('./appointment');
+const SaleDetail = require('./saleDetail');
 
 const getSaleDetailsByAppointmentId = async (appointmentId) => {
     try {
@@ -117,10 +122,29 @@ const getSaleAll = async () => {
     return await Sale.findAll({
         include: [
             {
-                model: SaleDetail
+                model: SaleDetail,
+                include: [
+                    {
+                        model: Product,  // Cambia models.Product por Product
+                        attributes: ['name', 'price'],
+                    },
+                    {
+                        model: Service,  // Cambia models.Service por Service
+                        attributes: ['name', 'price'],
+                    },
+                    {
+                        model: User,     // Cambia models.User por User
+                        as: 'Employee',
+                        attributes: ['name'],
+                    },
+                    {
+                        model: Appointment,  // Cambia models.Appointment por Appointment
+                        required: false
+                    }
+                ]
             },
             {
-                model: models.User,
+                model: User,  // Cambia models.User por User
                 attributes: ['name', 'email']
             }
         ]
