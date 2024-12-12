@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database'); // Asegúrate de importar la instancia de sequelize correctamente
-const Permission = require('./permisos'); // Asegúrate de que el modelo Permission esté importado
+const Permission = require('./permission'); // Asegúrate de que el modelo Permission esté importado
 
 
 const Role = sequelize.define('Role', {

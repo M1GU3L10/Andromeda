@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Permission = require('./permisos');
+const Permission = require('./permission');
 
 const Privilege = sequelize.define('Privilege', {
   name: {
