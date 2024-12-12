@@ -165,7 +165,7 @@ const updateStatusSales = async (id, newStatus) => {
         }
 
         // 2. Intentar actualizar la cita asociada (si existe)
-        const [updatedAppointmentRows] = await models.appointment.update(
+        const [updatedAppointmentRows] = await models.Appointment.update(
             { status: newStatus },
             {
                 where: { id },
