@@ -3,50 +3,54 @@ const Category = require('./category');
 const Service = require('./service');
 const User = require('./User');
 const Role = require('./role');
-const Permission = require('./permission');
+const Permission = require('./permisos');
 const PermissionRole = require('./permissionRole');
 const Shopping = require('./shopping');
 const ShoppingDetail = require('./shoppingDetail');
-const absence = require('./absence');
-const appointment = require('./appointment');
 const Absence = require('./absence');
+const Appointment = require('./appointment');
 const Sale = require('./sale');
-const Detail = require('./saleDetail');
+const SaleDetail = require('./saleDetail');
 const Product = require('./products');
-const supplier = require('./suppliers');
+const Supplier = require('./suppliers');
 const Order = require('./orders');
 const OrderDetail = require('./ordersDetail');
 const Privilege = require('./privilegios');
-const PrivilegePermissionRole = require('./privilegePermissionRole')
+const PrivilegePermissionRole = require('./privilegePermissionRole');
 
 // Define associations
-appointment.belongsTo(User, { foreignKey: 'clienteId' });
-User.hasMany(appointment, { foreignKey: 'clienteId' });
+Appointment.belongsTo(User, { foreignKey: 'clienteId' });
+User.hasMany(Appointment, { foreignKey: 'clienteId' });
 
 Sale.belongsTo(User, { foreignKey: 'id_usuario' });
 User.hasMany(Sale, { foreignKey: 'id_usuario' });
 
-Sale.hasMany(Detail, { foreignKey: 'id_sale' });
-Detail.belongsTo(Sale, { foreignKey: 'id_sale' });
+Sale.hasMany(SaleDetail, { foreignKey: 'id_sale' });
+SaleDetail.belongsTo(Sale, { foreignKey: 'id_sale' });
 
-Product.hasMany(Detail, { foreignKey: 'id_producto' });
-Detail.belongsTo(Product, { foreignKey: 'id_producto' });
+Product.hasMany(SaleDetail, { foreignKey: 'id_producto' });
+SaleDetail.belongsTo(Product, { foreignKey: 'id_producto' });
 
-Service.hasMany(Detail, { foreignKey: 'serviceId' });
-Detail.belongsTo(Service, { foreignKey: 'serviceId' });
+Service.hasMany(SaleDetail, { foreignKey: 'serviceId' });
+SaleDetail.belongsTo(Service, { foreignKey: 'serviceId' });
 
-User.hasMany(Detail, { foreignKey: 'empleadoId', as: 'Employee' });
-Detail.belongsTo(User, { foreignKey: 'empleadoId', as: 'Employee' });
+User.hasMany(SaleDetail, { foreignKey: 'empleadoId', as: 'Employee' });
+SaleDetail.belongsTo(User, { foreignKey: 'empleadoId', as: 'Employee' });
 
-appointment.hasMany(Detail, { foreignKey: 'appointmentId' });
-Detail.belongsTo(appointment, { foreignKey: 'appointmentId' });
+Appointment.hasMany(SaleDetail, { foreignKey: 'appointmentId' });
+SaleDetail.belongsTo(Appointment, { foreignKey: 'appointmentId' });
 
-
-
-// Definir asociaciones
-Role.belongsToMany(Permission, { through: PermissionRole, as: 'permissions', foreignKey: 'roleId'});
-Permission.belongsToMany(Role, { through: PermissionRole, as: 'roles', foreignKey: 'permissionId' });
-
+// Define many-to-many associations
+Role.belongsToMany(Permission, { 
+    through: PermissionRole, 
+    as: 'permissions', 
+    foreignKey: 'roleId'
+});
+Permission.belongsToMany(Role, { 
+    through: PermissionRole, 
+    as: 'roles', 
+    foreignKey: 'permissionId' 
+});
 
 const models = {
     PrivilegePermissionRole,
@@ -56,18 +60,17 @@ const models = {
     User,
     Role,
     Shopping,
-    absence,
-    appointment,
     Absence,
+    Appointment,
     Sale,
-    Detail,
+    SaleDetail,
     Product,
-    supplier,
+    Supplier,
     Order,
+    OrderDetail,
     Permission,
     PermissionRole,
-    ShoppingDetail,
-    OrderDetail
+    ShoppingDetail
 };
 
 const connectDb = async () => {
