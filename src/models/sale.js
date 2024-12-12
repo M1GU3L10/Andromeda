@@ -38,7 +38,5 @@ const Sale = sequelize.define('Sale', {
     },
 });
 
-Sale.belongsTo(User, { foreignKey: 'id_usuario' });
-User.hasMany(Sale, { foreignKey: 'id_usuario' });
 
 module.exports = Sale;

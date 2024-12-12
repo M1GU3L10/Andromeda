@@ -3,12 +3,12 @@ const { models } = require('../models');
 
 
 const getAllAppointments = async () => {
-    return await models.appointment.findAll();
+    return await models.Appointment.findAll();
 };
 
 const getAppointmentById = async (id) => {
   try {
-    return await models.appointment.findOne({
+    return await models.Appointment.findOne({
       where: { id },
       include: [
         {
@@ -31,7 +31,7 @@ const updateStatusAppointment = async (id, status) => {
     }
 
     // 1. Actualizar el estado de la cita
-    const [updatedAppointmentCount] = await models.appointment.update(
+    const [updatedAppointmentCount] = await models.Appointment.update(
       { status },
       {
         where: { id },

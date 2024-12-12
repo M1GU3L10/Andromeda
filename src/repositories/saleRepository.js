@@ -134,7 +134,7 @@ const getSaleAll = async () => {
                         attributes: ['name'],
                     },
                     {
-                        model: models.appointment,
+                        model: models.Appointment,
                         required: false
                     }
                 ]
