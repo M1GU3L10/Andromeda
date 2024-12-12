@@ -61,7 +61,7 @@ const createSale = async (saleData) => {
 
     let createdAppointment = null;
     if (hasServices && appointmentData) {
-      createdAppointment = await models.appointment.create({
+      createdAppointment = await models.Appointment.create({
         id: createdSale.id, // Usar el ID de la venta
         Init_Time: appointmentData.Init_Time,
         Finish_Time: appointmentData.Finish_Time,
