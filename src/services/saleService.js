@@ -147,7 +147,7 @@ const getSaleById = async (id) => {
 
 const getSaleAll = async () => {
   return await models.Sale.findAll({
-    include: [models.Detail]
+    include: [models.SaleDetail]
   });
 };
 
