@@ -4,7 +4,7 @@ const productRepository = require('./productsRepository');
 const sequelize = require('../config/database');
 const { Transaction } = require('sequelize');
 const { models } = require('../models');
-const { Appointment } = require('../models');
+const  Appointment  = require('../models/appointment');
 
 const getSaleDetailsByAppointmentId = async (appointmentId) => {
     try {
