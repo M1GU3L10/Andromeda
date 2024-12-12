@@ -69,6 +69,13 @@ const models = {
     ShoppingDetail
 };
 
+// Asegúrate de que todas las asociaciones estén definidas antes de exportar
+Object.values(models).forEach(model => {
+    if (model.associate) {
+        model.associate(models);
+    }
+});
+
 const connectDb = async () => {
     try {
         if (process.env.NODE_ENV === 'production') {

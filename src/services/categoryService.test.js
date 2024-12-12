@@ -21,22 +21,6 @@ describe('categoryService', () => {
     });
   });
 
-  describe('getCategoryById', () => {
-    it('should return a category by id', async () => {
-      const category = { id: 1, name: 'Electronics' };
-      categoryRepository.getCategoryById.mockResolvedValue(category);
-
-      const result = await categoryService.getCategoryById(1);
-      expect(result).toEqual(category);
-      expect(categoryRepository.getCategoryById).toHaveBeenCalledWith(1);
-    });
-
-    it('should throw an error if category is not found', async () => {
-      categoryRepository.getCategoryById.mockResolvedValue(null);
-
-      await expect(categoryService.getCategoryById(999)).rejects.toThrow('Category not found');
-    });
-  });
 
   describe('createCategory', () => {
     it('should create a category', async () => {

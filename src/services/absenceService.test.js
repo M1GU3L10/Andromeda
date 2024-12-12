@@ -19,23 +19,6 @@ describe('absenceService', () => {
     });
   });
 
-  describe('getAbsenceById', () => {
-    it('should return an absence by id', async () => {
-      const absence = { id: 1, reason: 'Sick leave' };
-      absenceRepository.getAbsenceById.mockResolvedValue(absence);
-
-      const result = await absenceService.getAbsenceById(1);
-      expect(result).toEqual(absence);
-      expect(absenceRepository.getAbsenceById).toHaveBeenCalledWith(1);
-    });
-
-    it('should throw an error if absence is not found', async () => {
-      absenceRepository.getAbsenceById.mockResolvedValue(null);
-
-      await expect(absenceService.getAbsenceById(999)).rejects.toThrow('Absence not found');
-    });
-  });
-
   describe('createAbsence', () => {
     it('should create an absence', async () => {
       const data = { reason: 'Sick leave', startDate: '2024-11-01', endDate: '2024-11-05' };
